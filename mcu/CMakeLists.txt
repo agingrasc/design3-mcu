@@ -20,6 +20,7 @@ include_directories("./inc"
 
 set(SOURCE_FILES
         src/main.c
+        src/manchester.c
         src/system_stm32f4xx.c
         ${STM_SRC_ROOT}/stm32f4xx_gpio.c
         ${STM_SRC_ROOT}/stm32f4xx_tim.c
