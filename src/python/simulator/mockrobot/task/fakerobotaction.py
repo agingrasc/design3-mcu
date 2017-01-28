@@ -1,4 +1,4 @@
-from src.python.robot.task.robotaction import IRobotAction
+from robot.task.robotaction import IRobotAction
 
 
 class FakeRobotAction(IRobotAction):

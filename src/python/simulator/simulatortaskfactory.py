@@ -1,8 +1,9 @@
-from src.python.robot.task.task import Task
-from src.python.simulator.mockrobot.task.fakerobotaction import FakeRobotAction
+from robot.task.task import Task
+from simulator.mockrobot.task.fakerobotaction import FakeRobotAction
 
 
 class SimulatorTaskFactory:
+
     def create_task_for_competition(self):
         task = Task()
 
