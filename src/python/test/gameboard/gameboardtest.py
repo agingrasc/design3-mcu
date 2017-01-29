@@ -26,16 +26,16 @@ class GameBoardTest(unittest.TestCase):
 
     def test_set_robot_pos(self):
         board = gameboard.GameBoard(VALID_MAX_X, VALID_MAX_Y, self.obstacle_builder)
-        board.set_position_robot(VALID_ROBOT_X_POSITION, VALID_ROBOT_Y_POSITION)
+        board.set_robot_position(VALID_ROBOT_X_POSITION, VALID_ROBOT_Y_POSITION)
 
         self.assertEqual(VALID_ROBOT_X_POSITION,
-                         board.robot_coordonate.pos_x)
+                         board.robot_coordinate.pos_x)
         self.assertEqual(VALID_ROBOT_Y_POSITION,
-                         board.robot_coordonate.pos_y)
+                         board.robot_coordinate.pos_y)
 
     def test_set_robot_unique(self):
         board = gameboard.GameBoard(VALID_MAX_X, VALID_MAX_Y, self.obstacle_builder)
-        board.set_position_robot(VALID_ROBOT_X_POSITION, VALID_ROBOT_Y_POSITION)
+        board.set_robot_position(VALID_ROBOT_X_POSITION, VALID_ROBOT_Y_POSITION)
 
         for i in range(0, VALID_MAX_X):
             for j in range(0, VALID_MAX_Y):
