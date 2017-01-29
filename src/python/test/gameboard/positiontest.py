@@ -1,6 +1,6 @@
 import unittest
 import math
-from . import position
+from app.gameboard import position
 
 
 class PositionTest(unittest.TestCase):
@@ -29,7 +29,7 @@ class PositionTest(unittest.TestCase):
     def test_samexy_setcartesian(self):
         pos = position.Position(self.a_valid_x, self.a_valid_x)
 
-        pos.set_pos_y(self.a_valid_y)
+        pos.pos_y = self.a_valid_y
 
         angle = math.atan(self.a_valid_y/self.a_valid_x)
         distance = math.sqrt(float(self.a_valid_x**2) + float(self.a_valid_y**2))
@@ -39,7 +39,7 @@ class PositionTest(unittest.TestCase):
     def test_differentxy_setcartesian(self):
         pos = position.Position(self.a_valid_x, self.a_valid_y)
 
-        pos.set_pos_y(self.a_valid_x)
+        pos.pos_y = self.a_valid_x
 
         angle = math.atan(1.0)
         distance = math.sqrt(float(self.a_valid_x**2) + float(self.a_valid_x**2))

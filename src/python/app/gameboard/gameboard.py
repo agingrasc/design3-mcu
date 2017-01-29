@@ -1,4 +1,4 @@
-from gameboard import position
+from app.gameboard import position
 
 
 TAG_ROBOT = 'R'

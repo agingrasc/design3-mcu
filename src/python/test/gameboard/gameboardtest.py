@@ -1,5 +1,5 @@
 import unittest
-from . import gameboard
+from app.gameboard import gameboard
 
 
 class GameBoardTest(unittest.TestCase):
@@ -16,9 +16,9 @@ class GameBoardTest(unittest.TestCase):
         board = gameboard.GameBoard(self.valid_max_x, self.valid_max_y)
         board.set_position_robot(self.valid_robot_x_position, self.valid_robot_y_position)
         self.assertEqual(self.valid_robot_x_position,
-                         board.get_position_robot().get_pos_x())
+                         board.get_position_robot().pos_x)
         self.assertEqual(self.valid_robot_y_position,
-                         board.get_position_robot().get_pos_y())
+                         board.get_position_robot().pos_y)
 
     def test_set2_obstacle(self):
         board = gameboard.GameBoard(self.valid_max_x, self.valid_max_y)
