@@ -15,54 +15,79 @@ class GameBoard:
         self.max_x = max_x
         self.max_y = max_y
         self.robot_coordonate = Coordonate(0, 0)
-        self.__world_board = []
-        for i in range(0, max_x):
-            row = []
-            for j in range(0, max_y):
-                coord = Coordonate(i, j)
-                row.append(coord)
-                if i == 0 or (i == self.max_x - 1) or j == 0 or (j == self.max_y - 1):
-                    coord.set_tag(TAG_OBSTACLE)
-            self.__world_board.append(row)
-
-        self.__pos_pictures = []
+        self.game_board = []
+        self.pos_pictures = []
+        self.obtacles = []
+        self.__build_board()
 
     def set_position_robot(self, pos_x, pos_y):
         self.robot_coordonate.set_tag(TAG_CAN_PASS)
-        self.robot_coordonate = self.__world_board[pos_x][pos_y]
+        self.robot_coordonate = self.game_board[pos_x][pos_y]
         self.robot_coordonate.set_tag(TAG_ROBOT)
 
-    def get_coordonate(self, pos_x, pos_y):
-        return self.__world_board[pos_x][pos_y]
-
-    def set_obstacle(self, pos_x, pos_y, rayon, tag=""):
-        rayon += 1
-        startx_pos = pos_x - rayon
-        endx_pos = pos_x + rayon
-        starty_pos = pos_y - rayon
-        endy_pos = pos_y + rayon
-
-        if startx_pos < 0 or tag == TAG_CANT_PASS_LEFT:
-            startx_pos = 0
-        if endx_pos > self.max_x - 1 or tag == TAG_CANT_PASS_RIGHT:
-            endx_pos = self.max_x - 1
-
-        if starty_pos < 0:
-            starty_pos = 0
-        if endy_pos > self.max_y - 1:
-            endy_pos = self.max_y - 1
-
-        for i in range(startx_pos, endx_pos):
-            for j in range(starty_pos, endy_pos):
-                obj = self.__world_board[i][j]
-                obj.set_tag(TAG_OBSTACLE)
+    def set_obstacle(self, pos_x, pos_y, radius, tag=""):
+        new_obstacle = Obstacle(pos_x, pos_y, radius)
+        new_obstacle.activate(self, tag)
+        self.obtacles.append(new_obstacle)
 
     def print_game_board(self):
         for i in range(0, self.max_x):
             line = ""
             for j in range(0, self.max_y):
-                line += self.__world_board[i][j].get_signe()
+                line += self.game_board[i][j].get_signe()
             print(line)
+
+    def __build_board(self):
+        for i in range(0, self.max_x):
+            row = []
+            for j in range(0, self.max_y):
+                coord = Coordonate(i, j)
+                row.append(coord)
+                if i == 0 or (i == self.max_x - 1) or j == 0 or (j == self.max_y - 1):
+                    coord.set_tag(TAG_OBSTACLE)
+            self.game_board.append(row)
+
+
+class Obstacle(position.Position):
+
+    def __init__(self, pos_x, pos_y, radius):
+        position.Position.__init__(self, pos_x, pos_y)
+        self.radius = radius + 1
+
+    def activate(self, board, tag):
+        startx_pos = self.__verify_start_x(tag)
+        starty_pos = self.__verify_start_y()
+        endx_pos = self.__verify_end_x(board, tag)
+        endy_pos = self.__verify_end_y(board)
+
+        for i in range(startx_pos, endx_pos):
+            for j in range(starty_pos, endy_pos):
+                obj = board.game_board[i][j]
+                obj.set_tag(TAG_OBSTACLE)
+
+    def __verify_start_x(self, tag):
+        startx_pos = self.pos_x - self.radius
+        if startx_pos < 0 or tag == TAG_CANT_PASS_LEFT:
+            startx_pos = 0
+        return startx_pos
+
+    def __verify_end_x(self, board, tag):
+        endx_pos = self.pos_x + self.radius
+        if endx_pos > board.max_x - 1 or tag == TAG_CANT_PASS_RIGHT:
+            endx_pos = board.max_x - 1
+        return endx_pos
+
+    def __verify_end_y(self, board):
+        endy_pos = self.pos_y + self.radius
+        if endy_pos > board.max_y - 1:
+            endy_pos = board.max_y - 1
+        return endy_pos
+
+    def __verify_start_y(self):
+        starty_pos = self.pos_y - self.radius
+        if starty_pos < 0:
+            starty_pos = 0
+        return starty_pos
 
 
 class Coordonate(position.Position):
