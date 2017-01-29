@@ -7,7 +7,7 @@ class Position:
         self.__pos_x = pos_x
         self.__pos_y = pos_y
 
-    def __str__(self):
+    def to_string(self):
         return "(" + str(self.__pos_x) + ", " + str(self.__pos_y) + ")"
 
     def get_pos_x(self):
