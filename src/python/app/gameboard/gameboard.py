@@ -11,24 +11,19 @@ TAG_CANT_PASS_LEFT = "OCPL"
 
 class GameBoard:
 
-    def __init__(self, max_x, max_y):
+    def __init__(self, max_x, max_y, obstacle_builder):
         self.max_x = max_x
         self.max_y = max_y
         self.robot_coordonate = Coordonate(0, 0)
         self.game_board = []
         self.pos_pictures = []
-        self.obtacles = []
         self.__build_board()
+        obstacle_builder.build(self)
 
     def set_position_robot(self, pos_x, pos_y):
         self.robot_coordonate.set_tag(TAG_CAN_PASS)
         self.robot_coordonate = self.game_board[pos_x][pos_y]
         self.robot_coordonate.set_tag(TAG_ROBOT)
-
-    def set_obstacle(self, pos_x, pos_y, radius, tag=""):
-        new_obstacle = Obstacle(pos_x, pos_y, radius)
-        new_obstacle.activate(self, tag)
-        self.obtacles.append(new_obstacle)
 
     def print_game_board(self):
         for i in range(0, self.max_x):
@@ -48,46 +43,58 @@ class GameBoard:
             self.game_board.append(row)
 
 
-class Obstacle(position.Position):
+class ObstacleBuilder:
 
-    def __init__(self, pos_x, pos_y, radius):
-        position.Position.__init__(self, pos_x, pos_y)
-        self.radius = radius + 1
+    def __init__(self):
+        self.obstacles = []
 
-    def activate(self, board, tag):
-        startx_pos = self.__verify_start_x(tag)
-        starty_pos = self.__verify_start_y()
-        endx_pos = self.__verify_end_x(board, tag)
-        endy_pos = self.__verify_end_y(board)
+    def add_obtacle(self, obstacle_value_object):
+        self.obstacles.append(obstacle_value_object)
 
-        for i in range(startx_pos, endx_pos):
-            for j in range(starty_pos, endy_pos):
-                obj = board.game_board[i][j]
-                obj.set_tag(TAG_OBSTACLE)
+    def build(self, board):
+        for obstacle in self.obstacles:
+            startx_pos = self.__verify_start_x(obstacle)
+            starty_pos = self.__verify_start_y(obstacle)
+            endx_pos = self.__verify_end_x(obstacle, board)
+            endy_pos = self.__verify_end_y(obstacle, board)
 
-    def __verify_start_x(self, tag):
-        startx_pos = self.pos_x - self.radius
-        if startx_pos < 0 or tag == TAG_CANT_PASS_LEFT:
+            for i in range(startx_pos, endx_pos):
+                for j in range(starty_pos, endy_pos):
+                    obj = board.game_board[i][j]
+                    obj.set_tag(TAG_OBSTACLE)
+
+    def __verify_start_x(self, obstacle):
+        startx_pos = obstacle.pos_x - obstacle.radius
+        if startx_pos < 0 or obstacle.tag == TAG_CANT_PASS_LEFT:
             startx_pos = 0
         return startx_pos
 
-    def __verify_end_x(self, board, tag):
-        endx_pos = self.pos_x + self.radius
-        if endx_pos > board.max_x - 1 or tag == TAG_CANT_PASS_RIGHT:
+    def __verify_end_x(self, obstacle, board):
+        endx_pos = obstacle.pos_x + obstacle.radius
+        if endx_pos > board.max_x - 1 or obstacle.tag == TAG_CANT_PASS_RIGHT:
             endx_pos = board.max_x - 1
         return endx_pos
 
-    def __verify_end_y(self, board):
-        endy_pos = self.pos_y + self.radius
+    def __verify_end_y(self, obstacle, board):
+        endy_pos = obstacle.pos_y + obstacle.radius
         if endy_pos > board.max_y - 1:
             endy_pos = board.max_y - 1
         return endy_pos
 
-    def __verify_start_y(self):
-        starty_pos = self.pos_y - self.radius
+    def __verify_start_y(self, obstacle):
+        starty_pos = obstacle.pos_y - obstacle.radius
         if starty_pos < 0:
             starty_pos = 0
         return starty_pos
+
+
+class ObstacleValueObject:
+
+    def __init__(self, pos_x, pos_y, radius, tag=''):
+        self.pos_x = pos_x
+        self.pos_y = pos_y
+        self.radius = radius + 1
+        self.tag = tag
 
 
 class Coordonate(position.Position):
