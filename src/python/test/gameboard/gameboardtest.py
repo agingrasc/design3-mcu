@@ -41,7 +41,7 @@ class GameBoardTest(unittest.TestCase):
                 if i != self.valid_robot_x_position or j != self.valid_robot_y_position:
                     self.assertNotEqual(board.get_coordonate(i, j).tag, gameboard.TAG_ROBOT)
 
-    def test_set2_obstacle_x(self):
+    def test_set_obstacle_x(self):
         board = gameboard.GameBoard(self.valid_max_x, self.valid_max_y)
         rayon = 2
 
@@ -57,7 +57,7 @@ class GameBoardTest(unittest.TestCase):
         self.assertEqual(gameboard.TAG_OBSTACLE, obj_max_x.get_signe())
         self.assertEqual(gameboard.TAG_CAN_PASS, obj_lim_x.get_signe())
 
-    def test_set3_left_obstacle_x(self):
+    def test_set_left_obstacle_x(self):
         board = gameboard.GameBoard(self.valid_max_x, self.valid_max_y)
         rayon = 3
 
@@ -77,7 +77,7 @@ class GameBoardTest(unittest.TestCase):
         self.assertEqual(gameboard.TAG_OBSTACLE, obj_max_x.get_signe())
         self.assertEqual(gameboard.TAG_CAN_PASS, obj_lim_x.get_signe())
 
-    def test_set3_right_obstacle_y(self):
+    def test_set_right_obstacle_y(self):
         board = gameboard.GameBoard(self.valid_max_x, self.valid_max_y)
         rayon = 3
 
