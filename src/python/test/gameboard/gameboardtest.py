@@ -44,15 +44,16 @@ class GameBoardTest(unittest.TestCase):
 
     def test_set_notag_obstacle(self):
         obstacle = gameboard.ObstacleValueObject(
-            VALID_OBSTACLE_X_POSITION,
-            VALID_OBSTACLE_Y_POSITION,
-            VALID_RADIUS)
+            pos_x=VALID_OBSTACLE_X_POSITION,
+            pos_y=VALID_OBSTACLE_Y_POSITION,
+            radius=VALID_RADIUS,
+            tag='')
         self.obstacle_builder.add_obtacle(obstacle)
         board = gameboard.GameBoard(VALID_MAX_X, VALID_MAX_Y, self.obstacle_builder)
 
-        max_x = VALID_OBSTACLE_X_POSITION + VALID_RADIUS
-        min_x = 1
-        lim_x = VALID_OBSTACLE_X_POSITION + VALID_RADIUS + 1
+        max_x = VALID_OBSTACLE_X_POSITION + VALID_RADIUS - 1
+        min_x = VALID_OBSTACLE_X_POSITION - VALID_RADIUS - 1
+        lim_x = VALID_OBSTACLE_X_POSITION + VALID_RADIUS
 
         coord_max_x = board.game_board[max_x][VALID_OBSTACLE_Y_POSITION]
         coord_min_x = board.game_board[min_x][VALID_OBSTACLE_Y_POSITION]
@@ -64,16 +65,16 @@ class GameBoardTest(unittest.TestCase):
 
     def test_set_left_obstacle(self):
         obstacle = gameboard.ObstacleValueObject(
-            VALID_OBSTACLE_X_POSITION,
-            VALID_OBSTACLE_Y_POSITION,
-            VALID_RADIUS,
-            gameboard.Tag.CANT_PASS_LEFT)
+            pos_x=VALID_OBSTACLE_X_POSITION,
+            pos_y=VALID_OBSTACLE_Y_POSITION,
+            radius=VALID_RADIUS,
+            tag=gameboard.Tag.CANT_PASS_LEFT)
         self.obstacle_builder.add_obtacle(obstacle)
         board = gameboard.GameBoard(VALID_MAX_X, VALID_MAX_Y, self.obstacle_builder)
 
-        max_x = VALID_OBSTACLE_X_POSITION + VALID_RADIUS
-        min_x = 1
-        lim_x = VALID_OBSTACLE_X_POSITION + VALID_RADIUS + 1
+        max_x = VALID_OBSTACLE_X_POSITION + VALID_RADIUS - 1
+        min_x = VALID_OBSTACLE_X_POSITION - VALID_RADIUS - 1
+        lim_x = VALID_OBSTACLE_X_POSITION + VALID_RADIUS
 
         coord_max_x = board.game_board[max_x][VALID_OBSTACLE_Y_POSITION]
         coord_min_x = board.game_board[min_x][VALID_OBSTACLE_Y_POSITION]
@@ -85,16 +86,16 @@ class GameBoardTest(unittest.TestCase):
 
     def test_set_right_obstacle(self):
         obstacle = gameboard.ObstacleValueObject(
-            VALID_OBSTACLE_X_POSITION,
-            VALID_OBSTACLE_Y_POSITION,
-            VALID_RADIUS,
-            gameboard.Tag.CANT_PASS_RIGHT)
+            pos_x=VALID_OBSTACLE_X_POSITION,
+            pos_y=VALID_OBSTACLE_Y_POSITION,
+            radius=VALID_RADIUS,
+            tag=gameboard.Tag.CANT_PASS_RIGHT)
         self.obstacle_builder.add_obtacle(obstacle)
         board = gameboard.GameBoard(VALID_MAX_X, VALID_MAX_Y, self.obstacle_builder)
 
-        max_x = VALID_OBSTACLE_X_POSITION + VALID_RADIUS
-        min_x = 1
-        lim_x = VALID_OBSTACLE_X_POSITION + VALID_RADIUS + 1
+        max_x = VALID_OBSTACLE_X_POSITION + VALID_RADIUS - 1
+        min_x = VALID_OBSTACLE_X_POSITION - VALID_RADIUS - 1
+        lim_x = VALID_OBSTACLE_X_POSITION + VALID_RADIUS
 
         coord_max_x = board.game_board[max_x][VALID_OBSTACLE_Y_POSITION]
         coord_min_x = board.game_board[min_x][VALID_OBSTACLE_Y_POSITION]

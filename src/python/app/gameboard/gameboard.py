@@ -1,5 +1,8 @@
-from app.gameboard import position
+import collections
 from enum import Enum
+from app.gameboard import position
+
+ObstacleValueObject = collections.namedtuple('ObstacleValueObject', 'pos_x pos_y radius tag')
 
 
 class Tag(Enum):
@@ -9,7 +12,6 @@ class Tag(Enum):
     CAN_PASS = ' '
     CANT_PASS_RIGHT = "OCPR"
     CANT_PASS_LEFT = "OCPL"
-
 
 
 class GameBoard:
@@ -32,7 +34,7 @@ class GameBoard:
         for i in range(0, self.width):
             line = ""
             for j in range(0, self.length):
-                line += self.game_board[i][j].get_signe()
+                line += self.game_board[i][j].get_signe().value
             print(line)
 
     def __build_board(self):
@@ -97,15 +99,6 @@ class ObstacleBuilder:
         if starty_pos < 0:
             starty_pos = 0
         return starty_pos
-
-
-class ObstacleValueObject:
-
-    def __init__(self, pos_x, pos_y, radius, tag=''):
-        self.pos_x = pos_x
-        self.pos_y = pos_y
-        self.radius = radius + 1
-        self.tag = tag
 
 
 class Coordinate(position.Position):
