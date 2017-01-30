@@ -1,4 +1,4 @@
-from map.position import Position
+from gameboard.position import Position
 from robot.robot import Robot
 from robot.task.task import Task
 from simulator.mockrobot.task.mockmovingrobotaction import MockMovingRobotAction
