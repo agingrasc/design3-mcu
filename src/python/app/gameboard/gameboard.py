@@ -1,12 +1,15 @@
 from app.gameboard import position
+from enum import Enum
 
 
-TAG_ROBOT = 'R'
-TAG_PICTURE = 'P'
-TAG_OBSTACLE = 'X'
-TAG_CAN_PASS = ' '
-TAG_CANT_PASS_RIGHT = "OCPR"
-TAG_CANT_PASS_LEFT = "OCPL"
+class Tag(Enum):
+    ROBOT = 'R'
+    PICTURE = 'P'
+    OBSTACLE = 'X'
+    CAN_PASS = ' '
+    CANT_PASS_RIGHT = "OCPR"
+    CANT_PASS_LEFT = "OCPL"
+
 
 
 class GameBoard:
@@ -21,9 +24,9 @@ class GameBoard:
         self.__add_obstacles(obstacle_builder)
 
     def set_robot_position(self, pos_x, pos_y):
-        self.robot_coordinate.set_tag(TAG_CAN_PASS)
+        self.robot_coordinate.set_tag(Tag.CAN_PASS)
         self.robot_coordinate = self.game_board[pos_x][pos_y]
-        self.robot_coordinate.set_tag(TAG_ROBOT)
+        self.robot_coordinate.set_tag(Tag.ROBOT)
 
     def print_game_board(self):
         for i in range(0, self.width):
@@ -38,7 +41,7 @@ class GameBoard:
             for j in range(0, self.length):
                 coord = Coordinate(i, j)
                 if i == 0 or (i == self.width - 1) or j == 0 or (j == self.length - 1):
-                    coord.set_tag(TAG_OBSTACLE)
+                    coord.set_tag(Tag.OBSTACLE)
                 row.append(coord)
             self.game_board.append(row)
 
@@ -66,20 +69,20 @@ class ObstacleBuilder:
             for i in range(startx_pos, endx_pos):
                 for j in range(starty_pos, endy_pos):
                     new_obstacle_coord = Coordinate(i, j)
-                    new_obstacle_coord.set_tag(TAG_OBSTACLE)
+                    new_obstacle_coord.set_tag(Tag.OBSTACLE)
                     obstacle_coord.append(new_obstacle_coord)
 
         return obstacle_coord
 
     def __verify_start_x(self, obstacle):
         startx_pos = obstacle.pos_x - obstacle.radius
-        if startx_pos < 0 or obstacle.tag == TAG_CANT_PASS_LEFT:
+        if startx_pos < 0 or obstacle.tag == Tag.CANT_PASS_LEFT:
             startx_pos = 0
         return startx_pos
 
     def __verify_end_x(self, obstacle, width):
         endx_pos = obstacle.pos_x + obstacle.radius
-        if endx_pos > width - 1 or obstacle.tag == TAG_CANT_PASS_RIGHT:
+        if endx_pos > width - 1 or obstacle.tag == Tag.CANT_PASS_RIGHT:
             endx_pos = width - 1
         return endx_pos
 
@@ -109,17 +112,17 @@ class Coordinate(position.Position):
 
     def __init__(self, pos_x, pos_y):
         position.Position.__init__(self, pos_x, pos_y)
-        self.tag = TAG_CAN_PASS
+        self.tag = Tag.CAN_PASS
 
     def set_tag(self, new_tag):
         self.tag = new_tag
 
     def get_signe(self):
-        if self.tag == TAG_ROBOT:
-            return TAG_ROBOT
-        elif self.tag == TAG_PICTURE:
-            return TAG_PICTURE
-        elif self.tag == TAG_OBSTACLE:
-            return TAG_OBSTACLE
+        if self.tag == Tag.ROBOT:
+            return Tag.ROBOT
+        elif self.tag == Tag.PICTURE:
+            return Tag.PICTURE
+        elif self.tag == Tag.OBSTACLE:
+            return Tag.OBSTACLE
         else:
-            return TAG_CAN_PASS
+            return Tag.CAN_PASS
