@@ -8,7 +8,7 @@ class Position:
         self.pos_y = pos_y
 
     def __str__(self):
-        return "(" + str(self.pos_x) + ", " + str(self.pos_x) + ")"
+        return "(" + str(self.pos_x) + ", " + str(self.pos_y) + ")"
 
     def get_distance(self):
         return math.sqrt(float(self.pos_x**2) + float(self.pos_y**2))
