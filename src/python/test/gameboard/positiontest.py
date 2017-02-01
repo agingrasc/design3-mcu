@@ -1,6 +1,6 @@
 import unittest
 import math
-from app.gameboard import position
+from python.app.gameboard import position
 
 
 class PositionTest(unittest.TestCase):
