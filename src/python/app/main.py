@@ -1,7 +1,7 @@
 import sys
 import random
 from flask import Flask, jsonify, make_response, request, abort
-from api.gotoposition import goto_position
+from api.gotoposition import go_to_position
 
 app = Flask(__name__)
 
@@ -42,7 +42,7 @@ if __name__ == '__main__':
         print("AUTOMATIC MODE not implemented")
     elif status == MANUAL:
         print("MANUAL MODE")
-        app.register_blueprint(goto_position)
+        app.register_blueprint(go_to_position)
     else:
         print("Bad arguments : manual or automatic")
     app.run(debug=False)

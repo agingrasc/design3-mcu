@@ -1,7 +1,15 @@
 console.log("yeah")
 function goto_position(){
-    $.get("http//localhost:12345/goto_position", function(data, status){
-        alert("Data: " + data + "\nStatus: " + status);
+    var x_position = document.getElementById("x");
+    var y_position = document.getElementById("y");
+    console.log(x_position.value);
+    console.log(y_position.value);
+    $.get("http://localhost:12345/go-to-position", function(data, status){
+        })
+        .done(function() {
+            alert( "second success" );
+        })
+        .fail(function() {
+            alert( "error" );
     });
-    alert("Go To Position")
 }
