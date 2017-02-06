@@ -3,8 +3,8 @@
         "browser",
         "underscore",
         "jquery"
-            ],
-        "plugins": {
-          "node": {}
-        }
+    ],
+    "plugins": {
+        "node": {}
+    }
 }
