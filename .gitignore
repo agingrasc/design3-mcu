@@ -31,3 +31,12 @@
 # Debug files
 *.dSYM/
 *.su
+
+# ide
+*.idea
+
+# for vim
+*.swp
+
+# cmake
+cmake-build-debug
