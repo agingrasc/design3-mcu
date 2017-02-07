@@ -48,4 +48,4 @@ if __name__ == '__main__':
         app.register_blueprint(go_to_position)
     else:
         print("Bad arguments : manual or automatic")
-    app.run(debug=False)
+    app.run(host='0.0.0.0')
