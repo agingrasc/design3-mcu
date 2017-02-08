@@ -115,7 +115,9 @@ int main(){
     lcd_init();
 
     motorControllerInit();
+#ifndef ID_MODE
     pidInit();
+#endif
     cmdHandlerInit();
     MotorEncodersInit();
     //init_uart(19200);

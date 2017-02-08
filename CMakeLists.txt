@@ -22,14 +22,36 @@ set(SOURCE_FILES
         src/main.c
         src/manchester.c
         src/system_stm32f4xx.c
+        src/CommandHandler.c
+        src/delay.c
+        src/id.c
+        src/LCD.c
+        src/MotorController.c
+        src/MotorEncoder.c
+        src/pid.c
+        src/tm_stm32f4_usb_vcp.c
+        src/uart.c
+        src/usb_bsp.c
+        src/usb_core.c
+        src/usb_dcd.c
+        src/usb_dcd_int.c
+        src/usbd_cdc_core.c
+        src/usbd_cdc_vcp.c
+        src/usbd_core.c
+        src/usbd_desc.c
+        src/usbd_ioreq.c
+        src/usbd_req.c
+        src/usbd_usr.c
         ${STM_SRC_ROOT}/stm32f4xx_gpio.c
         ${STM_SRC_ROOT}/stm32f4xx_tim.c
         ${STM_SRC_ROOT}/stm32f4xx_rcc.c
+        ${STM_SRC_ROOT}/stm32f4xx_usart.c
+        ${STM_SRC_ROOT}/stm32f4xx_exti.c
         ${STM_SRC_ROOT}/misc.c
         )
 
 # Flags de compilation par source
-set(STM32_FLAGS "-mfpu=fpv4-sp-d16 -mthumb -mthumb-interwork -mlittle-endian -mfloat-abi=hard -march=armv7-m")
+set(STM32_FLAGS "-mfpu=fpv4-sp-d16 -mthumb -mthumb-interwork -mlittle-endian -mfloat-abi=soft -march=armv7-m")
 set(GENERAL_COMPILE_FLAGS"-Wall")
 set(GENERAL_COMPILE_DEFINE "-DSTM32F4 -DUSE_STDPERIPH_DRIVER")
 set_source_files_properties(${SOURCE_FILES} PROPERTY COMPILE_FLAGS "${STM32_FLAGS} ${GENERAL_COMPILE_FLAGS} ${GENERAL_COMPILE_DEFINE}")
