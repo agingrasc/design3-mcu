@@ -1,7 +1,7 @@
 """" Interface entre le système de prise de décision et le MCU. Se charge d'envoyer les commandes. """
 import serial
 
-from mcu.commands import Command
+from app.mcu.commands import Command
 
 SERIAL_DEV_NAME = "ttyDesign3"
 

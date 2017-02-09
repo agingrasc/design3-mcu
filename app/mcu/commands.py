@@ -4,8 +4,8 @@ from collections import namedtuple
 
 import math
 
-from mcu import protocol
-from mcu.protocol import PencilStatus, Leds
+from app.mcu import protocol
+from app.mcu.protocol import PencilStatus, Leds
 
 
 PIDConstants = namedtuple("PIDConstatns", 'k_gain i_gain d_gain max_cmd min_cmd')
