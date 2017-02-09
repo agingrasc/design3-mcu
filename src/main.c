@@ -120,13 +120,6 @@ int main(){
 #endif
     cmdHandlerInit();
     MotorEncodersInit();
-    //init_uart(19200);
-    //LCDController LCDctrl;
-    //initLCDController(&LCDctrl);
-    //delay(100);
-    //LCD_initSequence(&LCDctrl);
-    //delay(100);
-    //LCD_pushScreen(&LCDctrl);
 
 #ifdef ID_MODE
     id_test_status = 0;
@@ -137,17 +130,37 @@ int main(){
 
     unsigned int last_second = 0;
 
-    while(1)
-    {
+    int cmd_header_ok = 0;
+    int cmd_payload_ok = 0;
+    while(1) {
     	// Check for VCP connection
     	checkForVCP();
 
-    	//art_write_byte(25);
-        if (!TM_USB_VCP_BufferEmpty())
+		command cmd;
+        if (!cmd_header_ok && !TM_USB_VCP_BufferEmpty())
         {
-            //GPIO_ToggleBits(GPIOD, GPIO_Pin_12);
-        	uint32_t cmd = usbserial_read_cmd();
-            if (cmd > 0) handleCmd(cmd);
+            char header[2];
+            cmd_header_ok = usb_read_cmd_header(header);
+            if (cmd_header_ok) {
+                cmd.header.type = header[0];
+                cmd.header.size = header[1];
+            }
+        }
+
+        if (cmd_header_ok && !TM_USB_VCP_BufferEmpty()) {
+            char payload[256];
+            cmd_payload_ok = usb_read_cmd_payload(payload, cmd.header.size);
+            if (cmd_payload_ok) {
+                for (int i = 0; i < cmd.header.size; i++) {
+                    cmd.payload[i] = payload[i];
+                }
+            }
+        }
+
+        if (cmd_payload_ok) {
+            command_execute(cmd);
+            cmd_header_ok = 0;
+            cmd_payload_ok = 0;
         }
 
         // Update time line, if necessary
@@ -157,8 +170,6 @@ int main(){
 			//uart_write_buffer(id_val_consigne, ID_VAL_COUNT);
 			//uart_write_byte('a');
 			last_second = mstemp;
-
 		}
     }
-    return 0;
 }

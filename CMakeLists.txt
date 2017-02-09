@@ -42,6 +42,7 @@ set(SOURCE_FILES
         src/usbd_ioreq.c
         src/usbd_req.c
         src/usbd_usr.c
+        src/command.c
         ${STM_SRC_ROOT}/stm32f4xx_gpio.c
         ${STM_SRC_ROOT}/stm32f4xx_tim.c
         ${STM_SRC_ROOT}/stm32f4xx_rcc.c

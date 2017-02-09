@@ -17,6 +17,7 @@
 #include "defines.h"
 #include "tm_stm32f4_usb_vcp.h"
 #include "defines.h"
+#include "command.h"
 
 #ifdef ID_MODE
 #include "id.h"

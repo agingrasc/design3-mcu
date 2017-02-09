@@ -30,6 +30,32 @@ USB_OTG_CORE_HANDLE	USB_OTG_dev;
 /* USB VCP Internal receive buffer */
 extern uint8_t TM_INT_USB_VCP_ReceiveBuffer[USB_VCP_RECEIVE_BUFFER_LENGTH];
 
+int usb_read_cmd_header(char* header) {
+	if (tm_int_usb_vcp_buf_num < 2) {
+		return 0;
+	}
+
+	uint8_t type = 0;
+	uint8_t size = 0;
+	TM_USB_VCP_Getc(&type);
+	TM_USB_VCP_Getc(&size);
+	header[0] = type;
+	header[1] = size;
+	return 2;
+}
+
+int usb_read_cmd_payload(char* payload, uint8_t size) {
+	if (tm_int_usb_vcp_buf_num < size) {
+		return 0;
+	}
+
+	char c;
+	for (int i = 0; i < size; i++) {
+		TM_USB_VCP_Getc(&c);
+		payload[i] = c;
+	}
+	return size;
+}
 
 uint32_t usbserial_read_cmd()
 {

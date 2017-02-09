@@ -215,6 +215,8 @@ typedef struct {
  * @{
  */
 
+int usb_read_cmd_header(char*);
+int usb_read_cmd_payload(char*, uint8_t);
 uint32_t usbserial_read_cmd();
 void usbserial_flush_buffer(void);
 
