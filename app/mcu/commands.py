@@ -9,26 +9,27 @@ from .protocol import PencilStatus, Leds
 
 
 PIDConstants = namedtuple("PIDConstatns", 'k_gain i_gain d_gain max_cmd min_cmd')
-DEADZONE = 100
-DEFAULT_DELTA_T = 0.030 # 30ms, a modifier
+DEADZONE = 15
+DEFAULT_DELTA_T = 0.030  # 30ms, a modifier
 
 
 class PositionRegulator(object):
     """ Implémente un régulateur PI qui agit avec une rétroaction en position et génère une commande de vitesse."""
 
     def __init__(self):
+        self._set_point = 0, 0, 0
         self.accumulator = 0, 0, 0
         self.constants = PIDConstants(1, 0, 0, 125, 0)
 
     @property
     def set_point(self):
-        return self.set_point
+        return self._set_point
 
     @set_point.setter
-    def set_poit(self, set_point):
+    def set_point(self, set_point):
         if self.set_point != set_point:
             self.accumulator = 0, 0, 0
-            self.set_point = set_point
+            self._set_point = set_point
 
     def next_speed_command(self, actual_position, delta_t=DEFAULT_DELTA_T):
         actual_x, actual_y, actual_theta = actual_position
@@ -40,7 +41,7 @@ class PositionRegulator(object):
         saturated_command = self._saturate_command(command)
         # TODO: ajuster le x et y en fonction de l'orientation
 
-        if math.sqrt(err_x**2 + err_y**2) > DEADZONE:
+        if math.sqrt(err_x**2 + err_y**2) < DEADZONE:
             saturated_command = 0, 0, 0
         return saturated_command
 
@@ -52,8 +53,8 @@ class PositionRegulator(object):
         Returns:
             La commande saturée
         """
-        saturated_command = command
-        for idx,cmd_part in enumerate(command):
+        saturated_command = [0, 0, 0]
+        for idx, cmd_part in enumerate(command):
             if cmd_part < -self.constants.max_cmd:
                 saturated_command[idx] = -self.constants.max_cmd
             elif cmd_part > self.constants.max_cmd:
@@ -61,7 +62,7 @@ class PositionRegulator(object):
             elif -self.constants.min_cmd < cmd_part < self.constants.min_cmd:
                 # FIXME: il faudra probablement relineariser si la commande n'est pas au minimum
                 saturated_command[idx] = 0
-        return saturated_command
+        return tuple(saturated_command)
 
 
 # regulator static et persistent
@@ -86,7 +87,7 @@ class Move(Command):
 
     def pack_command(self) -> bytes:
         regulator.set_point = self.x, self.y, self.theta
-        position = 0, 0, 0 # TODO: obtenir la retroaction de la camera
+        position = 0, 0, 0  # TODO: obtenir la retroaction de la camera
         regulated_command = regulator.next_speed_command(position)
         return protocol.generate_move_command(*regulated_command)
 
