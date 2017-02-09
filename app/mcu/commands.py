@@ -4,8 +4,8 @@ from collections import namedtuple
 
 import math
 
-from app.mcu import protocol
-from app.mcu.protocol import PencilStatus, Leds
+from . import protocol
+from .protocol import PencilStatus, Leds
 
 
 PIDConstants = namedtuple("PIDConstatns", 'k_gain i_gain d_gain max_cmd min_cmd')
@@ -17,7 +17,6 @@ class PositionRegulator(object):
     """ Implémente un régulateur PI qui agit avec une rétroaction en position et génère une commande de vitesse."""
 
     def __init__(self):
-        self.set_point = 0, 0, 0
         self.accumulator = 0, 0, 0
         self.constants = PIDConstants(1, 0, 0, 125, 0)
 

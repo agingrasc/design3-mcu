@@ -1,6 +1,6 @@
 import unittest
-from app.mcu import protocol
-from app.mcu.protocol import Leds, PencilStatus
+from mcu import protocol
+from mcu.protocol import Leds, PencilStatus
 
 
 class ProtocolTest(unittest.TestCase):

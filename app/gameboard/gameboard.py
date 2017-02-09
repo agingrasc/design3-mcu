@@ -1,6 +1,6 @@
 import collections
 from enum import Enum
-from app.gameboard import position
+from gameboard import position
 
 ObstacleValueObject = collections.namedtuple('ObstacleValueObject', 'pos_x pos_y radius tag')
 

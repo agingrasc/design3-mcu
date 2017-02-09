@@ -1,5 +1,5 @@
-from app.robot.task.task import Task
-from app.simulator.mockrobot.task.fakerobotaction import FakeRobotAction
+from ..robot.task.task import Task
+from .mockrobot.task.fakerobotaction import FakeRobotAction
 
 
 class SimulatorTaskFactory:
