@@ -52,18 +52,18 @@ set(SOURCE_FILES
         )
 
 # Flags de compilation par source
-set(STM32_FLAGS "-mfpu=fpv4-sp-d16 -mthumb -mthumb-interwork -mlittle-endian -mfloat-abi=soft -march=armv7-m")
+set(STM32_FLAGS "-mfpu=fpv4-sp-d16 -mthumb -mthumb-interwork -mlittle-endian -mfloat-abi=hard -march=armv7-m")
 set(GENERAL_COMPILE_FLAGS"-Wall")
-set(GENERAL_COMPILE_DEFINE "-DSTM32F4 -DUSE_STDPERIPH_DRIVER")
+set(GENERAL_COMPILE_DEFINE "-DSTM32F4 -DUSE_STDPERIPH_DRIVER -DSTM32F40XX -DSTM32F40_41xxx")
 set_source_files_properties(${SOURCE_FILES} PROPERTY COMPILE_FLAGS "${STM32_FLAGS} ${GENERAL_COMPILE_FLAGS} ${GENERAL_COMPILE_DEFINE}")
-set_source_files_properties(src/startup_stm32f4xx.s PROPERTY COMPILE_FLAGS "${STM32_FLAGS}")
+set_source_files_properties(startup/startup_stm32.s PROPERTY COMPILE_FLAGS "${STM32_FLAGS}")
 
 # Linker file avec fichier de link
 set(LINKER_SCRIPT "../stm32_flash.ld" CACHE STRING "")
 # se base sur le toolchain file, ajoute simplement le linker script
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T ${LINKER_SCRIPT} -nostartfiles")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T ${LINKER_SCRIPT} -nostartfiles --specs=nosys.specs")
 
 
-add_executable(${PROJECT_NAME} ${SOURCE_FILES} src/startup_stm32f4xx.s)
-add_executable(${PROJECT_NAME}.elf ${SOURCE_FILES} src/startup_stm32f4xx.s)
+add_executable(${PROJECT_NAME} ${SOURCE_FILES} startup/startup_stm32.s)
+add_executable(${PROJECT_NAME}.elf ${SOURCE_FILES} startup/startup_stm32.s)
 add_bin_from_elf(${PROJECT_NAME}.bin ${PROJECT_NAME}.elf)

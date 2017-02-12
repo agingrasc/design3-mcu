@@ -109,7 +109,7 @@ int main(){
 	TIM9->SMCR |= 5;
 	TIM9->CR1 |= 0x1;
 
-    initDelay();
+    //initDelay();
     initTimer();
 
     lcd_init();
