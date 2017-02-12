@@ -11,6 +11,6 @@ typedef struct command {
     char payload[256];
 } command;
 
-int command_execute(command);
+int command_execute(command*);
 
 #endif //DESIGN3_MCU_COMMAND_H

@@ -13,7 +13,7 @@ void initLed()
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
     GPIO_Init(GPIOD, &GPIO_InitStructure);
-    //GPIO_SetBits(GPIOD, GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15);
+    GPIO_ResetBits(GPIOD, GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15);
 }
 
 void updateDisplay() {
@@ -112,7 +112,7 @@ int main(){
     //initDelay();
     initTimer();
 
-    lcd_init();
+    //lcd_init();
 
     motorControllerInit();
 #ifndef ID_MODE
@@ -144,6 +144,7 @@ int main(){
             if (cmd_header_ok) {
                 cmd.header.type = header[0];
                 cmd.header.size = header[1];
+				TM_USB_VCP_Putc(0x01);
             }
         }
 
@@ -158,7 +159,7 @@ int main(){
         }
 
         if (cmd_payload_ok) {
-            command_execute(cmd);
+            command_execute(&cmd);
             cmd_header_ok = 0;
             cmd_payload_ok = 0;
         }

@@ -31,7 +31,7 @@ void SysTick_Handler(void){
 }
 
 void TIM7_IRQHandler(void){
-    GPIO_ToggleBits(GPIOD, GPIO_Pin_15);
+    //GPIO_ToggleBits(GPIOD, GPIO_Pin_15);
     MotorEncodersRead();
 #ifndef ID_MODE
     updatePID();

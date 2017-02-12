@@ -9,7 +9,7 @@
 #define DEFINES_H_
 
 // Dynamic identification mode
-#define ID_MODE 1
+#define ID_MODE 0
 
 // VCP defines
 
