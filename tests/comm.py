@@ -4,7 +4,7 @@ import time
 HEADER_W = "Ecriture header: {}"
 PAYLOAD_W = "Ecriture payload: {}"
 
-ser = serial.Serial("/dev/ttyACM0")
+ser = serial.Serial("/dev/ttySTM32")
 
 def get_code():
     return int.from_bytes(ser.read(1), byteorder='little')
