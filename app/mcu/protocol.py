@@ -83,6 +83,7 @@ def _generate_header(cmd_type: CommandType, payload_len: PayloadLength) -> bytes
     assert isinstance(payload_len, PayloadLength), "Le payload_len doit etre dans PayloadLength"
     assert payload_len.value < 256, "Le payload_len doit etre inferieur a 256"
     assert payload_len.value >= 0, "Le payload_len doit etre signe"
+    checksum = (256 - (cmd_type.value + payload_len.value)) % 256
 
-    return bytes([cmd_type.value, payload_len.value])
+    return bytes([cmd_type.value, payload_len.value, checksum])
 
