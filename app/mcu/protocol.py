@@ -18,8 +18,10 @@ class CommandType(Enum):
 
 
 class Leds(Enum):
-    RED = 0
-    GREEN = 1
+    UP_RED = 0
+    UP_GREEN = 1
+    DOWN_RED = 2
+    DOWN_GREEN = 3
 
 
 class PencilStatus(Enum):
