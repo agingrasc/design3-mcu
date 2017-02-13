@@ -49,12 +49,12 @@ class ProtocolTest(unittest.TestCase):
 
     def test_red_led(self):
         expected_red = b'\x03\x01\xfc\x00'
-        actual_red = protocol.generate_led_command(Leds.RED)
+        actual_red = protocol.generate_led_command(Leds.UP_RED)
         self.assertEqual(expected_red, actual_red)
 
     def test_green_led(self):
         expected_green = b'\x03\x01\xfc\x01'
-        actual_green = protocol.generate_led_command(Leds.GREEN)
+        actual_green = protocol.generate_led_command(Leds.UP_GREEN)
         self.assertEqual(expected_green, actual_green)
 
     def test_invalid_led(self):
