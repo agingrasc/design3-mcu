@@ -1,7 +1,6 @@
 import unittest
 
-import mcu.commands
-from mcu.commands import regulator
+from .commands import regulator
 
 
 class TestCommands(unittest.TestCase):

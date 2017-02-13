@@ -1,6 +1,6 @@
 import unittest
-from mcu import protocol
-from mcu.protocol import Leds, PencilStatus
+from . import protocol
+from .protocol import Leds, PencilStatus
 
 
 class ProtocolTest(unittest.TestCase):
@@ -21,12 +21,14 @@ class ProtocolTest(unittest.TestCase):
         packed_cmd = protocol.generate_move_command(10, 10, 10)
         self.assertEqual(expected_cmd, packed_cmd)
 
-    def test_bad_arg_move(self):
+    def test_one_arg_over_255(self):
         self.assertRaises(AssertionError, protocol.generate_move_command, 256, 0, 0)
-        self.assertRaises(AssertionError, protocol.generate_move_command, -1, 0, 0)
         self.assertRaises(AssertionError, protocol.generate_move_command, 0, 256, 0)
-        self.assertRaises(AssertionError, protocol.generate_move_command, 0, -1, 0)
         self.assertRaises(AssertionError, protocol.generate_move_command, 0, 0, 256)
+
+    def test_one_arg_under_0(self):
+        self.assertRaises(AssertionError, protocol.generate_move_command, -1, 0, 0)
+        self.assertRaises(AssertionError, protocol.generate_move_command, 0, -1, 0)
         self.assertRaises(AssertionError, protocol.generate_move_command, 0, 0, -1)
 
     def test_multiple_bad_args_move(self):
@@ -38,18 +40,19 @@ class ProtocolTest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_basic_pencil(self):
-        expected = b'\x02\x01\x00'
-        actual = protocol.generate_pencil_command(PencilStatus.RAISED)
-        self.assertEqual(expected, actual)
+        expected_pencil_cmd = b'\x02\x01\x00'
+        actual_pencil_cmd = protocol.generate_pencil_command(PencilStatus.RAISED)
+        self.assertEqual(expected_pencil_cmd, actual_pencil_cmd)
 
     def test_invalid_pencil_status(self):
         self.assertRaises(AssertionError, protocol.generate_pencil_command, 0)
 
-    def test_basic_led(self):
+    def test_red_led(self):
         expected_red = b'\x03\x01\x00'
         actual_red = protocol.generate_led_command(Leds.RED)
         self.assertEqual(expected_red, actual_red)
 
+    def test_green_led(self):
         expected_green = b'\x03\x01\x01'
         actual_green = protocol.generate_led_command(Leds.GREEN)
         self.assertEqual(expected_green, actual_green)
