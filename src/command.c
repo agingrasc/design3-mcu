@@ -53,3 +53,11 @@ int command_execute(command* cmd) {
             break;
     }
 }
+
+int checksum_header(headerData* header) {
+    uint8_t checksum = header->size + header->type + header->checksum;
+    if (!checksum) {
+        return 0;
+    }
+    return 1;
+}

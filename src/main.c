@@ -109,10 +109,9 @@ int main(){
 	TIM9->SMCR |= 5;
 	TIM9->CR1 |= 0x1;
 
-    //initDelay();
     initTimer();
 
-    //lcd_init();
+    lcd_init();
 
     motorControllerInit();
 #ifndef ID_MODE
@@ -139,13 +138,28 @@ int main(){
 		command cmd;
         if (!cmd_header_ok && !TM_USB_VCP_BufferEmpty())
         {
-            char header[2];
+            char header[3];
             cmd_header_ok = usb_read_cmd_header(header);
-            if (cmd_header_ok) {
+			int valid_checksum = 1;
+            if (cmd_header_ok == 3) {
                 cmd.header.type = header[0];
                 cmd.header.size = header[1];
-				TM_USB_VCP_Putc(0x01);
+				cmd.header.checksum = header[2];
+				valid_checksum = checksum_header(&cmd.header);
             }
+            else if (cmd_header_ok > 0) {
+				usb_empty_buffer();
+				TM_USB_VCP_Putc(0x10);
+			}
+
+            if (!valid_checksum) {
+				TM_USB_VCP_Putc(0x01);
+			}
+			else {
+				cmd_header_ok = 0;
+				usb_empty_buffer();
+				TM_USB_VCP_Putc(0x10);
+			}
         }
 
         if (cmd_header_ok && !TM_USB_VCP_BufferEmpty()) {

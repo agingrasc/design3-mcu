@@ -1,10 +1,10 @@
 import serial
 import time
 
-ser = serial.Serial("/dev/ttyACM5")
+ser = serial.Serial("/dev/ttyACM0")
 
 # test allumer led verte (bleu)
-ser.write(b'\x03\x01')
+ser.write(b'\x03\x01\xfc')
 print(ser.read(1))
 ser.write(b'\x01')
 print(ser.read(1))
@@ -13,14 +13,22 @@ print(ser.read(1))
 time.sleep(1)
 
 # test éteindre led verte (bleu)
-ser.write(b'\x03\x01')
+ser.write(b'\x03\x01\xfc')
 print(ser.read(1))
 ser.write(b'\x03')
 print(ser.read(1))
 
 # test led innexistante
+ser.write(b'\x03\x01\xfc')
+print(ser.read(1))
+ser.write(b'\x05')
+print(ser.read(1))
+
+# test checksum incorrecte
 ser.write(b'\x03\x01')
 print(ser.read(1))
 ser.write(b'\x05')
 print(ser.read(1))
+
+# femerture du port
 ser.close()
