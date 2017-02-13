@@ -6,7 +6,7 @@ led_ok = Blueprint('led-ok', __name__)
 
 
 @led_ok.route('/led-ok', methods=['POST'])
-def led_ok():
+def _led_ok():
     robot_controller.startup_test()
     return make_response(jsonify({'result': 'ok'}), 200)
 
