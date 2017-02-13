@@ -1,8 +1,8 @@
-from gameboard.position import Position
-from robot.robot import Robot
-from robot.task.task import Task
-from simulator.mockrobot.task.mockmovingrobotaction import MockMovingRobotAction
-from simulator.mockrobot.wheel.wheelservice import MockWheelService
+from ..gameboard.position import Position
+from ..robot.robot import Robot
+from ..robot.task.task import Task
+from .mockrobot.task.mockmovingrobotaction import MockMovingRobotAction
+from .mockrobot.wheel.wheelservice import MockWheelService
 
 
 class Simulator:

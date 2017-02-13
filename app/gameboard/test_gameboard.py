@@ -1,5 +1,5 @@
 import unittest
-from python.app.gameboard import gameboard
+from app.gameboard import gameboard
 
 VALID_ROBOT_X_POSITION = 11
 VALID_ROBOT_Y_POSITION = 22

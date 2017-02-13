@@ -1,14 +1,11 @@
 import sys
-import random
-from flask import Flask, jsonify, make_response, request, abort
+from flask import Flask, jsonify, make_response
 from api.gotoposition import go_to_position
 
 app = Flask(__name__)
 
 MANUAL = "manual"
 AUTOMATIC = "automatic"
-
-# app.register_blueprint(recettes)
 
 
 def run_automatic():
