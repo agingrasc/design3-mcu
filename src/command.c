@@ -15,22 +15,22 @@ void cmd_led(command* cmd) {
     switch (cmd->payload[0]) {
         case 0:
             GPIO_SetBits(GPIOD, RED_LED);
-            TM_USB_VCP_Putc(0x00);
+            TM_USB_VCP_Putc(CMD_EXECUTE_OK);
             break;
         case 1:
             GPIO_SetBits(GPIOD, GREEN_LED);
-            TM_USB_VCP_Putc(0x00);
+            TM_USB_VCP_Putc(CMD_EXECUTE_OK);
             break;
         case 2:
             GPIO_ResetBits(GPIOD, RED_LED);
-            TM_USB_VCP_Putc(0x01);
+            TM_USB_VCP_Putc(CMD_EXECUTE_OK);
             break;
         case 3:
             GPIO_ResetBits(GPIOD, GREEN_LED);
-            TM_USB_VCP_Putc(0x01);
+            TM_USB_VCP_Putc(CMD_EXECUTE_OK);
             break;
         default:
-            TM_USB_VCP_Putc(0xff);
+            TM_USB_VCP_Putc(CMD_EXECUTE_FAILURE);
             break;
     }
 }
