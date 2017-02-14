@@ -85,7 +85,7 @@ float computePIDCommand(PIDType* pidData, uint32_t timestamp, int targetSpeed, i
 void updatePID(void){
 	for (int i = 0; i < MOTOR_COUNT; i++) {
 		if(PID_mode){
-			float perc_consig = computePIDCommand(&PID_data[i], timestamp, (int)motors[i].input_consigne_rpm, (int)motors[i].motor_speed_rpm);
+			float perc_consig = computePIDCommand(&PID_data[i], timestamp, (int)motors[i].input_consigne, (int)motors[i].motor_speed);
 			uint32_t new_consig = perc_consig * 100;
 			setupPWMPercentage(i, new_consig);
 		}

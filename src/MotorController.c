@@ -5,7 +5,7 @@
 void motorControllerInit(void){
 	int i;
 	for (i = 0; i < MOTOR_COUNT; i++) {
-		motors[i].input_consigne_rpm = 0x0;
+		motors[i].input_consigne = 0x0;
 		motors[i].consigne_percent = 0x0;
 		motors[i].old_consigne_percent = 0x0;
 	}
@@ -13,18 +13,47 @@ void motorControllerInit(void){
     setupPWMTimer();
 }
 
-void setupPWMTimer(void){
-	// Direction setup
-	GPIO_InitTypeDef GPIO_InitStructure;
-
-	RCC_AHB1PeriphClockCmd(MCD_CLK_PORT, ENABLE);
+void setMotorPin1Direction(uint8_t engine_no, GPIO_TypeDef *port, uint32_t clk, uint16_t pin) {
+	RCC_AHB1PeriphClockCmd(clk, ENABLE);
 	GPIO_InitTypeDef init_gpio_struct;
-	init_gpio_struct.GPIO_Pin = MCD_A_PIN1 | MCD_A_PIN2 | MCD_B_PIN1 | MCD_B_PIN2 | MCD_C_PIN1 | MCD_C_PIN2 | MCD_D_PIN1 | MCD_D_PIN2;
+	init_gpio_struct.GPIO_Pin = pin;
 	init_gpio_struct.GPIO_OType = GPIO_OType_PP;
 	init_gpio_struct.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	init_gpio_struct.GPIO_Mode = GPIO_Mode_OUT;
 	init_gpio_struct.GPIO_Speed = GPIO_Speed_100MHz;
-	GPIO_Init(MCS_PIN_PORT, &init_gpio_struct);
+	GPIO_Init(port, &init_gpio_struct);
+
+	motors[engine_no].DIRx_pin1 = port;
+	motors[engine_no].dir_pin1 = pin;
+}
+
+void setMotorPin2Direction(uint8_t engine_no, GPIO_TypeDef *port, uint32_t clk, uint16_t pin) {
+	RCC_AHB1PeriphClockCmd(clk, ENABLE);
+	GPIO_InitTypeDef init_gpio_struct;
+	init_gpio_struct.GPIO_Pin = pin;
+	init_gpio_struct.GPIO_OType = GPIO_OType_PP;
+	init_gpio_struct.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	init_gpio_struct.GPIO_Mode = GPIO_Mode_OUT;
+	init_gpio_struct.GPIO_Speed = GPIO_Speed_100MHz;
+	GPIO_Init(port, &init_gpio_struct);
+
+	motors[engine_no].DIRx_pin2 = port;
+	motors[engine_no].dir_pin2 = pin;
+}
+
+void setupPWMTimer(void){
+	// Direction setup
+	GPIO_InitTypeDef init_gpio_struct;
+
+	// Enable motor pin controls
+	setMotorPin1Direction(MOTOR_A, MCD_A_PIN1_PORT, MCD_A_PIN1_CLK_PORT, MCD_A_PIN1);
+	setMotorPin2Direction(MOTOR_A, MCD_A_PIN2_PORT, MCD_A_PIN2_CLK_PORT, MCD_A_PIN2);
+	setMotorPin1Direction(MOTOR_B, MCD_B_PIN1_PORT, MCD_B_PIN1_CLK_PORT, MCD_B_PIN1);
+	setMotorPin2Direction(MOTOR_B, MCD_B_PIN2_PORT, MCD_B_PIN2_CLK_PORT, MCD_B_PIN2);
+	setMotorPin1Direction(MOTOR_C, MCD_C_PIN1_PORT, MCD_C_PIN1_CLK_PORT, MCD_C_PIN1);
+	setMotorPin2Direction(MOTOR_C, MCD_C_PIN2_PORT, MCD_C_PIN2_CLK_PORT, MCD_C_PIN2);
+	setMotorPin1Direction(MOTOR_D, MCD_D_PIN1_PORT, MCD_D_PIN1_CLK_PORT, MCD_D_PIN1);
+	setMotorPin2Direction(MOTOR_D, MCD_D_PIN2_PORT, MCD_D_PIN2_CLK_PORT, MCD_D_PIN2);
 
 	// PWM setup
     RCC_AHB1PeriphClockCmd(MCS_PIN_CLK, ENABLE);
@@ -111,10 +140,14 @@ uint8_t motorSetDirection(uint8_t motor_id, uint8_t motor_dir) {
 	case MC_DIR_CW:
 		pv1 = Bit_RESET;
 		pv2 = Bit_SET;
+		motors[motor_id].ENCx->CCER &= ~(1 << 1);
 		break;
 	case MC_DIR_CCW:
 		pv1 = Bit_SET;
 		pv2 = Bit_RESET;
+		// Reverse the polarity of the A channel
+		// Thus, the encoder timer will always count up.
+		motors[motor_id].ENCx->CCER |= (1 << 1);
 		break;
 	case MC_DIR_BVMOTOR:
 		pv1 = Bit_SET;
@@ -124,8 +157,8 @@ uint8_t motorSetDirection(uint8_t motor_id, uint8_t motor_dir) {
 		return -1;
 	}
 
-	GPIO_WriteBit(motors[motor_id].DIRx, motors[motor_id].dir_pin1, pv1);
-	GPIO_WriteBit(motors[motor_id].DIRx, motors[motor_id].dir_pin2, pv2);
+	GPIO_WriteBit(motors[motor_id].DIRx_pin1, motors[motor_id].dir_pin1, pv1);
+	GPIO_WriteBit(motors[motor_id].DIRx_pin2, motors[motor_id].dir_pin2, pv2);
 
 	return 0;
 }

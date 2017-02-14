@@ -34,16 +34,33 @@
 #define MC_DIR_CCW			2
 #define MC_DIR_BVMOTOR		3
 
-#define MCD_CLK_PORT		RCC_AHB1Periph_GPIOD
-#define MCD_PORT			GPIOD
-#define MCD_A_PIN1			GPIO_Pin_0
-#define MCD_A_PIN2			GPIO_Pin_1
-#define MCD_B_PIN1			GPIO_Pin_2
-#define MCD_B_PIN2			GPIO_Pin_3
-#define MCD_C_PIN1			GPIO_Pin_4
-#define MCD_C_PIN2			GPIO_Pin_5
-#define MCD_D_PIN1			GPIO_Pin_6
-#define MCD_D_PIN2			GPIO_Pin_7
+#define MCD_A_PIN1_CLK_PORT		RCC_AHB1Periph_GPIOE
+#define MCD_A_PIN1_PORT			GPIOE
+#define MCD_A_PIN1				GPIO_Pin_1
+#define MCD_A_PIN2_CLK_PORT		RCC_AHB1Periph_GPIOE
+#define MCD_A_PIN2_PORT			GPIOE
+#define MCD_A_PIN2				GPIO_Pin_0
+
+#define MCD_B_PIN1_CLK_PORT		RCC_AHB1Periph_GPIOD
+#define MCD_B_PIN1_PORT			GPIOD
+#define MCD_B_PIN1				GPIO_Pin_7
+#define MCD_B_PIN2_CLK_PORT		RCC_AHB1Periph_GPIOE
+#define MCD_B_PIN2_PORT			GPIOE
+#define MCD_B_PIN2				GPIO_Pin_2
+
+#define MCD_C_PIN1_CLK_PORT		RCC_AHB1Periph_GPIOC
+#define MCD_C_PIN1_PORT			GPIOC
+#define MCD_C_PIN1				GPIO_Pin_13
+#define MCD_C_PIN2_CLK_PORT		RCC_AHB1Periph_GPIOC
+#define MCD_C_PIN2_PORT			GPIOC
+#define MCD_C_PIN2				GPIO_Pin_10
+
+#define MCD_D_PIN1_CLK_PORT		RCC_AHB1Periph_GPIOC
+#define MCD_D_PIN1_PORT			GPIOC
+#define MCD_D_PIN1				GPIO_Pin_11
+#define MCD_D_PIN2_CLK_PORT		RCC_AHB1Periph_GPIOC
+#define MCD_D_PIN2_PORT			GPIOC
+#define MCD_D_PIN2				GPIO_Pin_12
 
 #define MAX_CONSIGNE        100
 #define PWM_PULSE_LENGTH    8399
