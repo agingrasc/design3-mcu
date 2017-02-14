@@ -18,17 +18,18 @@
 typedef struct motor {
 	// PWM (speed)
 	__IO uint32_t *duty_cycle;
-	char input_consigne_rpm;
+	char input_consigne;
 	uint32_t consigne_pulse;
 	char old_consigne_percent;
 	char consigne_percent;
 	// Direction
-	GPIO_TypeDef *DIRx;
+	GPIO_TypeDef *DIRx_pin1;
+	GPIO_TypeDef *DIRx_pin2;
 	uint16_t dir_pin1;
 	uint16_t dir_pin2;
 	// Encoder
 	TIM_TypeDef *ENCx;
-	volatile int32_t motor_speed_rpm;
+	volatile int32_t motor_speed;
 	volatile uint32_t old_timestamp;
 	volatile uint32_t encoder_cnt;
 	volatile uint32_t old_encoder_cnt;

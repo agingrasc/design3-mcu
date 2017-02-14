@@ -11,6 +11,9 @@
 // Dynamic identification mode
 #define ID_MODE 1
 
+// Encoder timer's initial value (middle of 0xFFFF)
+#define TIMER_INIT_VAL	0x7FFF
+
 // VCP defines
 
 /* Custom buffer size */

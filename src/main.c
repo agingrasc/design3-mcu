@@ -29,7 +29,7 @@ void updateDisplay() {
 	char buf1[16];
 
 	//sprintf(buf1, "%d %d", motors[current_motor].motor_speed_rpm, motors[current_motor].encoder_cnt);
-	sprintf(buf1, "%d %d", motors[0].motor_speed_rpm, motors[1].motor_speed_rpm);
+	sprintf(buf1, "%d %d", motors[0].motor_speed, motors[1].motor_speed);
 	for (int i = 0; i < 16; i++) {
 		if (buf1[i] == '\0') break;
 		lcd_putc(buf1[i]);
@@ -40,7 +40,7 @@ void updateDisplay() {
 
 	char buf2[16];
 	//sprintf(buf2, "%d %d", motors[current_motor].motor_speed_rpm, motors[current_motor].encoder_cnt);
-	sprintf(buf2, "%d %d%s", motors[2].motor_speed_rpm, motors[3].motor_speed_rpm, getIdTestStatus());
+	sprintf(buf2, "%d %d%s", motors[2].motor_speed, motors[3].motor_speed, getIdTestStatus());
 	for (int i = 0; i < 16; i++) {
 		if (buf2[i] == '\0') break;
 		lcd_putc(buf2[i]);
@@ -76,38 +76,6 @@ int main(){
 
  	/* Initialize USB virtual COM port */
  	TM_USB_VCP_Init();
-
-	// Don't know why I have to do this here.
-	// This is for motor b
-	RCC->AHB1ENR |= RCC_AHB1Periph_GPIOA;
-	GPIOA->MODER |= 0x2;
-	GPIOA->MODER |= (0x2 << 2);
-	GPIOA->PUPDR |= 0x1;
-	GPIOA->PUPDR |= (01 << 2);
-	GPIOA->AFR[0] |= GPIO_AF_TIM4;
-	GPIOA->AFR[0] |= (GPIO_AF_TIM4 << 4);
-
-	// This is for motor d
-	RCC->AHB1ENR |= RCC_AHB1Periph_GPIOE;
-	GPIOE->MODER |= (0x2 << 18);
-	GPIOE->MODER |= (0x2 << 22); // AF
-	GPIOE->PUPDR |= (0x1 << 18);
-	GPIOE->PUPDR |= (0x1 << 22);
-	GPIOE->AFR[1] |= (GPIO_AF_TIM1 << 4);
-	GPIOE->AFR[1] |= (GPIO_AF_TIM1 << 12);
-
-	// this is for motor c
-	//RCC->AHB1ENR |= RCC_AHB1Periph_GPIOE;
-	RCC->APB2ENR |= RCC_APB2Periph_TIM9;
-	GPIOE->MODER |= (0x2 << 10);
-	GPIOE->PUPDR |= (0x1 << 10);
-	GPIOE->AFR[0] |= (GPIO_AF_TIM9 << 20);
-	TIM9->CCMR1 |= 0x1;
-	TIM9->CCER |= 0x1;
-	TIM9->ARR = 0xffff;
-	TIM9->SMCR |= (4 << 4);
-	TIM9->SMCR |= 5;
-	TIM9->CR1 |= 0x1;
 
     initDelay();
     initTimer();

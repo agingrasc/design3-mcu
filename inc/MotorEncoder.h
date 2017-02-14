@@ -25,45 +25,32 @@
 #define MA_ENCB_AF			GPIO_AF_TIM5
 
 // OK
-/*#define MB_TIMER       		TIM4
-#define MB_TIMER_CLK   		RCC_APB1Periph_TIM4
-#define MB_ENCA_PIN			GPIO_Pin_6
-#define MB_ENCA_GPIO_PORT	GPIOB
-#define MB_ENCA_GPIO_CLK	RCC_AHB1Periph_GPIOB
-#define MB_ENCA_SOURCE		GPIO_PinSource6
-#define MB_ENCA_AF			GPIO_AF_TIM4
-#define MB_ENCB_PIN			GPIO_Pin_7
-#define MB_ENCB_GPIO_PORT	GPIOB
-#define MB_ENCB_GPIO_CLK	RCC_AHB1Periph_GPIOB
-#define MB_ENCB_SOURCE		GPIO_PinSource7
-#define MB_ENCB_AF			GPIO_AF_TIM4*/
 #define MB_TIMER       		TIM4
 #define MB_TIMER_CLK   		RCC_APB1Periph_TIM4
-#define MB_ENCA_PIN			GPIO_Pin_12
+#define MB_ENCA_PIN			GPIO_Pin_13
 #define MB_ENCA_GPIO_PORT	GPIOD
 #define MB_ENCA_GPIO_CLK	RCC_AHB1Periph_GPIOD
-#define MB_ENCA_SOURCE		GPIO_PinSource12
+#define MB_ENCA_SOURCE		GPIO_PinSource13
 #define MB_ENCA_AF			GPIO_AF_TIM4
-#define MB_ENCB_PIN			GPIO_Pin_13
+#define MB_ENCB_PIN			GPIO_Pin_12
 #define MB_ENCB_GPIO_PORT	GPIOD
 #define MB_ENCB_GPIO_CLK	RCC_AHB1Periph_GPIOD
-#define MB_ENCB_SOURCE		GPIO_PinSource13
+#define MB_ENCB_SOURCE		GPIO_PinSource12
 #define MB_ENCB_AF			GPIO_AF_TIM4
 
-// does not work
+// OK
 #define MC_TIMER       		TIM2
 #define MC_TIMER_CLK   		RCC_APB1Periph_TIM2
-#define MC_ENCA_PIN			GPIO_Pin_10
-#define MC_ENCA_GPIO_PORT	GPIOB
-#define MC_ENCA_GPIO_CLK	RCC_AHB1Periph_GPIOB
-#define MC_ENCA_SOURCE		GPIO_PinSource10
+#define MC_ENCA_PIN			GPIO_Pin_5
+#define MC_ENCA_GPIO_PORT	GPIOA
+#define MC_ENCA_GPIO_CLK	RCC_AHB1Periph_GPIOA
+#define MC_ENCA_SOURCE		GPIO_PinSource5
 #define MC_ENCA_AF			GPIO_AF_TIM2
-#define MC_ENCB_PIN			GPIO_Pin_11
+#define MC_ENCB_PIN			GPIO_Pin_3
 #define MC_ENCB_GPIO_PORT	GPIOB
 #define MC_ENCB_GPIO_CLK	RCC_AHB1Periph_GPIOB
-#define MC_ENCB_SOURCE		GPIO_PinSource11
+#define MC_ENCB_SOURCE		GPIO_PinSource3
 #define MC_ENCB_AF			GPIO_AF_TIM2
-
 
 // OK
 #define MD_TIMER       		TIM1

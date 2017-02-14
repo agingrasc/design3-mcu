@@ -34,7 +34,7 @@ int switchCmd(uint32_t p_cmd){
         	TM_USB_VCP_Putc(0x0F);
             break;
         case 0x55:
-            tmp_motor_speed = motors[current_motor].motor_speed_rpm;
+            tmp_motor_speed = motors[current_motor].motor_speed;
             if(tmp_motor_speed > 0xFF){tmp_motor_speed = 0xFF;}
             //uart_write_byte(tmp_motor_speed);
             TM_USB_VCP_Putc(tmp_motor_speed);
@@ -47,11 +47,11 @@ int switchCmd(uint32_t p_cmd){
                 motors[current_motor].consigne_percent = getParam(p_cmd); //consigne_percent = getParam(p_cmd);
             }
         case 0xaa:
-            //uart_write_byte(motors[current_motor].input_consigne_rpm);
-        	TM_USB_VCP_Putc(motors[current_motor].input_consigne_rpm);
+            //uart_write_byte(motors[current_motor].input_consigne);
+        	TM_USB_VCP_Putc(motors[current_motor].input_consigne);
             break;
         case 0xF0:
-        	motors[current_motor].input_consigne_rpm = (char)getParam(p_cmd);
+        	motors[current_motor].input_consigne = (char)getParam(p_cmd);
             break;
 #ifdef ID_MODE
         case 0xBB:
