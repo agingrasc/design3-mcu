@@ -2,8 +2,7 @@
 
 #include "main.h"
 
-void initLed()
-{
+void initLed() {
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 
     GPIO_InitTypeDef GPIO_InitStructure;
@@ -67,7 +66,7 @@ void checkForVCP() {
     }
 }
 
-int main(){
+int main() {
     current_motor = 0;
 
     SystemInit();
@@ -99,13 +98,12 @@ int main(){
 
     int cmd_header_ok = 0;
     int cmd_payload_ok = 0;
-    while(1) {
+    while (1) {
         // Check for VCP connection
         checkForVCP();
 
         command cmd;
-        if (!cmd_header_ok && !TM_USB_VCP_BufferEmpty())
-        {
+        if (!cmd_header_ok && !TM_USB_VCP_BufferEmpty()) {
             char header[3];
             cmd_header_ok = usb_read_cmd_header(header);
             int valid_checksum = 1;
@@ -114,16 +112,14 @@ int main(){
                 cmd.header.size = header[1];
                 cmd.header.checksum = header[2];
                 valid_checksum = checksum_header(&cmd.header);
-            }
-            else if (cmd_header_ok > 0) {
+            } else if (cmd_header_ok > 0) {
                 usb_empty_buffer();
                 TM_USB_VCP_Putc(CMD_INVALID_HEADER);
             }
 
             if (!valid_checksum) {
                 TM_USB_VCP_Putc(CMD_RECEPTION_OK);
-            }
-            else {
+            } else {
                 cmd_header_ok = 0;
                 usb_empty_buffer();
                 TM_USB_VCP_Putc(CMD_CHECKSUM_FAILURE);
@@ -147,7 +143,7 @@ int main(){
         }
 
         // Update time line, if necessary
-        unsigned int mstemp = (unsigned int)(timestamp / 1000);
+        unsigned int mstemp = (unsigned int) (timestamp / 1000);
         if (mstemp != last_second) { // One second elapsed
             updateDisplay(); // Update time on LCD
             //uart_write_buffer(id_val_consigne, ID_VAL_COUNT);

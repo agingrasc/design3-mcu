@@ -11,7 +11,7 @@
 #define GREEN_LED GPIO_Pin_15
 #define RED_LED GPIO_Pin_14
 
-void cmd_led(command* cmd) {
+void cmd_led(command *cmd) {
     switch (cmd->payload[0]) {
         case 0:
             GPIO_SetBits(GPIOD, RED_LED);
@@ -35,7 +35,7 @@ void cmd_led(command* cmd) {
     }
 }
 
-int command_execute(command* cmd) {
+int command_execute(command *cmd) {
     switch (cmd->header.type) {
         case (uint8_t) MOVE_CMD:
             //call pid(cmd.payload[0], cmd.payload[1], cmd.payload[2], delta_t);
@@ -52,9 +52,10 @@ int command_execute(command* cmd) {
         default:
             break;
     }
+    return 0;
 }
 
-int checksum_header(headerData* header) {
+int checksum_header(headerData *header) {
     uint8_t checksum = header->size + header->type + header->checksum;
     if (!checksum) {
         return 0;

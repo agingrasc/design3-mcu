@@ -23,7 +23,7 @@
   * limitations under the License.
   *
   ******************************************************************************
-  */ 
+  */
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_usr.h"
@@ -36,54 +36,54 @@
 TM_USB_VCP_Result TM_USB_VCP_INT_Status = TM_USB_VCP_NOT_CONNECTED;
 
 USBD_Usr_cb_TypeDef USR_cb =
-{
-  USBD_USR_Init,
-  USBD_USR_DeviceReset,
-  USBD_USR_DeviceConfigured,
-  USBD_USR_DeviceSuspended,
-  USBD_USR_DeviceResumed,
-  USBD_USR_DeviceConnected,
-  USBD_USR_DeviceDisconnected,    
-};
+        {
+                USBD_USR_Init,
+                USBD_USR_DeviceReset,
+                USBD_USR_DeviceConfigured,
+                USBD_USR_DeviceSuspended,
+                USBD_USR_DeviceResumed,
+                USBD_USR_DeviceConnected,
+                USBD_USR_DeviceDisconnected,
+        };
 
 void USBD_USR_Init(void) {
-	TM_USB_VCP_INT_Status = TM_USB_VCP_NOT_CONNECTED;
+    TM_USB_VCP_INT_Status = TM_USB_VCP_NOT_CONNECTED;
 }
 
-void USBD_USR_DeviceReset(uint8_t speed ) {
-	TM_USB_VCP_INT_Status = TM_USB_VCP_NOT_CONNECTED;
+void USBD_USR_DeviceReset(uint8_t speed) {
+    TM_USB_VCP_INT_Status = TM_USB_VCP_NOT_CONNECTED;
 }
 
-void USBD_USR_DeviceConfigured (void) {
-	TM_USB_VCP_INT_Status = TM_USB_VCP_CONNECTED;
+void USBD_USR_DeviceConfigured(void) {
+    TM_USB_VCP_INT_Status = TM_USB_VCP_CONNECTED;
 }
 
 void USBD_USR_DeviceSuspended(void) {
-	TM_USB_VCP_INT_Status = TM_USB_VCP_NOT_CONNECTED;
+    TM_USB_VCP_INT_Status = TM_USB_VCP_NOT_CONNECTED;
 }
 
 void USBD_USR_DeviceResumed(void) {
-	TM_USB_VCP_INT_Status = TM_USB_VCP_NOT_CONNECTED;
+    TM_USB_VCP_INT_Status = TM_USB_VCP_NOT_CONNECTED;
 }
 
-void USBD_USR_DeviceConnected (void) {
-	TM_USB_VCP_INT_Status = TM_USB_VCP_NOT_CONNECTED;
+void USBD_USR_DeviceConnected(void) {
+    TM_USB_VCP_INT_Status = TM_USB_VCP_NOT_CONNECTED;
 }
 
-void USBD_USR_DeviceDisconnected (void) {
-	TM_USB_VCP_INT_Status = TM_USB_VCP_NOT_CONNECTED;
+void USBD_USR_DeviceDisconnected(void) {
+    TM_USB_VCP_INT_Status = TM_USB_VCP_NOT_CONNECTED;
 }
 
 TM_USB_VCP_Result USBD_User_GetStatus(void) {
-	return TM_USB_VCP_INT_Status;
+    return TM_USB_VCP_INT_Status;
 }
 
 /**
 * @}
-*/ 
+*/
 
 /**
 * @}
-*/ 
+*/
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

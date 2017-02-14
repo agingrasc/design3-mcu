@@ -25,51 +25,50 @@ uint32_t tm_int_usb_vcp_buf_in, tm_int_usb_vcp_buf_out, tm_int_usb_vcp_buf_num;
 extern TM_USB_VCP_Result TM_USB_VCP_INT_Status;
 extern LINE_CODING linecoding;
 uint8_t TM_USB_VCP_INT_Init = 0;
-USB_OTG_CORE_HANDLE	USB_OTG_dev;
+USB_OTG_CORE_HANDLE USB_OTG_dev;
 
 /* USB VCP Internal receive buffer */
 extern uint8_t TM_INT_USB_VCP_ReceiveBuffer[USB_VCP_RECEIVE_BUFFER_LENGTH];
 
 int usb_empty_buffer() {
-	uint8_t _;
-	while (TM_USB_VCP_Getc(&_) != TM_USB_VCP_DATA_EMPTY);
-	return 0;
+    uint8_t _;
+    while (TM_USB_VCP_Getc(&_) != TM_USB_VCP_DATA_EMPTY);
+    return 0;
 }
 
-int usb_read_cmd_header(char* header) {
-	if (tm_int_usb_vcp_buf_num < 3) {
-		return tm_int_usb_vcp_buf_num;
-	}
+int usb_read_cmd_header(char *header) {
+    if (tm_int_usb_vcp_buf_num < 3) {
+        return tm_int_usb_vcp_buf_num;
+    }
 
-	uint8_t type = 0;
-	uint8_t size = 0;
-	uint8_t checksum = 0;
-	TM_USB_VCP_Getc(&type);
-	TM_USB_VCP_Getc(&size);
-	TM_USB_VCP_Getc(&checksum);
-	header[0] = type;
-	header[1] = size;
-	header[2] = checksum;
-	return 3;
+    uint8_t type = 0;
+    uint8_t size = 0;
+    uint8_t checksum = 0;
+    TM_USB_VCP_Getc(&type);
+    TM_USB_VCP_Getc(&size);
+    TM_USB_VCP_Getc(&checksum);
+    header[0] = type;
+    header[1] = size;
+    header[2] = checksum;
+    return 3;
 }
 
-int usb_read_cmd_payload(char* payload, uint8_t size) {
-	if (tm_int_usb_vcp_buf_num < size) {
-		return 0;
-	}
+int usb_read_cmd_payload(char *payload, uint8_t size) {
+    if (tm_int_usb_vcp_buf_num < size) {
+        return 0;
+    }
 
-	char c;
-	for (int i = 0; i < size; i++) {
-		TM_USB_VCP_Getc(&c);
-		payload[i] = c;
-	}
-	return size;
+    char c;
+    for (int i = 0; i < size; i++) {
+        TM_USB_VCP_Getc(&c);
+        payload[i] = c;
+    }
+    return size;
 }
 
-uint32_t usbserial_read_cmd()
-{
-	//if (tm_int_usb_vcp_buf_num < 3) // Not enough data to process a command
-	//	return 0;
+uint32_t usbserial_read_cmd() {
+    //if (tm_int_usb_vcp_buf_num < 3) // Not enough data to process a command
+    //	return 0;
 
     /*uint8_t arg1, arg2, arg3;
     TM_USB_VCP_Getc(&arg1);
@@ -81,207 +80,209 @@ uint32_t usbserial_read_cmd()
     command |= ((uint32_t)arg2 << 8);
     command |= ((uint32_t)arg3 << 16);*/
 
-	uint32_t command = 0;
-	uint8_t arg1 = 0;
-	TM_USB_VCP_Getc(&arg1);
-	command |= ((uint32_t)arg1);
+    uint32_t command = 0;
+    uint8_t arg1 = 0;
+    TM_USB_VCP_Getc(&arg1);
+    command |= ((uint32_t) arg1);
 
-	/*tm_int_usb_vcp_buf_num--;
-	tm_int_usb_vcp_buf_out = (tm_int_usb_vcp_buf_out + 1) % USB_VCP_RECEIVE_BUFFER_LENGTH;
-	uint32_t command = 0;*/
+    /*tm_int_usb_vcp_buf_num--;
+    tm_int_usb_vcp_buf_out = (tm_int_usb_vcp_buf_out + 1) % USB_VCP_RECEIVE_BUFFER_LENGTH;
+    uint32_t command = 0;*/
 
-	//command |= ((uint32_t)TM_INT_USB_VCP_ReceiveBuffer[tm_int_usb_vcp_buf_out]);
-	command |= ((uint32_t)TM_INT_USB_VCP_ReceiveBuffer[(tm_int_usb_vcp_buf_out - 2) % USB_VCP_RECEIVE_BUFFER_LENGTH]) << 8;
-	command |= ((uint32_t)TM_INT_USB_VCP_ReceiveBuffer[(tm_int_usb_vcp_buf_out - 3) % USB_VCP_RECEIVE_BUFFER_LENGTH]) << 16;
+    //command |= ((uint32_t)TM_INT_USB_VCP_ReceiveBuffer[tm_int_usb_vcp_buf_out]);
+    command |= ((uint32_t) TM_INT_USB_VCP_ReceiveBuffer[(tm_int_usb_vcp_buf_out - 2) % USB_VCP_RECEIVE_BUFFER_LENGTH])
+            << 8;
+    command |= ((uint32_t) TM_INT_USB_VCP_ReceiveBuffer[(tm_int_usb_vcp_buf_out - 3) % USB_VCP_RECEIVE_BUFFER_LENGTH])
+            << 16;
 
-	//tm_int_usb_vcp_buf_out++;
+    //tm_int_usb_vcp_buf_out++;
 
     return command;
 }
 
 void usbserial_flush_buffer(void) {
-	tm_int_usb_vcp_buf_in = 0;
-	tm_int_usb_vcp_buf_out = 0;
-	tm_int_usb_vcp_buf_num = 0;
+    tm_int_usb_vcp_buf_in = 0;
+    tm_int_usb_vcp_buf_out = 0;
+    tm_int_usb_vcp_buf_num = 0;
 }
 
 TM_USB_VCP_Result TM_USB_VCP_Init(void) {
-	/* Initialize USB */
-	USBD_Init(	&USB_OTG_dev,
+    /* Initialize USB */
+    USBD_Init(&USB_OTG_dev,
 #ifdef USE_USB_OTG_FS
-				USB_OTG_FS_CORE_ID,
+              USB_OTG_FS_CORE_ID,
 #else
-				USB_OTG_HS_CORE_ID,
+            USB_OTG_HS_CORE_ID,
 #endif
-				&USR_desc, 
-				&USBD_CDC_cb, 
-				&USR_cb);
-	
-	/* Reset buffer counters */
-	tm_int_usb_vcp_buf_in = 0;
-	tm_int_usb_vcp_buf_out = 0;
-	tm_int_usb_vcp_buf_num = 0;
-	
-	/* Initialized */
-	TM_USB_VCP_INT_Init = 1;
-	
-	/* Return OK */
-	return TM_USB_VCP_OK;
+              &USR_desc,
+              &USBD_CDC_cb,
+              &USR_cb);
+
+    /* Reset buffer counters */
+    tm_int_usb_vcp_buf_in = 0;
+    tm_int_usb_vcp_buf_out = 0;
+    tm_int_usb_vcp_buf_num = 0;
+
+    /* Initialized */
+    TM_USB_VCP_INT_Init = 1;
+
+    /* Return OK */
+    return TM_USB_VCP_OK;
 }
 
 uint8_t TM_USB_VCP_BufferEmpty(void) {
-	return (tm_int_usb_vcp_buf_num == 0);
+    return (tm_int_usb_vcp_buf_num == 0);
 }
 
 uint8_t TM_USB_VCP_BufferFull(void) {
-	return (tm_int_usb_vcp_buf_num == USB_VCP_RECEIVE_BUFFER_LENGTH);
+    return (tm_int_usb_vcp_buf_num == USB_VCP_RECEIVE_BUFFER_LENGTH);
 }
 
 uint8_t TM_USB_VCP_FindCharacter(volatile char c) {
-	uint16_t num, out;
-	
-	/* Temp variables */
-	num = tm_int_usb_vcp_buf_num;
-	out = tm_int_usb_vcp_buf_out;
-	
-	while (num > 0) {
-		/* Check overflow */
-		if (out == USB_VCP_RECEIVE_BUFFER_LENGTH) {
-			out = 0;
-		}
-		if (TM_INT_USB_VCP_ReceiveBuffer[out] == c) {
-			/* Character found */
-			return 1;
-		}
-		out++;
-		num--;
-	}
-	
-	/* Character is not in buffer */
-	return 0;
+    uint16_t num, out;
+
+    /* Temp variables */
+    num = tm_int_usb_vcp_buf_num;
+    out = tm_int_usb_vcp_buf_out;
+
+    while (num > 0) {
+        /* Check overflow */
+        if (out == USB_VCP_RECEIVE_BUFFER_LENGTH) {
+            out = 0;
+        }
+        if (TM_INT_USB_VCP_ReceiveBuffer[out] == c) {
+            /* Character found */
+            return 1;
+        }
+        out++;
+        num--;
+    }
+
+    /* Character is not in buffer */
+    return 0;
 }
 
-TM_USB_VCP_Result TM_USB_VCP_Getc(uint8_t* c) {
-	/* Any data in buffer */
-	if (tm_int_usb_vcp_buf_num > 0) {
-		/* Check overflow */
-		if (tm_int_usb_vcp_buf_out >= USB_VCP_RECEIVE_BUFFER_LENGTH) {
-			tm_int_usb_vcp_buf_out = 0;
-		}
-		*c = TM_INT_USB_VCP_ReceiveBuffer[tm_int_usb_vcp_buf_out];
-		// no
-		//TM_INT_USB_VCP_ReceiveBuffer[tm_int_usb_vcp_buf_out] = 0;
-		
-		/* Set counters */
-		tm_int_usb_vcp_buf_out++;
-		tm_int_usb_vcp_buf_num--;
-		
-		/* Data OK */
-		return TM_USB_VCP_DATA_OK;
-	}
-	*c = 0;
-	/* Data not ready */
-	return TM_USB_VCP_DATA_EMPTY;
+TM_USB_VCP_Result TM_USB_VCP_Getc(uint8_t *c) {
+    /* Any data in buffer */
+    if (tm_int_usb_vcp_buf_num > 0) {
+        /* Check overflow */
+        if (tm_int_usb_vcp_buf_out >= USB_VCP_RECEIVE_BUFFER_LENGTH) {
+            tm_int_usb_vcp_buf_out = 0;
+        }
+        *c = TM_INT_USB_VCP_ReceiveBuffer[tm_int_usb_vcp_buf_out];
+        // no
+        //TM_INT_USB_VCP_ReceiveBuffer[tm_int_usb_vcp_buf_out] = 0;
+
+        /* Set counters */
+        tm_int_usb_vcp_buf_out++;
+        tm_int_usb_vcp_buf_num--;
+
+        /* Data OK */
+        return TM_USB_VCP_DATA_OK;
+    }
+    *c = 0;
+    /* Data not ready */
+    return TM_USB_VCP_DATA_EMPTY;
 }
 
 TM_USB_VCP_Result TM_USB_VCP_Putc(volatile char c) {
-	uint8_t ce = (uint8_t)c;
-	
-	/* Send data over USB */
-	VCP_DataTx(&ce, 1);
-	
-	/* Return OK */
-	return TM_USB_VCP_OK;
+    uint8_t ce = (uint8_t) c;
+
+    /* Send data over USB */
+    VCP_DataTx(&ce, 1);
+
+    /* Return OK */
+    return TM_USB_VCP_OK;
 }
 
-TM_USB_VCP_Result TM_USB_VCP_Puts(char* str) {
-	while (*str) {
-		TM_USB_VCP_Putc(*str++);
-	}
-	
-	/* Return OK */
-	return TM_USB_VCP_OK;
+TM_USB_VCP_Result TM_USB_VCP_Puts(char *str) {
+    while (*str) {
+        TM_USB_VCP_Putc(*str++);
+    }
+
+    /* Return OK */
+    return TM_USB_VCP_OK;
 }
 
-TM_USB_VCP_Result TM_USB_VCP_Send(uint8_t* DataArray, uint32_t Length) {
-	/* Send array */
-	VCP_DataTx(DataArray, Length);
-	
-	/* Return OK */
-	return TM_USB_VCP_OK;
+TM_USB_VCP_Result TM_USB_VCP_Send(uint8_t *DataArray, uint32_t Length) {
+    /* Send array */
+    VCP_DataTx(DataArray, Length);
+
+    /* Return OK */
+    return TM_USB_VCP_OK;
 }
 
-uint16_t TM_USB_VCP_Gets(char* buffer, uint16_t bufsize) {
-	uint16_t i = 0;
-	uint8_t c;
-	
-	/* Check for any data on USART */
-	if (TM_USB_VCP_BufferEmpty() || (!TM_USB_VCP_FindCharacter('\n') && !TM_USB_VCP_BufferFull())) {
-		return 0;
-	}
-	
-	/* If available buffer size is more than 0 characters */
-	while (i < (bufsize - 1)) {
-		/* We have available data */
-		while (TM_USB_VCP_Getc(&c) != TM_USB_VCP_DATA_OK);
-		/* Save new data */
-		buffer[i] = (char) c;
-		/* Check for end of string */
-		if (buffer[i] == '\n') {
-			i++;
-			/* Done */
-			break;
-		} else {
-			i++;
-		}
-	}
-	
-	/* Add zero to the end of string */
-	buffer[i] = 0;               
+uint16_t TM_USB_VCP_Gets(char *buffer, uint16_t bufsize) {
+    uint16_t i = 0;
+    uint8_t c;
 
-	/* Return number of characters in string */
-	return i;
+    /* Check for any data on USART */
+    if (TM_USB_VCP_BufferEmpty() || (!TM_USB_VCP_FindCharacter('\n') && !TM_USB_VCP_BufferFull())) {
+        return 0;
+    }
+
+    /* If available buffer size is more than 0 characters */
+    while (i < (bufsize - 1)) {
+        /* We have available data */
+        while (TM_USB_VCP_Getc(&c) != TM_USB_VCP_DATA_OK);
+        /* Save new data */
+        buffer[i] = (char) c;
+        /* Check for end of string */
+        if (buffer[i] == '\n') {
+            i++;
+            /* Done */
+            break;
+        } else {
+            i++;
+        }
+    }
+
+    /* Add zero to the end of string */
+    buffer[i] = 0;
+
+    /* Return number of characters in string */
+    return i;
 }
 
 TM_USB_VCP_Result TM_INT_USB_VCP_AddReceived(uint8_t c) {
-	/* Still available data in buffer */
-	if (tm_int_usb_vcp_buf_num < USB_VCP_RECEIVE_BUFFER_LENGTH) {
-		/* Check for overflow */
-		if (tm_int_usb_vcp_buf_in >= USB_VCP_RECEIVE_BUFFER_LENGTH) {
-			tm_int_usb_vcp_buf_in = 0;
-		}
-		/* Add character to buffer */
-		TM_INT_USB_VCP_ReceiveBuffer[tm_int_usb_vcp_buf_in] = c;
-		/* Increase counters */
-		tm_int_usb_vcp_buf_in++;
-		tm_int_usb_vcp_buf_num++;
-		
-		/* Return OK */
-		return TM_USB_VCP_OK;
-	}
-	
-	/* Return Buffer full */
-	return TM_USB_VCP_RECEIVE_BUFFER_FULL;
+    /* Still available data in buffer */
+    if (tm_int_usb_vcp_buf_num < USB_VCP_RECEIVE_BUFFER_LENGTH) {
+        /* Check for overflow */
+        if (tm_int_usb_vcp_buf_in >= USB_VCP_RECEIVE_BUFFER_LENGTH) {
+            tm_int_usb_vcp_buf_in = 0;
+        }
+        /* Add character to buffer */
+        TM_INT_USB_VCP_ReceiveBuffer[tm_int_usb_vcp_buf_in] = c;
+        /* Increase counters */
+        tm_int_usb_vcp_buf_in++;
+        tm_int_usb_vcp_buf_num++;
+
+        /* Return OK */
+        return TM_USB_VCP_OK;
+    }
+
+    /* Return Buffer full */
+    return TM_USB_VCP_RECEIVE_BUFFER_FULL;
 }
 
 TM_USB_VCP_Result TM_USB_VCP_GetStatus(void) {
-	if (TM_USB_VCP_INT_Init) {
-		return TM_USB_VCP_INT_Status;
-	}
-	return TM_USB_VCP_ERROR;
+    if (TM_USB_VCP_INT_Init) {
+        return TM_USB_VCP_INT_Status;
+    }
+    return TM_USB_VCP_ERROR;
 }
 
-TM_USB_VCP_Result TM_USB_VCP_GetSettings(TM_USB_VCP_Settings_t* Settings) {
-	/* Fill data */
-	Settings->Baudrate = linecoding.bitrate;
-	Settings->DataBits = linecoding.datatype;
-	Settings->Parity = linecoding.paritytype;
-	Settings->Stopbits = linecoding.format;
-	Settings->Changed = linecoding.changed;
-	
-	/* Clear changed flag */
-	linecoding.changed = 0;
-	
-	/* Return OK */
-	return TM_USB_VCP_OK;
+TM_USB_VCP_Result TM_USB_VCP_GetSettings(TM_USB_VCP_Settings_t *Settings) {
+    /* Fill data */
+    Settings->Baudrate = linecoding.bitrate;
+    Settings->DataBits = linecoding.datatype;
+    Settings->Parity = linecoding.paritytype;
+    Settings->Stopbits = linecoding.format;
+    Settings->Changed = linecoding.changed;
+
+    /* Clear changed flag */
+    linecoding.changed = 0;
+
+    /* Return OK */
+    return TM_USB_VCP_OK;
 }

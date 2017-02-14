@@ -12,7 +12,7 @@
 #define ID_MODE 0
 
 // Encoder timer's initial value (middle of 0xFFFF)
-#define TIMER_INIT_VAL	0x7FFF
+#define TIMER_INIT_VAL    0x7FFF
 
 // VCP defines
 

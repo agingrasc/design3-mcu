@@ -22,4 +22,5 @@ typedef struct ManchesterInfo {
 } ManchesterInfo;
 
 ManchesterInfo decode();
+
 #endif //DESIGN3_MCU_MANCHESTER_H

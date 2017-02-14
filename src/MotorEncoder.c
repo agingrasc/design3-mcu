@@ -2,7 +2,7 @@
 
 #include "MotorEncoder.h"
 
-void MotorEncodersInit(){
+void MotorEncodersInit() {
     GPIO_InitTypeDef GPIO_InitStructure;
 
     RCC_AHB1PeriphClockCmd(MA_ENCA_GPIO_CLK, ENABLE);
@@ -38,16 +38,16 @@ void MotorEncodersInit(){
     // Hope we will never need it
 #ifdef MOTOR3_ENC_ALT
     RCC->AHB1ENR |= RCC_AHB1Periph_GPIOE;
-	RCC->APB2ENR |= RCC_APB2Periph_TIM9;
-	GPIOE->MODER |= (0x2 << 10);
-	GPIOE->PUPDR |= (0x1 << 10);
-	GPIOE->AFR[0] |= (GPIO_AF_TIM9 << 20);
-	TIM9->CCMR1 |= 0x1;
-	TIM9->CCER |= 0x1;
-	TIM9->ARR = 0xffff;
-	TIM9->SMCR |= (4 << 4);
-	TIM9->SMCR |= 5;
-	TIM9->CR1 |= 0x1;
+    RCC->APB2ENR |= RCC_APB2Periph_TIM9;
+    GPIOE->MODER |= (0x2 << 10);
+    GPIOE->PUPDR |= (0x1 << 10);
+    GPIOE->AFR[0] |= (GPIO_AF_TIM9 << 20);
+    TIM9->CCMR1 |= 0x1;
+    TIM9->CCER |= 0x1;
+    TIM9->ARR = 0xffff;
+    TIM9->SMCR |= (4 << 4);
+    TIM9->SMCR |= 5;
+    TIM9->CR1 |= 0x1;
 #endif
 
     // Motor D
@@ -128,7 +128,7 @@ void MotorEncodersInit(){
     MotorEncodersRead();
 }
 
-void MotorEncodersRead(){
+void MotorEncodersRead() {
     // Get encoders count
 #ifdef ID_MODE
     int i = 0;
@@ -151,15 +151,14 @@ void MotorEncodersRead(){
 
     if (last_tick_delta < -30) {
         last_tick_delta = (0xFFFF - motors[i].old_encoder_cnt) + motors[i].encoder_cnt;
-    }
-    else if (last_tick_delta < 0) {
+    } else if (last_tick_delta < 0) {
         last_tick_delta = motors[i].old_encoder_cnt - motors[i].encoder_cnt;
     }
 
     // RPM
     //motors[i].motor_speed = ((last_tick_delta)*MILLI_PER_MN)/((tmp_timestamp-motors[i].old_timestamp)*TICK_PER_ROT);
     // Tick/sec
-    motors[i].motor_speed = (last_tick_delta*1000)/(tmp_timestamp-motors[i].old_timestamp);
+    motors[i].motor_speed = (last_tick_delta * 1000) / (tmp_timestamp - motors[i].old_timestamp);
 
     motors[i].old_timestamp = tmp_timestamp;
 

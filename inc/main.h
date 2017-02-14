@@ -20,7 +20,9 @@
 #include "command.h"
 
 #ifdef ID_MODE
+
 #include "id.h"
+
 #endif
 
 int main(void);

@@ -6,15 +6,19 @@ PAYLOAD_W = "Ecriture payload: {}"
 
 ser = serial.Serial("/dev/ttySTM32")
 
+
 def get_code():
     return int.from_bytes(ser.read(1), byteorder='little')
+
 
 def print_code(msg):
     code = get_code()
     print(msg.format(code))
 
+
 def print_expect(val):
     print("Expect value: {}".format(val))
+
 
 # test allumer led verte (bleu)
 ser.write(b'\x03\x01\xfc')

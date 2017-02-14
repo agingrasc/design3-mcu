@@ -2,7 +2,7 @@
 
 #include "delay.h"
 
-void initTimer(void){
+void initTimer(void) {
     // +++ TIM7 - MicroSecond +++
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);
     TIM_TimeBaseInitTypeDef tim7_init_struct;
@@ -24,7 +24,7 @@ void initTimer(void){
     NVIC_Init(&NVIC1_InitStructure);
 }
 
-void TIM7_IRQHandler(void){
+void TIM7_IRQHandler(void) {
     //GPIO_ToggleBits(GPIOD, GPIO_Pin_15);
     MotorEncodersRead();
 #ifndef ID_MODE

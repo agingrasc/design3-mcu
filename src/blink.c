@@ -29,59 +29,48 @@ uint8_t current_led_state = 1;
 GPIO_InitTypeDef GPIO_InitStructure;
 GPIO_InitTypeDef GPIO_Btn_InitStructure;
 
-static void state_hold_up()
-{
-    if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) == 1)
-    {
+static void state_hold_up() {
+    if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) == 1) {
         state_change_accumulator = 0;
         current_button_state = TRANSITION_DOWN;
     }
 }
 
 
-static void state_transition_to_down()
-{
+static void state_transition_to_down() {
     state_change_accumulator += 1;
-    if (state_change_accumulator >= STATE_CHANGE_DELAY)
-    {
+    if (state_change_accumulator >= STATE_CHANGE_DELAY) {
         current_button_state = DOWN;
         current_led_state = !current_led_state;
     }
 }
 
-static void state_hold_down()
-{
+static void state_hold_down() {
     if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0)) {
         state_change_accumulator = 0;
         current_button_state = TRANSITION_UP;
     }
 }
 
-static void state_transition_to_up()
-{
-    if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) == 0)
-    {
+static void state_transition_to_up() {
+    if (GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) == 0) {
         state_change_accumulator += 1;
-    }
-    else
-    {
+    } else {
         state_change_accumulator = 0;
     }
-    if (state_change_accumulator >= STATE_CHANGE_DELAY)
-    {
+    if (state_change_accumulator >= STATE_CHANGE_DELAY) {
         current_button_state = UP;
     }
 }
 
-static void setup(void)
-{
+static void setup(void) {
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 
-    GPIO_InitStructure.GPIO_Pin   = ALL_LEDS;
+    GPIO_InitStructure.GPIO_Pin = ALL_LEDS;
     GPIO_Btn_InitStructure.GPIO_Pin = GPIO_Pin_0;
 
-    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_OUT;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
     GPIO_Btn_InitStructure.GPIO_Mode = GPIO_Mode_IN;
 
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
@@ -90,7 +79,7 @@ static void setup(void)
     GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
     GPIO_Btn_InitStructure.GPIO_OType = GPIO_OType_PP;
 
-    GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;
+    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
     GPIO_Btn_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 
     GPIO_Init(LEDS_GPIO_PORT, &GPIO_InitStructure);
@@ -99,15 +88,12 @@ static void setup(void)
     GPIO_ResetBits(LEDS_GPIO_PORT, ALL_LEDS);
 }
 
-int main(void)
-{
+int main(void) {
     setup();
-    while (1)
-    {
+    while (1) {
         if (current_led_state) {
             GPIO_SetBits(LEDS_GPIO_PORT, ALL_LEDS);
-        }
-        else {
+        } else {
             GPIO_ResetBits(LEDS_GPIO_PORT, ALL_LEDS);
         }
 

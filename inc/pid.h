@@ -5,6 +5,7 @@
 
 #include "main.h"
 #include "motor.h"
+
 #define P_GAIN 1
 #define I_GAIN 0
 #define D_GAIN 0
@@ -26,7 +27,9 @@ typedef struct PIDData {
 PIDType PID_data[MOTOR_COUNT];
 
 void pidInit(void);
-float computePIDCommand(PIDType*, uint32_t, int, int);
+
+float computePIDCommand(PIDType *, uint32_t, int, int);
+
 void updatePID(void);
 
 #endif

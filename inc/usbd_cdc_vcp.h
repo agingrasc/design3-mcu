@@ -34,26 +34,29 @@
 #include "usbd_cdc_core.h"
 #include "usbd_conf.h"
 
-uint16_t VCP_DataTx   (uint8_t* Buf, uint32_t Len);
-uint16_t VCP_DataRx   (uint8_t* Buf, uint32_t Len);
+uint16_t VCP_DataTx(uint8_t *Buf, uint32_t Len);
+
+uint16_t VCP_DataRx(uint8_t *Buf, uint32_t Len);
 
 void VCP_put_char(uint8_t buf);
-void VCP_send_str(uint8_t* buf);
+
+void VCP_send_str(uint8_t *buf);
+
 uint8_t VCP_get_char(uint8_t *buf);
+
 uint8_t VCP_get_string(uint8_t *buf);
 
 /* Exported typef ------------------------------------------------------------*/
 /* The following structures groups all needed parameters to be configured for the 
    ComPort. These parameters can modified on the fly by the host through CDC class
    command class requests. */
-typedef struct
-{
-  uint32_t bitrate;
-  uint8_t  format;
-  uint8_t  paritytype;
-  uint8_t  datatype;
-	uint8_t changed;
-}LINE_CODING;
+typedef struct {
+    uint32_t bitrate;
+    uint8_t format;
+    uint8_t paritytype;
+    uint8_t datatype;
+    uint8_t changed;
+} LINE_CODING;
 
 
 #define DEFAULT_CONFIG                  0

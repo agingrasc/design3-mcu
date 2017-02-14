@@ -153,7 +153,7 @@ Data -		PB14
 /**
  * @}
  */
- 
+
 /**
  * @defgroup TM_USB_VCP_Typedefs
  * @brief    Library Typedefs
@@ -164,43 +164,43 @@ Data -		PB14
  * @brief VCP Result Enumerations
  */
 typedef enum {
-	TM_USB_VCP_OK,                  /*!< Everything ok */
-	TM_USB_VCP_ERROR,               /*!< An error occurred */
-	TM_USB_VCP_RECEIVE_BUFFER_FULL, /*!< Receive buffer is full */
-	TM_USB_VCP_DATA_OK,             /*!< Data OK */
-	TM_USB_VCP_DATA_EMPTY,          /*!< Data empty */
-	TM_USB_VCP_NOT_CONNECTED,       /*!< Not connected to PC */
-	TM_USB_VCP_CONNECTED,           /*!< Connected to PC */
-	TM_USB_VCP_DEVICE_SUSPENDED,    /*!< Device is suspended */
-	TM_USB_VCP_DEVICE_RESUMED       /*!< Device is resumed */
+    TM_USB_VCP_OK,                  /*!< Everything ok */
+    TM_USB_VCP_ERROR,               /*!< An error occurred */
+    TM_USB_VCP_RECEIVE_BUFFER_FULL, /*!< Receive buffer is full */
+    TM_USB_VCP_DATA_OK,             /*!< Data OK */
+    TM_USB_VCP_DATA_EMPTY,          /*!< Data empty */
+    TM_USB_VCP_NOT_CONNECTED,       /*!< Not connected to PC */
+    TM_USB_VCP_CONNECTED,           /*!< Connected to PC */
+    TM_USB_VCP_DEVICE_SUSPENDED,    /*!< Device is suspended */
+    TM_USB_VCP_DEVICE_RESUMED       /*!< Device is resumed */
 } TM_USB_VCP_Result;
 
 /**
  * @brief  Structure for USART if you are working USB/UART converter with STM32F4xx
  */
 typedef struct {
-	uint32_t Baudrate; /*!< Baudrate, which is set by user on terminal. 
+    uint32_t Baudrate; /*!< Baudrate, which is set by user on terminal.
 	                        Value is number of bits per second, for example: 115200 */
-	uint8_t Stopbits;  /*!< Stop bits, which is set by user on terminal.
+    uint8_t Stopbits;  /*!< Stop bits, which is set by user on terminal.
 	                        Possible values:
                                - 0: 1 stop bit
                                - 1: 1.5 stop bits
                                - 2: 2 stop bits */
-	uint8_t DataBits;  /*!< Data bits, which is set by user on terminal.
+    uint8_t DataBits;  /*!< Data bits, which is set by user on terminal.
                             Possible values:
                                - 5: 5 data bits
                                - 6: 6 data bits
                                - 7: 7 data bits
                                - 8: 8 data bits
                                - 9: 9 data bits */
-	uint8_t Parity;    /*!< Parity, which is set by user on terminal.
+    uint8_t Parity;    /*!< Parity, which is set by user on terminal.
                             Possible values:
                                - 0: No parity
                                - 1: Odd parity
                                - 2: Even parity
                                - 3: Mark parity
                                - 4: Space parity */
-	uint8_t Changed;   /*!< When you check for settings in my function, 
+    uint8_t Changed;   /*!< When you check for settings in my function,
 	                        this will be set to 1 if user has changed parameters,
                             so you can reinitialize USART peripheral if you need to. */
 } TM_USB_VCP_Settings_t;
@@ -216,9 +216,13 @@ typedef struct {
  */
 
 int usb_empty_buffer(void);
-int usb_read_cmd_header(char*);
-int usb_read_cmd_payload(char*, uint8_t);
+
+int usb_read_cmd_header(char *);
+
+int usb_read_cmd_payload(char *, uint8_t);
+
 uint32_t usbserial_read_cmd();
+
 void usbserial_flush_buffer(void);
 
 /**
@@ -234,7 +238,7 @@ TM_USB_VCP_Result TM_USB_VCP_Init(void);
  * @param  *Settings: Pointer to TM_USB_VCP_Settings_t structure where to save data
  * @retval TM_USB_VCP_OK
  */
-TM_USB_VCP_Result TM_USB_VCP_GetSettings(TM_USB_VCP_Settings_t* Settings);
+TM_USB_VCP_Result TM_USB_VCP_GetSettings(TM_USB_VCP_Settings_t *Settings);
 
 /**
  * @brief  Gets received character from internal buffer
@@ -243,7 +247,7 @@ TM_USB_VCP_Result TM_USB_VCP_GetSettings(TM_USB_VCP_Settings_t* Settings);
  *            - TM_USB_VCP_DATA_OK: Character is valid inside *c_str
  *            - TM_USB_VCP_DATA_EMPTY: No character in *c
  */
-TM_USB_VCP_Result TM_USB_VCP_Getc(uint8_t* c);
+TM_USB_VCP_Result TM_USB_VCP_Getc(uint8_t *c);
 
 /**
  * @brief  Puts character to USB VCP
@@ -263,14 +267,14 @@ TM_USB_VCP_Result TM_USB_VCP_Putc(volatile char c);
  *            - 0: String not valid
  *            - > 0: String valid, number of characters inside string
  */
-uint16_t TM_USB_VCP_Gets(char* buffer, uint16_t bufsize);
+uint16_t TM_USB_VCP_Gets(char *buffer, uint16_t bufsize);
 
 /**
  * @brief  Puts string to USB VCP
  * @param  *str: Pointer to string variable
  * @retval TM_USB_VCP_OK
  */
-TM_USB_VCP_Result TM_USB_VCP_Puts(char* str);
+TM_USB_VCP_Result TM_USB_VCP_Puts(char *str);
 
 /**
  * @brief  Sends array of data to USB VCP
@@ -278,7 +282,7 @@ TM_USB_VCP_Result TM_USB_VCP_Puts(char* str);
  * @param  Length: Number of elements to sent in units of bytes
  * @retval Sending status
  */
-TM_USB_VCP_Result TM_USB_VCP_Send(uint8_t* DataArray, uint32_t Length);
+TM_USB_VCP_Result TM_USB_VCP_Send(uint8_t *DataArray, uint32_t Length);
 
 /**
  * @brief  Gets VCP status
@@ -322,11 +326,11 @@ extern TM_USB_VCP_Result TM_INT_USB_VCP_AddReceived(uint8_t c);
 /**
  * @}
  */
- 
+
 /**
  * @}
  */
- 
+
 /**
  * @}
  */

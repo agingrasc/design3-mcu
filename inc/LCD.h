@@ -8,15 +8,17 @@
 #ifndef LCD_H_
 #define LCD_H_
 
-#define MAX_COLS	16 // Maximum LCD screen columns
+#define MAX_COLS    16 // Maximum LCD screen columns
 
 void lcd_init();
+
 void lcd_send(uint8_t rs, uint8_t cmd);
+
 void lcd_set_cursor(uint8_t row, uint8_t col);
+
 void lcd_clear_row(uint8_t row);
 
 void lcd_putc(char ch);
-
 
 
 #endif /* LCD_H_ */
