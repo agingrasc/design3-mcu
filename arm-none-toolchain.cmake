@@ -8,7 +8,7 @@ set(CROSS_COMPILE arm-none-eabi-)
 
 # binaire pour la compilation
 CMAKE_FORCE_C_COMPILER(/usr/bin/arm-none-eabi-gcc GNU)
-set(CMAKE_C_COMPILER /opt/gcc-arm-embedded/gcc-arm-none-eabi-5_4-2016q2/bin/arm-none-eabi-gcc)
+set(CMAKE_C_COMPILER /usr/bin/arm-none-eabi-gcc)
 set(CMAKE_ASM_COMPILER /opt/gcc-arm-embedded/gcc-arm-none-eabi-5_4-2016q2/bin/arm-none-eabi-as)
 
 set(CMAKE_OBJCOPY arm-none-eabi-objcopy
