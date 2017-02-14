@@ -10,9 +10,7 @@
 #define SYSTICK_RELOAD SystemCoreClock/FREQUENCY
 uint32_t timestamp;
 
-void initTimer(void);
-void initDelay(void);
 void delay(uint32_t);
-void udelay(uint32_t);
-
+void udelay(uint16_t);
+void initTimer(void);
 #endif

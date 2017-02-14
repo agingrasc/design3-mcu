@@ -40,3 +40,10 @@
 
 # cmake
 cmake-build-debug
+
+# eclipse
+.project
+.cproject
+
+# various
+tmp

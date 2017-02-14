@@ -24,14 +24,8 @@ void initTimer(void){
     NVIC_Init(&NVIC1_InitStructure);
 }
 
-void SysTick_Handler(void){
-  //GPIO_ToggleBits(GPIOD, GPIO_Pin_13);
-  //MotorEncodersRead();
-  timestamp++;
-}
-
 void TIM7_IRQHandler(void){
-    GPIO_ToggleBits(GPIOD, GPIO_Pin_15);
+    //GPIO_ToggleBits(GPIOD, GPIO_Pin_15);
     MotorEncodersRead();
 #ifndef ID_MODE
     updatePID();
@@ -39,19 +33,11 @@ void TIM7_IRQHandler(void){
     TIM_ClearITPendingBit(TIM7, TIM_IT_Update);
 }
 
-void initDelay()
-{
-    timestamp = 0;
-    SysTick_Config(SYSTICK_RELOAD);
+void delay(uint32_t wait) {
+
 }
 
-void delay(uint32_t mSecToWait)
-{
-  uint32_t target = timestamp + mSecToWait;
-  while (target > timestamp);
+void udelay(uint16_t wait) {
+
 }
 
-void udelay(uint32_t microsec){
-    uint32_t i;
-    for(i=0;i<(microsec*100);i++);
-}
