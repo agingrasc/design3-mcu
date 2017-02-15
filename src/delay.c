@@ -9,13 +9,12 @@ void initDelay(void) {
     NVIC_InitTypeDef systick_init;
     systick_init.NVIC_IRQChannel = SysTick_IRQn;
     systick_init.NVIC_IRQChannelCmd = ENABLE;
-    systick_init.NVIC_IRQChannelPreemptionPriority = 0x05;
-    systick_init.NVIC_IRQChannelSubPriority = 0x05;
+    systick_init.NVIC_IRQChannelPreemptionPriority = 0x01;
+    systick_init.NVIC_IRQChannelSubPriority = 0x01;
     NVIC_Init(&systick_init);
 }
 
 void initTimer(void) {
-    // +++ TIM7 - MicroSecond +++
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM7, ENABLE);
     TIM_TimeBaseInitTypeDef tim7_init_struct;
     tim7_init_struct.TIM_CounterMode = TIM_CounterMode_Up;
@@ -27,14 +26,12 @@ void initTimer(void) {
     TIM_ITConfig(TIM7, TIM_IT_Update, ENABLE);
     TIM_Cmd(TIM7, ENABLE);
 
-    //timer responsable du timestamp
-    RCC_APB1PeriphClockCmd(RCC_APB2Periph_TIM9, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM9, ENABLE);
     TIM_TimeBaseInitTypeDef tim9_init_struct;
-    tim9_init_struct.TIM_CounterMode = TIM_CounterMode_Down;
+    tim9_init_struct.TIM_CounterMode = TIM_CounterMode_Up;
     tim9_init_struct.TIM_ClockDivision = TIM_CKD_DIV1;
-    // timer tick = 168 000 000 / ((499 + 1) * (1 + 1)) = 1000 (1ms)
-    tim9_init_struct.TIM_Prescaler = 499;
-    tim9_init_struct.TIM_Period = 1;
+    tim9_init_struct.TIM_Prescaler = 9990;
+    tim9_init_struct.TIM_Period = 1670;
     TIM_TimeBaseInit(TIM9, &tim9_init_struct);
     TIM_ITConfig(TIM9, TIM_IT_Update, ENABLE);
     TIM_Cmd(TIM9, ENABLE);
@@ -48,10 +45,10 @@ void initTimer(void) {
     NVIC_Init(&NVIC1_InitStructure);
 
     NVIC_InitTypeDef nvic2_init;
-    nvic2_init.NVIC_IRQChannel = 24; //la table d'interrupt a ete modifie pour pointer vers TIM9_Handler
+    nvic2_init.NVIC_IRQChannel = TIM9_IRQn;
     nvic2_init.NVIC_IRQChannelCmd = ENABLE;
-    nvic2_init.NVIC_IRQChannelPreemptionPriority = 0x0f;
-    nvic2_init.NVIC_IRQChannelSubPriority = 0x10;
+    nvic2_init.NVIC_IRQChannelPreemptionPriority = 0x05;
+    nvic2_init.NVIC_IRQChannelSubPriority = 0x05;
     NVIC_Init(&nvic2_init);
 }
 
@@ -63,7 +60,9 @@ void TIM7_IRQHandler(void) {
     TIM_ClearITPendingBit(TIM7, TIM_IT_Update);
 }
 
-void TIM9_IRQHandler(void) {
+void TIM9Handler(void) {
+    GPIO_ToggleBits(GPIOD, GPIO_Pin_15);
+    TIM_ClearITPendingBit(TIM9, TIM_IT_Update);
 }
 
 void SysTick_Handler(void) {

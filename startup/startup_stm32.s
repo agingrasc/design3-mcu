@@ -154,8 +154,8 @@ g_pfnVectors:
   .word     WWDG_IRQHandler                   /* Window WatchDog              */                                        
   .word     PVD_IRQHandler                    /* PVD through EXTI Line detection */                        
   .word     TAMP_STAMP_IRQHandler             /* Tamper and TimeStamps through the EXTI line */            
-  .word     RTC_WKUP_IRQHandler               /* RTC Wakeup through the EXTI line */                      
-  .word     FLASH_IRQHandler                  /* FLASH (4)                       */
+  .word     RTC_WKUP_IRQHandler               /* RTC Wakeup through the EXTI line */
+  .word     FLASH_IRQHandler                  /* FLASH (4)                    */
   .word     RCC_IRQHandler                    /* RCC                          */                                            
   .word     EXTI0_IRQHandler                  /* EXTI Line0                   */                        
   .word     EXTI1_IRQHandler                  /* EXTI Line1                   */                          
@@ -165,7 +165,7 @@ g_pfnVectors:
   .word     DMA1_Stream0_IRQHandler           /* DMA1 Stream 0                */                  
   .word     DMA1_Stream1_IRQHandler           /* DMA1 Stream 1                */                   
   .word     DMA1_Stream2_IRQHandler           /* DMA1 Stream 2                */                   
-  .word     DMA1_Stream3_IRQHandler           /* DMA1 Stream 3 (14)               */
+  .word     DMA1_Stream3_IRQHandler           /* DMA1 Stream 3 (14)           */
   .word     DMA1_Stream4_IRQHandler           /* DMA1 Stream 4                */                   
   .word     DMA1_Stream5_IRQHandler           /* DMA1 Stream 5                */                   
   .word     DMA1_Stream6_IRQHandler           /* DMA1 Stream 6                */                   
@@ -175,7 +175,7 @@ g_pfnVectors:
   .word     CAN1_RX1_IRQHandler               /* CAN1 RX1                     */                          
   .word     CAN1_SCE_IRQHandler               /* CAN1 SCE                     */                          
   .word     EXTI9_5_IRQHandler                /* External Line[9:5]s          */                          
-  .word     TIM9_IRQHandler                   /* TIM1 Break and TIM9 (24)         */
+  .word     TIM9Handler                       /* TIM9 (24)                    */
   .word     TIM1_UP_TIM10_IRQHandler          /* TIM1 Update and TIM10        */         
   .word     TIM1_TRG_COM_TIM11_IRQHandler     /* TIM1 Trigger and Commutation and TIM11 */
   .word     TIM1_CC_IRQHandler                /* TIM1 Capture Compare         */                          
