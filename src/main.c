@@ -1,7 +1,6 @@
 // main.c
 
 #include "main.h"
-
 void initLed() {
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 
@@ -69,17 +68,12 @@ void checkForVCP() {
 int main() {
     current_motor = 0;
 
-    SystemInit();
-
     initLed();
-
     /* Initialize USB virtual COM port */
     TM_USB_VCP_Init();
-
+    initDelay();
     initTimer();
-
     lcd_init();
-
     motorControllerInit();
 #ifndef ID_MODE
     pidInit();
@@ -140,15 +134,6 @@ int main() {
             command_execute(&cmd);
             cmd_header_ok = 0;
             cmd_payload_ok = 0;
-        }
-
-        // Update time line, if necessary
-        unsigned int mstemp = (unsigned int) (timestamp / 1000);
-        if (mstemp != last_second) { // One second elapsed
-            updateDisplay(); // Update time on LCD
-            //uart_write_buffer(id_val_consigne, ID_VAL_COUNT);
-            //uart_write_byte('a');
-            last_second = mstemp;
         }
     }
 }

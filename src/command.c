@@ -1,6 +1,7 @@
 #include <sched.h>
 #include <stm32f4xx_conf.h>
 #include <tm_stm32f4_usb_vcp.h>
+#include <delay.h>
 #include "command.h"
 
 #define MOVE_CMD 0x00
@@ -26,6 +27,18 @@ void cmd_led(command *cmd) {
             TM_USB_VCP_Putc(CMD_EXECUTE_OK);
             break;
         case 3:
+            GPIO_ResetBits(GPIOD, GREEN_LED);
+            TM_USB_VCP_Putc(CMD_EXECUTE_OK);
+            break;
+        case 4:
+            GPIO_SetBits(GPIOD, RED_LED);
+            delay(1);
+            GPIO_ResetBits(GPIOD, RED_LED);
+            TM_USB_VCP_Putc(CMD_EXECUTE_OK);
+            break;
+        case 5:
+            GPIO_SetBits(GPIOD, GREEN_LED);
+            delay(1000);
             GPIO_ResetBits(GPIOD, GREEN_LED);
             TM_USB_VCP_Putc(CMD_EXECUTE_OK);
             break;

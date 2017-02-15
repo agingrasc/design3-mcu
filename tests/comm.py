@@ -27,7 +27,7 @@ ser.write(b'\x01')
 print_code(PAYLOAD_W)
 
 # wait
-time.sleep(1)
+time.sleep(0.5)
 
 # test éteindre led verte (bleu)
 ser.write(b'\x03\x01\xfc')
@@ -35,10 +35,19 @@ print_code(HEADER_W)
 ser.write(b'\x03')
 print_code(PAYLOAD_W)
 
-# test led innexistante
+# wait
+time.sleep(0.5)
+
+# test led 1 seconde sur mcu
 ser.write(b'\x03\x01\xfc')
 print_code(HEADER_W)
 ser.write(b'\x05')
+print_code(PAYLOAD_W)
+
+# test led innexistante
+ser.write(b'\x03\x01\xfc')
+print_code(HEADER_W)
+ser.write(b'\xff')
 print_expect(32)
 print_code(PAYLOAD_W)
 

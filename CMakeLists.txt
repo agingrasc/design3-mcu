@@ -18,6 +18,11 @@ include_directories("./inc"
         "${STM_ROOT}/Libraries/CMSIS/ST/STM32F4xx/Include"
         "${STM_ROOT}/Libraries/STM32F4xx_StdPeriph_Driver/inc")
 
+link_directories(
+        /usr/arm-none-eabi/lib/fpu
+        /usr/lib/gcc/arm-none-eabi/6.3.0/fpu
+)
+
 set(SOURCE_FILES
         src/main.c
         src/manchester.c
@@ -53,7 +58,7 @@ set(SOURCE_FILES
 
 # Flags de compilation par source
 set(STM32_FLAGS "-mfpu=fpv4-sp-d16 -mthumb -mthumb-interwork -mlittle-endian -mfloat-abi=hard -march=armv7-m")
-set(GENERAL_COMPILE_FLAGS"-Wall")
+set(GENERAL_COMPILE_FLAGS "-Wall --sysroot=/usr/arm-none-eabi")
 set(GENERAL_COMPILE_DEFINE "-DSTM32F4 -DUSE_STDPERIPH_DRIVER -DSTM32F40XX -DSTM32F40_41xxx")
 set_source_files_properties(${SOURCE_FILES} PROPERTY COMPILE_FLAGS "${STM32_FLAGS} ${GENERAL_COMPILE_FLAGS} ${GENERAL_COMPILE_DEFINE}")
 set_source_files_properties(startup/startup_stm32.s PROPERTY COMPILE_FLAGS "${STM32_FLAGS}")

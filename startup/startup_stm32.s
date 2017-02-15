@@ -143,7 +143,7 @@ g_pfnVectors:
   .word  0
   .word  0
   .word  0
-  .word  0
+  .word  0 /* (10) */
   .word  SVC_Handler
   .word  DebugMon_Handler
   .word  0
@@ -155,7 +155,7 @@ g_pfnVectors:
   .word     PVD_IRQHandler                    /* PVD through EXTI Line detection */                        
   .word     TAMP_STAMP_IRQHandler             /* Tamper and TimeStamps through the EXTI line */            
   .word     RTC_WKUP_IRQHandler               /* RTC Wakeup through the EXTI line */                      
-  .word     FLASH_IRQHandler                  /* FLASH                        */                                          
+  .word     FLASH_IRQHandler                  /* FLASH (4)                       */
   .word     RCC_IRQHandler                    /* RCC                          */                                            
   .word     EXTI0_IRQHandler                  /* EXTI Line0                   */                        
   .word     EXTI1_IRQHandler                  /* EXTI Line1                   */                          
@@ -165,7 +165,7 @@ g_pfnVectors:
   .word     DMA1_Stream0_IRQHandler           /* DMA1 Stream 0                */                  
   .word     DMA1_Stream1_IRQHandler           /* DMA1 Stream 1                */                   
   .word     DMA1_Stream2_IRQHandler           /* DMA1 Stream 2                */                   
-  .word     DMA1_Stream3_IRQHandler           /* DMA1 Stream 3                */                   
+  .word     DMA1_Stream3_IRQHandler           /* DMA1 Stream 3 (14)               */
   .word     DMA1_Stream4_IRQHandler           /* DMA1 Stream 4                */                   
   .word     DMA1_Stream5_IRQHandler           /* DMA1 Stream 5                */                   
   .word     DMA1_Stream6_IRQHandler           /* DMA1 Stream 6                */                   
@@ -175,7 +175,7 @@ g_pfnVectors:
   .word     CAN1_RX1_IRQHandler               /* CAN1 RX1                     */                          
   .word     CAN1_SCE_IRQHandler               /* CAN1 SCE                     */                          
   .word     EXTI9_5_IRQHandler                /* External Line[9:5]s          */                          
-  .word     TIM1_BRK_TIM9_IRQHandler          /* TIM1 Break and TIM9          */         
+  .word     TIM9_IRQHandler                   /* TIM1 Break and TIM9 (24)         */
   .word     TIM1_UP_TIM10_IRQHandler          /* TIM1 Update and TIM10        */         
   .word     TIM1_TRG_COM_TIM11_IRQHandler     /* TIM1 Trigger and Commutation and TIM11 */
   .word     TIM1_CC_IRQHandler                /* TIM1 Capture Compare         */                          
@@ -185,7 +185,7 @@ g_pfnVectors:
   .word     I2C1_EV_IRQHandler                /* I2C1 Event                   */                          
   .word     I2C1_ER_IRQHandler                /* I2C1 Error                   */                          
   .word     I2C2_EV_IRQHandler                /* I2C2 Event                   */                          
-  .word     I2C2_ER_IRQHandler                /* I2C2 Error                   */                            
+  .word     I2C2_ER_IRQHandler                /* I2C2 Error (34)                  */
   .word     SPI1_IRQHandler                   /* SPI1                         */                   
   .word     SPI2_IRQHandler                   /* SPI2                         */                   
   .word     USART1_IRQHandler                 /* USART1                       */                   
@@ -195,7 +195,7 @@ g_pfnVectors:
   .word     RTC_Alarm_IRQHandler              /* RTC Alarm (A and B) through EXTI Line */                 
   .word     OTG_FS_WKUP_IRQHandler            /* USB OTG FS Wakeup through EXTI line */                       
   .word     TIM8_BRK_TIM12_IRQHandler         /* TIM8 Break and TIM12         */         
-  .word     TIM8_UP_TIM13_IRQHandler          /* TIM8 Update and TIM13        */         
+  .word     TIM8_UP_TIM13_IRQHandler          /* TIM8 Update and TIM13 (44)       */
   .word     TIM8_TRG_COM_TIM14_IRQHandler     /* TIM8 Trigger and Commutation and TIM14 */
   .word     TIM8_CC_IRQHandler                /* TIM8 Capture Compare         */                          
   .word     DMA1_Stream7_IRQHandler           /* DMA1 Stream7                 */                          
@@ -203,9 +203,9 @@ g_pfnVectors:
   .word     SDIO_IRQHandler                   /* SDIO                         */                   
   .word     TIM5_IRQHandler                   /* TIM5                         */                   
   .word     SPI3_IRQHandler                   /* SPI3                         */                   
-  .word     UART4_IRQHandler                  /* UART4                        */                   
+  .word     UART4_IRQHandler                  /* UART4                        */
   .word     UART5_IRQHandler                  /* UART5                        */                   
-  .word     TIM6_DAC_IRQHandler               /* TIM6 and DAC1&2 underrun errors */                   
+  .word     TIM6_DAC_IRQHandler               /* TIM6 and DAC1&2 underrun errors (54) */
   .word     TIM7_IRQHandler                   /* TIM7                         */
   .word     DMA2_Stream0_IRQHandler           /* DMA2 Stream 0                */                   
   .word     DMA2_Stream1_IRQHandler           /* DMA2 Stream 1                */                   
@@ -341,8 +341,8 @@ g_pfnVectors:
    .weak      EXTI9_5_IRQHandler   
    .thumb_set EXTI9_5_IRQHandler,Default_Handler
             
-   .weak      TIM1_BRK_TIM9_IRQHandler            
-   .thumb_set TIM1_BRK_TIM9_IRQHandler,Default_Handler
+   .weak      TIM9_IRQHandler
+   .thumb_set TIM9_IRQHandler,Default_Handler
             
    .weak      TIM1_UP_TIM10_IRQHandler            
    .thumb_set TIM1_UP_TIM10_IRQHandler,Default_Handler
@@ -425,7 +425,7 @@ g_pfnVectors:
    .weak      SPI3_IRQHandler            
    .thumb_set SPI3_IRQHandler,Default_Handler
                      
-   .weak      UART4_IRQHandler         
+   .weak      UART4_IRQHandler
    .thumb_set UART4_IRQHandler,Default_Handler
                   
    .weak      UART5_IRQHandler         
