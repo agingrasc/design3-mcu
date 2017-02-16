@@ -16,6 +16,9 @@ include_directories("./inc"
         "${STM_ROOT}/Utilities/STM32F4-Discovery"
         "${STM_ROOT}/Libraries/CMSIS/Include"
         "${STM_ROOT}/Libraries/CMSIS/ST/STM32F4xx/Include"
+        "${STM_ROOT}/Libraries/STM32_USB_OTG_Driver/inc"
+        "${STM_ROOT}/Libraries/STM32_USB_Device_Library/Class/cdc/inc"
+        "${STM_ROOT}/Libraries/STM32_USB_Device_Library/Core/inc"
         "${STM_ROOT}/Libraries/STM32F4xx_StdPeriph_Driver/inc")
 
 link_directories(
@@ -37,15 +40,8 @@ set(SOURCE_FILES
         src/tm_stm32f4_usb_vcp.c
         src/uart.c
         src/usb_bsp.c
-        src/usb_core.c
-        src/usb_dcd.c
-        src/usb_dcd_int.c
-        src/usbd_cdc_core.c
         src/usbd_cdc_vcp.c
-        src/usbd_core.c
         src/usbd_desc.c
-        src/usbd_ioreq.c
-        src/usbd_req.c
         src/usbd_usr.c
         src/command.c
         ${STM_SRC_ROOT}/stm32f4xx_gpio.c
@@ -54,6 +50,13 @@ set(SOURCE_FILES
         ${STM_SRC_ROOT}/stm32f4xx_usart.c
         ${STM_SRC_ROOT}/stm32f4xx_exti.c
         ${STM_SRC_ROOT}/misc.c
+        ${STM_ROOT}/Libraries/STM32_USB_OTG_Driver/src/usb_core.c
+        ${STM_ROOT}/Libraries/STM32_USB_OTG_Driver/src/usb_dcd.c
+        ${STM_ROOT}/Libraries/STM32_USB_OTG_Driver/src/usb_dcd_int.c
+        ${STM_ROOT}/Libraries/STM32_USB_Device_Library/Class/cdc/src/usbd_cdc_core.c
+        ${STM_ROOT}/Libraries/STM32_USB_Device_Library/Core/src/usbd_core.c
+        ${STM_ROOT}/Libraries/STM32_USB_Device_Library/Core/src/usbd_ioreq.c
+        ${STM_ROOT}/Libraries/STM32_USB_Device_Library/Core/src/usbd_req.c
         )
 
 # Flags de compilation par source
