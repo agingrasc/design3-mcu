@@ -2,12 +2,14 @@
 communication."""
 from enum import Enum
 
+import struct
+
 
 class PayloadLength(Enum):
-    MOVE = 3
-    LED = 1
-    PENCIL = 1
-    CAMERA = 2
+    MOVE = 6
+    LED = 2
+    PENCIL = 2
+    CAMERA = 4
 
 
 class CommandType(Enum):
@@ -66,10 +68,12 @@ def _generate_payload(payload: list) -> bytes:
         La liste des arguments en representations binaires
     """
     assert isinstance(payload, list), "Le payload doit etre une liste"
+    byte_payload = b''
     for arg in payload:
-        assert arg < 256, "L'argument dans un payload doit etre inferieur a 256"
-        assert arg >= 0, "L'argument dans un payload doit etre signe"
-    return bytes(payload)
+        assert arg < 32768, "L'argument dans un payload doit etre inferieur a 32768"
+        assert arg >= -32768, "L'argument dans un payload doit etre superieur ou egal a -32768"
+        byte_payload += struct.pack('>h', arg)
+    return byte_payload
 
 
 def _generate_header(cmd_type: CommandType, payload_len: PayloadLength) -> bytes:
