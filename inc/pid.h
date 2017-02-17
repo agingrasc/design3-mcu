@@ -6,30 +6,21 @@
 #include "main.h"
 #include "motor.h"
 
-#define P_GAIN 1
-#define I_GAIN 0
-#define D_GAIN 0
-#define MAX_COMMAND 1
-#define DELTA_T_TIMESCALE 1000 //ms
 
 //doc: http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-introduction/
 
 typedef struct PIDData {
-    float proportionalGain;
-    float integralGain;
-    float derivativeGain;
-    float previousInput;
-    float maxCommand;
-    float accumulator;
+    short proportionalGain;
+    short integralGain;
+    short previousInput;
+    short accumulator;
     uint32_t lastTimestamp;
-} PIDType;
+} PIDData;
 
-PIDType PID_data[MOTOR_COUNT];
+PIDData PID_data[MOTOR_COUNT];
 
 void pidInit(void);
-
-float computePIDCommand(PIDType *, uint32_t, int, int);
-
+void pid_setpoint(Motor*, short);
 void updatePID(void);
 
 #endif

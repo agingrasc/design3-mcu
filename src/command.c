@@ -49,18 +49,19 @@ void cmd_led(command *cmd) {
 }
 
 void cmd_move(command* cmd) {
-    char* payload = cmd->payload;
-    short x = 0;
-    x |= (cmd->payload[0] & 0xff) << 8;
-    x |= cmd->payload[1] & 0xff;
+    short* payload = cmd->payload;
+    short x = payload[0];
+    short y = payload[1];
+    short t = payload[2];
 
-    short y = 0;
-    y |= (cmd->payload[2] & 0xff) << 8;
-    y |= (cmd->payload[3] & 0xff);
+    // on distribue la rotation en creant des differentiels en x et y
+    short partial_t = t/4;
 
-    short t = 0;
-    t |= (cmd->payload[4] & 0xff) << 8;
-    t |= (cmd->payload[5] & 0xff);
+    // FIXME: verifier que les bon moteurs recoivent les bonnes consignes
+    pid_setpoint(&motors[0], x + partial_t);
+    pid_setpoint(&motors[1], x - partial_t);
+    pid_setpoint(&motors[2], y + partial_t);
+    pid_setpoint(&motors[3], y - partial_t);
 
     TM_USB_VCP_Putc(CMD_EXECUTE_OK);
 }

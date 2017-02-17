@@ -1,10 +1,3 @@
-/*
- * motor.h
- *
- *  Created on: Jan 27, 2017
- *      Author: dark
- */
-
 #ifndef MOTOR_H_
 #define MOTOR_H_
 
@@ -18,7 +11,7 @@
 typedef struct motor {
     // PWM (speed)
     __IO uint32_t *duty_cycle;
-    char input_consigne;
+    int input_consigne;
     uint32_t consigne_pulse;
     char old_consigne_percent;
     char consigne_percent;

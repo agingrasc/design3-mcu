@@ -1,6 +1,19 @@
 // pid.c
 
+#include <stdlib.h>
 #include "pid.h"
+
+#define P_GAIN 1
+#define I_GAIN 0
+#define MIN_PERCENTAGE 20
+#define MAX_COMMAND 16767
+#define MIN_COMMAND (MIN_PERCENTAGE * 16767 / 100)
+#define DELTA_T_TIMESCALE 1000 //ms
+
+#define MAX_SETPOINT 16767
+#define MAX_TICK_PER_SECOND 12000
+
+short pid_compute_cmd(PIDData*, uint32_t, int, int);
 
 /**
  * Initialise le PID
@@ -9,35 +22,68 @@ void pidInit(void) {
     // Init structure
     PID_data[current_motor].proportionalGain = P_GAIN;
     PID_data[current_motor].integralGain = I_GAIN;
-    PID_data[current_motor].derivativeGain = D_GAIN;
     PID_data[current_motor].previousInput = 0;
-    PID_data[current_motor].maxCommand = MAX_COMMAND;
     PID_data[current_motor].accumulator = 0;
     PID_data[current_motor].lastTimestamp = 0;
+}
+
+void pid_setpoint(Motor *motor, short setpoint) {
+    motor->input_consigne = (setpoint / MAX_SETPOINT) * MAX_TICK_PER_SECOND;
+}
+
+/**
+ * Boucle du PID de l'interruption
+ */
+void updatePID(void) {
+    for (int i = 0; i < MOTOR_COUNT; i++) {
+        uint32_t work_timestamp = timestamp;
+        if (PID_mode) {
+            short speed_cmd = pid_compute_cmd(&PID_data[i], work_timestamp, motors[i].input_consigne,
+                                              motors[i].motor_speed);
+            uint32_t new_consig = (speed_cmd / MAX_COMMAND) * 100;
+            setupPWMPercentage(i, new_consig);
+        }
+        else {
+            setupPWMPercentage(i, motors[i].consigne_percent);
+        }
+    }
 }
 
 /**
  * Limite la commande
  */
-float clampCommand(PIDType *pidData, float naiveCommand) {
-    if (naiveCommand > pidData->maxCommand) {
-        return pidData->maxCommand;
+float clampCommand(short naiveCommand) {
+    if (naiveCommand > MAX_COMMAND) {
+        return MAX_COMMAND;
+    } else if (naiveCommand < -MAX_COMMAND) {
+        return -MAX_COMMAND;
     } else {
         return naiveCommand;
     }
 }
 
 /**
- * Limite la valeur de l'accumulator
+ * Limite la valeur de l'accumulateur
  */
-float clampAccumulator(PIDType *pidData, float accVal) {
-    float maxAccumulator = pidData->maxCommand / pidData->integralGain;
+int clampAccumulator(PIDData *pidData, float accVal) {
+    int maxAccumulator = MAX_COMMAND / pidData->integralGain;
     if (accVal > maxAccumulator) {
         pidData->accumulator = maxAccumulator;
         return maxAccumulator;
+    } else if (accVal < -maxAccumulator) {
+        pidData->accumulator = -maxAccumulator;
     } else {
         pidData->accumulator = accVal;
         return accVal;
+    }
+}
+
+int relinearize_command(int cmd) {
+    if (cmd > 0) {
+        return cmd+MIN_COMMAND;
+    }
+    else {
+        return cmd-MIN_COMMAND;
     }
 }
 
@@ -50,38 +96,22 @@ float clampAccumulator(PIDType *pidData, float accVal) {
  * - current_speed -> l'état actuel du plant en tick/s
  *
  * Return:
- * La commande [0, 1], où 1 équivaut à 100% de la tension.
+ * La commande -12000 à 12000 en nombre de tick par seconde
  */
-float computePIDCommand(PIDType *pidData, uint32_t timestamp, int targetSpeed, int current_speed) {
-    float delta_t = (timestamp - pidData->lastTimestamp) / DELTA_T_TIMESCALE;
-    float error = targetSpeed - current_speed;
-    float pCmd = pidData->proportionalGain * error;
-    float iCmd = pidData->accumulator + pidData->integralGain * error * delta_t;
+short pid_compute_cmd(PIDData *pidData, uint32_t timestamp, int targetSpeed, int current_speed) {
+    uint32_t delta_t = (timestamp - pidData->lastTimestamp) / DELTA_T_TIMESCALE;
+    int error = targetSpeed - current_speed;
+    int pCmd = pidData->proportionalGain * error;
+    int iCmd = pidData->accumulator + pidData->integralGain * error * delta_t;
     iCmd = clampAccumulator(pidData, iCmd);
-    float inputDerivative = current_speed - pidData->previousInput;
-    float dCmd = inputDerivative * pidData->derivativeGain / delta_t;
 
-    float naiveCmd = pCmd + iCmd + dCmd;
-    float cmd = clampCommand(pidData, naiveCmd);
+    int naiveCmd = pCmd + iCmd;
+    int cmd = clampCommand(naiveCmd);
 
+    cmd = relinearize_command(cmd);
     //sauvegarde donnee pour prochain calcul
     pidData->previousInput = current_speed;
     pidData->lastTimestamp = timestamp;
     return cmd;
 }
 
-/**
- * Boucle du PID de l'interruption
- */
-void updatePID(void) {
-    for (int i = 0; i < MOTOR_COUNT; i++) {
-        if (PID_mode) {
-            float perc_consig = computePIDCommand(&PID_data[i], timestamp, (int) motors[i].input_consigne,
-                                                  (int) motors[i].motor_speed);
-            uint32_t new_consig = perc_consig * 100;
-            setupPWMPercentage(i, new_consig);
-        } else {
-            setupPWMPercentage(i, motors[i].consigne_percent);
-        }
-    }
-}

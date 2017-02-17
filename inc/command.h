@@ -1,6 +1,8 @@
 #ifndef DESIGN3_MCU_COMMAND_H
 #define DESIGN3_MCU_COMMAND_H
 
+#include "pid.h"
+
 #define CMD_RECEPTION_OK 0x00
 #define CMD_CHECKSUM_FAILURE 0x10
 #define CMD_INVALID_HEADER 0x11
