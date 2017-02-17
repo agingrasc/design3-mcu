@@ -61,7 +61,6 @@ void TIM7_IRQHandler(void) {
 }
 
 void TIM9Handler(void) {
-    GPIO_ToggleBits(GPIOD, GPIO_Pin_15);
     TIM_ClearITPendingBit(TIM9, TIM_IT_Update);
 }
 

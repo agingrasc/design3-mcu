@@ -53,15 +53,19 @@ int usb_read_cmd_header(char *header) {
     return 3;
 }
 
-int usb_read_cmd_payload(char *payload, uint8_t size) {
+int usb_read_cmd_payload(short* payload, uint8_t size) {
     if (tm_int_usb_vcp_buf_num < size) {
         return 0;
     }
 
-    char c;
-    for (int i = 0; i < size; i++) {
-        TM_USB_VCP_Getc(&c);
-        payload[i] = c;
+    uint8_t high_byte;
+    uint8_t low_byte;
+    for (int i = 0; i < size/2; i++) {
+        TM_USB_VCP_Getc(&high_byte);
+        TM_USB_VCP_Getc(&low_byte);
+        payload[i] = 0;
+        payload[i] |= (high_byte & 0xff) << 8;
+        payload[i] |= (low_byte & 0xff);
     }
     return size;
 }

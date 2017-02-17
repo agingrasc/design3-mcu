@@ -48,10 +48,27 @@ void cmd_led(command *cmd) {
     }
 }
 
+void cmd_move(command* cmd) {
+    char* payload = cmd->payload;
+    short x = 0;
+    x |= (cmd->payload[0] & 0xff) << 8;
+    x |= cmd->payload[1] & 0xff;
+
+    short y = 0;
+    y |= (cmd->payload[2] & 0xff) << 8;
+    y |= (cmd->payload[3] & 0xff);
+
+    short t = 0;
+    t |= (cmd->payload[4] & 0xff) << 8;
+    t |= (cmd->payload[5] & 0xff);
+
+    TM_USB_VCP_Putc(CMD_EXECUTE_OK);
+}
+
 int command_execute(command *cmd) {
     switch (cmd->header.type) {
         case (uint8_t) MOVE_CMD:
-            //call pid(cmd.payload[0], cmd.payload[1], cmd.payload[2], delta_t);
+            cmd_move(cmd);
             break;
         case (uint8_t) CAMERA_CMD:
             //call move camera angle payload[0], payload[1]

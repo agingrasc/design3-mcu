@@ -219,7 +219,7 @@ int usb_empty_buffer(void);
 
 int usb_read_cmd_header(char *);
 
-int usb_read_cmd_payload(char *, uint8_t);
+int usb_read_cmd_payload(short*, uint8_t);
 
 uint32_t usbserial_read_cmd();
 

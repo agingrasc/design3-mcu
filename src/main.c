@@ -121,7 +121,7 @@ int main() {
         }
 
         if (cmd_header_ok && !TM_USB_VCP_BufferEmpty()) {
-            char payload[256];
+            short payload[256];
             cmd_payload_ok = usb_read_cmd_payload(payload, cmd.header.size);
             if (cmd_payload_ok) {
                 for (int i = 0; i < cmd.header.size; i++) {
