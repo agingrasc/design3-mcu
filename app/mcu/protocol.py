@@ -24,6 +24,8 @@ class Leds(Enum):
     UP_GREEN = 1
     DOWN_RED = 2
     DOWN_GREEN = 3
+    BLINK_RED = 4
+    BLINK_GREEN = 5
 
 
 class PencilStatus(Enum):
