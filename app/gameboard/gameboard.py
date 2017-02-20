@@ -106,6 +106,7 @@ class Coordinate(position.Position):
     def __init__(self, pos_x, pos_y):
         position.Position.__init__(self, pos_x, pos_y)
         self.tag = Tag.CAN_PASS
+        self.weight = 0
 
     def set_tag(self, new_tag):
         self.tag = new_tag
