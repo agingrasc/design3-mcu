@@ -1,3 +1,4 @@
+import sys
 import collections
 from enum import Enum
 from . import position
@@ -12,6 +13,7 @@ class Tag(Enum):
     CAN_PASS = ' '
     CANT_PASS_RIGHT = "OCPR"
     CANT_PASS_LEFT = "OCPL"
+    PATH = 'O'
 
 
 class GameBoard:
@@ -119,7 +121,13 @@ class Coordinate(position.Position):
         self.tag = new_tag
 
     def set_weight(self, weight):
-        self.weight = weight
+        if self.tag == Tag.OBSTACLE:
+            self.weight = sys.maxsize 
+        else:
+            self.weight = weight
+
+    def set_path(self):
+        self.tag = Tag.PATH
 
     def get_signe(self):
         if self.tag == Tag.ROBOT:
@@ -128,5 +136,7 @@ class Coordinate(position.Position):
             return Tag.PICTURE
         elif self.tag == Tag.OBSTACLE:
             return Tag.OBSTACLE
+        elif self.tag == Tag.PATH:
+            return Tag.PATH
         else:
             return Tag.CAN_PASS

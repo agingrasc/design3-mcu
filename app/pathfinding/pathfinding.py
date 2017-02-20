@@ -5,8 +5,28 @@ class PathFinding:
     def __init__(self):
         pass
 
-    def build_grid(self, grid, begin_position, end_position):
-        initialise_weight(grid, begin_position)
+    def find(self, grid, begin_position, end_position):
+        initialise_weight(grid, end_position)
+        path = []
+        current_neighbor = begin_position
+        while current_neighbor.weight > 0:
+            print("Current Neighbor")
+            print("x : " + str(current_neighbor.pos_x) + "y : " + str(current_neighbor.pos_y))
+            print("Current weight : " + str(current_neighbor.weight))
+            neighbors = grid.neighbors(current_neighbor)
+            current_neighbor = find_minimum(neighbors)
+            current_neighbor.set_path()
+            path.append(current_neighbor)
+        return path
+
+
+def find_minimum(neighbors):
+    current_neighbor = neighbors[0]
+    for neighbor in neighbors:
+        if neighbor.weight < current_neighbor.weight:
+            current_neighbor = neighbor
+    return current_neighbor
+
 
 def initialise_weight(grid, begin_position):
     neighbors = grid.neighbors(begin_position)
