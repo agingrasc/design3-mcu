@@ -8,6 +8,9 @@
 #define CAMERA_CMD 0x01
 #define PENCIL_CMD 0x02
 #define LED_CMD 0x03
+#define MANUAL_SPEED_CMD 0xa0
+#define READ_ENCODER 0xa1
+#define TOGGLE_PID 0xa2
 
 #define GREEN_LED GPIO_Pin_15
 #define RED_LED GPIO_Pin_14
@@ -66,6 +69,36 @@ void cmd_move(command* cmd) {
     TM_USB_VCP_Putc(CMD_EXECUTE_OK);
 }
 
+int cmd_manual_speed(command *cmd) {
+    short* payload = cmd->payload;
+    short motor_id = payload[0];
+    short pwm = payload[1];
+    short direction = payload[2];
+
+    uint8_t dir = MC_DIR_BGND;
+    if (direction == 0) {
+        dir = MC_DIR_CW;
+    }
+    else if (direction == 1) {
+        dir = MC_DIR_CCW;
+    }
+
+    motorSetDirection(motor_id, dir);
+    motors[motor_id].consigne_percent = pwm;
+
+    TM_USB_VCP_Putc(CMD_EXECUTE_OK);
+}
+
+int cmd_read_encoder(command *cmd) {
+    short motor = cmd->payload[0];
+    int16_t speed = (int16_t) motors[motor].motor_speed;
+    char high = (speed >> 8) & 0xff;
+    char low = speed & 0xff;
+    TM_USB_VCP_Putc(high);
+    TM_USB_VCP_Putc(low);
+    TM_USB_VCP_Putc(CMD_EXECUTE_OK);
+}
+
 int command_execute(command *cmd) {
     switch (cmd->header.type) {
         case (uint8_t) MOVE_CMD:
@@ -79,6 +112,15 @@ int command_execute(command *cmd) {
             break;
         case (uint8_t) LED_CMD:
             cmd_led(cmd);
+            break;
+        case (uint8_t) MANUAL_SPEED_CMD:
+            cmd_manual_speed(cmd);
+            break;
+        case (uint8_t) READ_ENCODER:
+            cmd_read_encoder(cmd);
+            break;
+        case (uint8_t) TOGGLE_PID:
+            PID_mode = !PID_mode;
             break;
         default:
             break;

@@ -25,6 +25,7 @@ void pidInit(void) {
     PID_data[current_motor].previousInput = 0;
     PID_data[current_motor].accumulator = 0;
     PID_data[current_motor].lastTimestamp = 0;
+    PID_mode = 1;
 }
 
 void pid_setpoint(Motor *motor, short setpoint) {

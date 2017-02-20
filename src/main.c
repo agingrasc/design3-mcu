@@ -71,15 +71,13 @@ int main() {
     initLed();
     /* Initialize USB virtual COM port */
     TM_USB_VCP_Init();
+    pidInit();
+    motorControllerInit();
+    //cmdHandlerInit();
+    MotorEncodersInit();
     initDelay();
     initTimer();
     lcd_init();
-    motorControllerInit();
-#ifndef ID_MODE
-    pidInit();
-#endif
-    cmdHandlerInit();
-    MotorEncodersInit();
 
 #ifdef ID_MODE
     id_test_status = 0;
@@ -120,9 +118,10 @@ int main() {
             }
         }
 
-        if (cmd_header_ok && !TM_USB_VCP_BufferEmpty()) {
+        if (cmd_header_ok && (!TM_USB_VCP_BufferEmpty() || cmd.header.size == 0)) {
             short payload[256];
-            cmd_payload_ok = usb_read_cmd_payload(payload, cmd.header.size);
+            usb_read_cmd_payload(payload, cmd.header.size);
+            cmd_payload_ok = 1;
             if (cmd_payload_ok) {
                 for (int i = 0; i < cmd.header.size; i++) {
                     cmd.payload[i] = payload[i];

@@ -19,8 +19,8 @@ void initTimer(void) {
     TIM_TimeBaseInitTypeDef tim7_init_struct;
     tim7_init_struct.TIM_CounterMode = TIM_CounterMode_Up;
     tim7_init_struct.TIM_ClockDivision = TIM_CKD_DIV1;
-    // timer_tick_freq = 84000000 / ((2099 + 1 )*(999 + 1)) = 40 (0.025 s = 25 ms)
-    tim7_init_struct.TIM_Prescaler = 2099;
+    // timer_tick_freq = 84000000 / ((2799 + 1 )*(999 + 1)) = 30 (33ms)
+    tim7_init_struct.TIM_Prescaler = 2799;
     tim7_init_struct.TIM_Period = 999;
     TIM_TimeBaseInit(TIM7, &tim7_init_struct);
     TIM_ITConfig(TIM7, TIM_IT_Update, ENABLE);
@@ -54,9 +54,7 @@ void initTimer(void) {
 
 void TIM7_IRQHandler(void) {
     MotorEncodersRead();
-#ifndef ID_MODE
     updatePID();
-#endif
     TIM_ClearITPendingBit(TIM7, TIM_IT_Update);
 }
 
