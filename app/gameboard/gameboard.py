@@ -43,7 +43,10 @@ class GameBoard:
         for i in range(0, self.width):
             line = ""
             for j in range(0, self.length):
-                line += str(self.game_board[i][j].weight)
+                if self.game_board[i][j].weight >= (sys.maxsize):
+                    line += " X "
+                else:
+                    line +=" " + str(self.game_board[i][j].weight)+ " "
             print(line)
 
     def __build_board(self):

@@ -10,11 +10,10 @@ class PathFinding:
         path = []
         current_neighbor = begin_position
         while current_neighbor.weight > 0:
-            print("Current Neighbor")
-            print("x : " + str(current_neighbor.pos_x) + "y : " + str(current_neighbor.pos_y))
-            print("Current weight : " + str(current_neighbor.weight))
+            print("x: " + str(current_neighbor.pos_x) + " y : " + str(current_neighbor.pos_y))
             neighbors = grid.neighbors(current_neighbor)
-            current_neighbor = find_minimum(neighbors)
+            new_neighbors = removed_already_visited_neighbors(neighbors, path)
+            current_neighbor = find_minimum(new_neighbors)
             current_neighbor.set_path()
             path.append(current_neighbor)
         return path
@@ -27,6 +26,18 @@ def find_minimum(neighbors):
             current_neighbor = neighbor
     return current_neighbor
 
+def removed_already_visited_neighbors(neighbors, path):
+    new_neighbors = []
+    for neighbor in neighbors:
+        if neighbor not in path:
+            new_neighbors.append(neighbor)
+    return new_neighbors
+
+def compare_coord(coord1, coord2):
+    if coord1.pos_x != coord2.pos_x:
+        return False
+    if coord2.pos_y != coord2.pos_y:
+        return False
 
 def initialise_weight(grid, begin_position):
     neighbors = grid.neighbors(begin_position)
