@@ -109,7 +109,6 @@ class GridTest(unittest.TestCase):
         self.assertTrue(containt_coord(expected, neighbors))
 
     def test_bottom_right_corner(self):
-        print("test_bottom_right_corner")
         test_position_x = WIDTH-1
         test_position_y = LENGHT-1
         position = Mock(pos_x=test_position_x, pos_y=test_position_y)

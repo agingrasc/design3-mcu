@@ -37,6 +37,13 @@ class GameBoard:
                 line += self.game_board[i][j].get_signe().value
             print(line)
 
+    def print_game_board_weight(self):
+        for i in range(0, self.width):
+            line = ""
+            for j in range(0, self.length):
+                line += str(self.game_board[i][j].weight)
+            print(line)
+
     def __build_board(self):
         for i in range(0, self.width):
             row = []
@@ -106,10 +113,13 @@ class Coordinate(position.Position):
     def __init__(self, pos_x, pos_y):
         position.Position.__init__(self, pos_x, pos_y)
         self.tag = Tag.CAN_PASS
-        self.weight = 0
+        self.weight = -1
 
     def set_tag(self, new_tag):
         self.tag = new_tag
+
+    def set_weight(self, weight):
+        self.weight = weight
 
     def get_signe(self):
         if self.tag == Tag.ROBOT:

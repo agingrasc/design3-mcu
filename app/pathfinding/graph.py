@@ -36,7 +36,6 @@ class Grid:
                 neighbors.append(self.game_board[position.pos_x-1][position.pos_y-1])
                 neighbors.append(self.game_board[position.pos_x+1][position.pos_y])
                 neighbors.append(self.game_board[position.pos_x+1][position.pos_y-1])
-
         elif x_min:
             neighbors.append(self.game_board[position.pos_x+1][position.pos_y])
             if y_max:
