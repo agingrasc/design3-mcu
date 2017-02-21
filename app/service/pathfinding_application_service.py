@@ -1,16 +1,13 @@
-from app.gameboard import gameboard
-from app.pathfinding import grid
-from app.pathfinding import pathfinding
+from app.pathfinding.grid import Grid
+from app.pathfinding.pathfinding import PathFinding
 
-class PathFindingApplicationService:
-    def __init__(self):
-        pass
 
-    def find(self, obstacles, width, length, robot_position, destination):
-        board = gameboard.GameBoard(width, length)
-        robot_coordinate = board.game_board[robot_position.x][robot_position.y]
-        destination_coordinate = board.game_board[destination.x][destination.y]
-        grid = grid.Grid(board, destination_coordinate)
-        for obstacle in obstacles:
-            grid.add_obstacle(obstacle)
-        return grid.find_path(robot_position)
+def find(obstacles, width, length, robot_position, destination):
+    grid = Grid(width, length)
+    robot_coordinate = grid.game_board[robot_position.x][robot_position.y]
+    destination_coordinate = grid.game_board[destination.x][destination.y]
+    pathfinder = PathFinding(grid, robot_coordinate,
+                             destination_coordinate)
+    for obstacle in obstacles:
+        pathfinder.add_obstacle(obstacle)
+    return pathfinder.find_path()

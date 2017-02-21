@@ -70,7 +70,7 @@ class PathFindingITest(TestCase):
         pathfinder.find_path()
         grid.print_game_board()
 
-    def test_find_extrem_left_right_obstacle(self):
+    def test_find_extrem_left_right_obstacles(self):
         grid = Grid(30, 55)
         obstacle1 = ObstacleValueObject(
             pos_x=25, pos_y=19, radius=3, tag=Tag.CANT_PASS_LEFT)
@@ -84,5 +84,25 @@ class PathFindingITest(TestCase):
                                              end_position)
         pathfinder.add_obstacle(obstacle1)
         pathfinder.add_obstacle(obstacle2)
+        pathfinder.find_path()
+        grid.print_game_board()
+
+    def test_find_left_rightx2_obstacles(self):
+        grid = Grid(30, 55)
+        obstacle1 = ObstacleValueObject(
+            pos_x=25, pos_y=8, radius=3, tag=Tag.CANT_PASS_LEFT)
+        obstacle2 = ObstacleValueObject(
+            pos_x=5, pos_y=39, radius=3, tag=Tag.CANT_PASS_RIGHT)
+        obstacle3 = ObstacleValueObject(
+            pos_x=5, pos_y=19, radius=3, tag=Tag.CANT_PASS_RIGHT)
+
+        end_position = grid.game_board[8][50]
+        begin_position = grid.game_board[2][2]
+
+        pathfinder = pathfinding.PathFinding(grid, begin_position,
+                                             end_position)
+        pathfinder.add_obstacle(obstacle1)
+        pathfinder.add_obstacle(obstacle2)
+        pathfinder.add_obstacle(obstacle3)
         pathfinder.find_path()
         grid.print_game_board()
