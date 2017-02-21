@@ -77,6 +77,7 @@ class ObstacleBuilder:
             for j in range(starty_pos, endy_pos):
                 new_obstacle_coord = Coordinate(i, j)
                 new_obstacle_coord.set_tag(Tag.OBSTACLE)
+                new_obstacle_coord.set_weight(sys.maxsize)
                 obstacle_coord.append(new_obstacle_coord)
         return obstacle_coord
 

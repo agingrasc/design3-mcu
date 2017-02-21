@@ -69,7 +69,6 @@ def ajust_right_obstacle(grid, position, radius, width, length):
     for x in range(width, x_position, -1):
         increment = x - x_position
         for y in range(y_max_position, y_max_position + x - x_position):
-            print(y)
             if y >= 0 and x >= 0 and x < width and y <length:
                 node = grid.game_board[x][y]
                 ajust_one_node(node, increment)

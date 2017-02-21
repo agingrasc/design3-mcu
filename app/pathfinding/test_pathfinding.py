@@ -29,38 +29,33 @@ class PathFindingTest(TestCase):
     def test_initialise_weight_one_obstacle(self):
         obstacle = ObstacleValueObject(pos_x=4, pos_y=9, radius=1, tag='')
         board = GameBoard(13, 13)
-        board.add_obstacle(obstacle)
 
-        grid = Grid(board)
+        end_position = board.game_board[1][1]
+
+        grid = Grid(board, end_position)
+        grid.add_obstacle(obstacle)
         board.print_game_board()
-        end_position = grid.game_board[1][1]
-        end_position.set_weight(0)
-
-        pathfinding.initialise_weight(grid, end_position, 1)
         board.print_game_board_weight()
 
     def test_initialise_weight_no_obstacle(self):
         board = GameBoard(6, 6)
 
-        grid = Grid(board)
         board.print_game_board()
-        end_position = grid.game_board[2][2]
-        end_position.set_weight(0)
+        end_position = board.game_board[1][1]
 
-        pathfinding.initialise_weight(grid, end_position, 1)
+        grid = Grid(board, end_position)
         board.print_game_board_weight()
 
     def test_find_no_obstacle(self):
         board = GameBoard(6, 6)
 
-        grid = Grid(board)
+        end_position = board.game_board[2][2]
+        begin_position = board.game_board[5][5]
+        grid = Grid(board, end_position)
         board.print_game_board()
-        end_position = grid.game_board[2][2]
-        begin_position = grid.game_board[5][5]
-        end_position.set_weight(0)
 
-        pathfinding.initialise_weight(grid, end_position, 5)
         pathfinding.find(grid, begin_position, end_position)
+        grid.find_path(begin_position)
         board.print_game_board_weight()
         board.print_game_board()
 
@@ -68,34 +63,15 @@ class PathFindingTest(TestCase):
         obstacle = ObstacleValueObject(
             pos_x=14, pos_y=19, radius=3, tag=Tag.CANT_PASS_LEFT)
         board = GameBoard(30, 55)
-        board.add_obstacle(obstacle)
 
-        grid = Grid(board)
-        end_position = grid.game_board[8][50]
-        begin_position = grid.game_board[2][2]
-        end_position.set_weight(0)
+        end_position = board.game_board[8][50]
+        begin_position = board.game_board[2][2]
 
-        pathfinding.initialise_weight(grid, end_position, 55)
-        pathfinding.ajust_left_obstacle(grid, Coordinate(14,19), 3,30 ,55)
-        pathfinding.find(grid, begin_position, end_position)
+        grid = Grid(board, end_position)
+        grid.add_obstacle(obstacle)
+
+        grid.find_path(begin_position)
         board.print_game_board()
-        board.print_game_board_weight()
-
-    def test_find_1_obstacle(self):
-        obstacle = ObstacleValueObject(
-            pos_x=14, pos_y=19, radius=3, tag=Tag.CANT_PASS_LEFT)
-        board = GameBoard(30, 55)
-        board.add_obstacle(obstacle)
-
-        grid = Grid(board)
-        end_position = grid.game_board[8][50]
-        begin_position = grid.game_board[2][2]
-        end_position.set_weight(0)
-
-        pathfinding.initialise_weight(grid, end_position, 55)
-        pathfinding.find(grid, begin_position, end_position)
-        board.print_game_board()
-        board.print_game_board_weight()
 
     def test_find_2_obstacle(self):
         obstacle1 = ObstacleValueObject(
@@ -103,36 +79,13 @@ class PathFindingTest(TestCase):
         obstacle2 = ObstacleValueObject(
             pos_x=5, pos_y=39, radius=3, tag=Tag.CANT_PASS_RIGHT)
         board = GameBoard(30, 55)
-        board.add_obstacle(obstacle1)
-        board.add_obstacle(obstacle2)
 
-        grid = Grid(board)
-        end_position = grid.game_board[8][50]
-        begin_position = grid.game_board[2][2]
-        end_position.set_weight(0)
+        end_position = board.game_board[8][50]
+        begin_position = board.game_board[2][2]
 
-        pathfinding.initialise_weight(grid, end_position, 55)
-        pathfinding.find(grid, begin_position, end_position)
+        grid = Grid(board, end_position)
+        grid.add_obstacle(obstacle1)
+        grid.add_obstacle(obstacle2)
+
+        grid.find_path(begin_position)
         board.print_game_board()
-        board.print_game_board_weight()
-
-    def test_find_ajust_2_obstacle(self):
-        obstacle1 = ObstacleValueObject(
-            pos_x=14, pos_y=19, radius=3, tag=Tag.CANT_PASS_LEFT)
-        obstacle2 = ObstacleValueObject(
-            pos_x=5, pos_y=39, radius=3, tag=Tag.CANT_PASS_RIGHT)
-        board = GameBoard(30, 55)
-        board.add_obstacle(obstacle1)
-        board.add_obstacle(obstacle2)
-
-        grid = Grid(board)
-        end_position = grid.game_board[8][50]
-        begin_position = grid.game_board[2][2]
-        end_position.set_weight(0)
-
-        pathfinding.initialise_weight(grid, end_position, 55)
-        pathfinding.ajust_left_obstacle(grid, Coordinate(14,19), 3,30 ,55)
-        pathfinding.ajust_right_obstacle(grid, Coordinate(5,39), 3,30 ,55)
-        pathfinding.find(grid, begin_position, end_position)
-        board.print_game_board()
-        board.print_game_board_weight()

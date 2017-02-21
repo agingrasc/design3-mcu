@@ -7,8 +7,9 @@ class PathFindingApplicationService:
         pass
 
     def find(self, robot_position, obstacles, width, length):
-        obstacle_builder = gameboard.ObstacleBuilder()
+        board = gameboard.GameBoard(width, length)
+        grid = grid.Grid(board)
         for obstacle in obstacles:
-            obstacle_builder.add_obtacle(obstacle)
+            board.add_obstacle
         game_board = gameboard.GameBoard(width, length, obstacle_builder)
 
