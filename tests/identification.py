@@ -47,6 +47,8 @@ def direction_test(motors_id: tuple, consigne, retroaction):
                     retroaction.append(speed)
                     print("({}) val: {}".format(delta_t, speed))
                 id_time = now - begin
+
+    set_consigne(0, companion_id, direction, main_id)
     print("{}\n{}".format(consigne, retroaction))
 
 
@@ -74,6 +76,8 @@ def main(motors_id: tuple):
 
 
 if __name__ == "__main__":
+    if sys.argv[1] == '--help' or sys.argv[1] == '-h':
+        print("frontx, fronty, rearx, reary")
     fname = sys.argv[1]
     main(motors[sys.argv[1]])
 

@@ -9,7 +9,7 @@
 #define DEFINES_H_
 
 // Dynamic identification mode
-#define ID_MODE 0
+//#define ID_MODE
 
 // Encoder timer's initial value (middle of 0xFFFF)
 #define TIMER_INIT_VAL    0x7FFF
