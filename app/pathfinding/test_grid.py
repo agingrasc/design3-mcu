@@ -10,15 +10,7 @@ LENGHT = 25
 
 class GridTest(unittest.TestCase):
     def setUp(self):
-        self.table = []
-        for i in range(0,WIDTH):
-            row = []
-            for j in range(0,LENGHT):
-                coord = Mock(pos_x=i, pos_y=j)
-                row.append(coord)
-            self.table.append(row)
-        self.game_board = Mock(width=WIDTH,length=LENGHT, game_board=self.table)
-        self.grid = Grid(self.game_board)
+        self.grid = Grid(WIDTH, LENGHT)
 
     def test_no_extremity(self):
         test_position_x = 4

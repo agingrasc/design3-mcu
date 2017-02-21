@@ -1,3 +1,33 @@
+from app.gameboard.position import Position
+from app.gameboard.gameboard import Tag
+
+class PathFinding:
+    def __init__(self, grid, begin_position, end_position):
+        self.grid = grid
+        self.begin_position = begin_position
+        self.end_position = end_position
+        self.end_position.set_weight(0)
+        increment_size = 1
+        if self.grid.length > self.grid.width:
+            increment_size = self.grid.length
+        else:
+            increment_size = self.grid.width
+        initialise_weight(self.grid, end_position, increment_size)
+
+    def add_obstacle(self, obstacle):
+        self.grid.add_obstacle(obstacle)
+        if obstacle.tag == Tag.CANT_PASS_LEFT:
+            ajust_left_obstacle(self.grid, Position(obstacle.pos_x, obstacle.pos_y), obstacle.radius, self.grid.width, self.grid.length)
+        elif obstacle.tag == Tag.CANT_PASS_RIGHT:
+            ajust_right_obstacle(self.grid, Position(obstacle.pos_x, obstacle.pos_y), obstacle.radius, self.grid.width, self.grid.length)
+
+    def find_path(self):
+        return find(self.grid, self.begin_position, self.end_position)
+
+
+
+
+
 def find(grid, begin_position, end_position):
     path = []
     current_neighbor = begin_position
@@ -83,4 +113,3 @@ def ajust_right_obstacle(grid, position, radius, width, length):
 def ajust_one_node(node, ajustement):
     if node.weight != 0:
         node.set_weight(node.weight + ajustement)
-

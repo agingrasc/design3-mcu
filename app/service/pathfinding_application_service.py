@@ -6,10 +6,11 @@ class PathFindingApplicationService:
     def __init__(self):
         pass
 
-    def find(self, robot_position, obstacles, width, length):
+    def find(self, obstacles, width, length, robot_position, destination):
         board = gameboard.GameBoard(width, length)
-        grid = grid.Grid(board)
+        robot_coordinate = board.game_board[robot_position.x][robot_position.y]
+        destination_coordinate = board.game_board[destination.x][destination.y]
+        grid = grid.Grid(board, destination_coordinate)
         for obstacle in obstacles:
-            board.add_obstacle
-        game_board = gameboard.GameBoard(width, length, obstacle_builder)
-
+            grid.add_obstacle(obstacle)
+        return grid.find_path(robot_position)
