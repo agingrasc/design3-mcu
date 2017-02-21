@@ -24,10 +24,6 @@ class PathFinding:
     def find_path(self):
         return find(self.grid, self.begin_position, self.end_position)
 
-
-
-
-
 def find(grid, begin_position, end_position):
     path = []
     current_neighbor = begin_position
@@ -39,7 +35,6 @@ def find(grid, begin_position, end_position):
         path.append(current_neighbor)
     return path
 
-
 def find_minimum(neighbors):
     current_neighbor = neighbors[0]
     for neighbor in neighbors:
@@ -47,14 +42,12 @@ def find_minimum(neighbors):
             current_neighbor = neighbor
     return current_neighbor
 
-
 def removed_already_visited_neighbors(neighbors, path):
     new_neighbors = []
     for neighbor in neighbors:
         if neighbor not in path:
             new_neighbors.append(neighbor)
     return new_neighbors
-
 
 def initialise_weight(grid, begin_position, increment_size):
     neighbors = set(grid.neighbors(begin_position))
