@@ -1,10 +1,9 @@
 from unittest import TestCase
 from app.gameboard.gameboard import GameBoard
 from app.gameboard.gameboard import Coordinate
-from app.gameboard.gameboard import ObstacleBuilder
 from app.gameboard.gameboard import ObstacleValueObject
 from app.gameboard.gameboard import Tag
-from app.pathfinding.graph import Grid
+from app.pathfinding.grid import Grid
 from . import pathfinding
 
 class PathFindingTest(TestCase):
@@ -28,10 +27,9 @@ class PathFindingTest(TestCase):
         self.assertEqual(array3[1], coord4)
 
     def test_initialise_weight_one_obstacle(self):
-        obstacle_builder = ObstacleBuilder()
         obstacle = ObstacleValueObject(pos_x=4, pos_y=9, radius=1, tag='')
-        obstacle_builder.add_obtacle(obstacle)
-        board = GameBoard(13, 13, obstacle_builder)
+        board = GameBoard(13, 13)
+        board.add_obstacle(obstacle)
 
         grid = Grid(board)
         board.print_game_board()
@@ -42,8 +40,7 @@ class PathFindingTest(TestCase):
         board.print_game_board_weight()
 
     def test_initialise_weight_no_obstacle(self):
-        obstacle_builder = ObstacleBuilder()
-        board = GameBoard(6, 6, obstacle_builder)
+        board = GameBoard(6, 6)
 
         grid = Grid(board)
         board.print_game_board()
@@ -54,8 +51,7 @@ class PathFindingTest(TestCase):
         board.print_game_board_weight()
 
     def test_find_no_obstacle(self):
-        obstacle_builder = ObstacleBuilder()
-        board = GameBoard(6, 6, obstacle_builder)
+        board = GameBoard(6, 6)
 
         grid = Grid(board)
         board.print_game_board()
@@ -69,11 +65,10 @@ class PathFindingTest(TestCase):
         board.print_game_board()
 
     def test_find_ajust_obstacle(self):
-        obstacle_builder = ObstacleBuilder()
         obstacle = ObstacleValueObject(
             pos_x=14, pos_y=19, radius=3, tag=Tag.CANT_PASS_LEFT)
-        obstacle_builder.add_obtacle(obstacle)
-        board = GameBoard(30, 55, obstacle_builder)
+        board = GameBoard(30, 55)
+        board.add_obstacle(obstacle)
 
         grid = Grid(board)
         end_position = grid.game_board[8][50]
@@ -87,11 +82,10 @@ class PathFindingTest(TestCase):
         board.print_game_board_weight()
 
     def test_find_1_obstacle(self):
-        obstacle_builder = ObstacleBuilder()
         obstacle = ObstacleValueObject(
             pos_x=14, pos_y=19, radius=3, tag=Tag.CANT_PASS_LEFT)
-        obstacle_builder.add_obtacle(obstacle)
-        board = GameBoard(30, 55, obstacle_builder)
+        board = GameBoard(30, 55)
+        board.add_obstacle(obstacle)
 
         grid = Grid(board)
         end_position = grid.game_board[8][50]
@@ -104,14 +98,13 @@ class PathFindingTest(TestCase):
         board.print_game_board_weight()
 
     def test_find_2_obstacle(self):
-        obstacle_builder = ObstacleBuilder()
-        obstacle = ObstacleValueObject(
+        obstacle1 = ObstacleValueObject(
             pos_x=14, pos_y=19, radius=3, tag=Tag.CANT_PASS_LEFT)
-        obstacle_builder.add_obtacle(obstacle)
         obstacle2 = ObstacleValueObject(
             pos_x=5, pos_y=39, radius=3, tag=Tag.CANT_PASS_RIGHT)
-        obstacle_builder.add_obtacle(obstacle2)
-        board = GameBoard(30, 55, obstacle_builder)
+        board = GameBoard(30, 55)
+        board.add_obstacle(obstacle1)
+        board.add_obstacle(obstacle2)
 
         grid = Grid(board)
         end_position = grid.game_board[8][50]
@@ -124,14 +117,13 @@ class PathFindingTest(TestCase):
         board.print_game_board_weight()
 
     def test_find_ajust_2_obstacle(self):
-        obstacle_builder = ObstacleBuilder()
-        obstacle = ObstacleValueObject(
+        obstacle1 = ObstacleValueObject(
             pos_x=14, pos_y=19, radius=3, tag=Tag.CANT_PASS_LEFT)
-        obstacle_builder.add_obtacle(obstacle)
         obstacle2 = ObstacleValueObject(
             pos_x=5, pos_y=39, radius=3, tag=Tag.CANT_PASS_RIGHT)
-        obstacle_builder.add_obtacle(obstacle2)
-        board = GameBoard(30, 55, obstacle_builder)
+        board = GameBoard(30, 55)
+        board.add_obstacle(obstacle1)
+        board.add_obstacle(obstacle2)
 
         grid = Grid(board)
         end_position = grid.game_board[8][50]

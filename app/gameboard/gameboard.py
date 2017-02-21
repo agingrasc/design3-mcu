@@ -18,14 +18,14 @@ class Tag(Enum):
 
 class GameBoard:
 
-    def __init__(self, width, length, obstacle_builder):
+    def __init__(self, width, length):
+        self.obstacles_builder = ObstacleBuilder()
         self.width = width
         self.length = length
         self.robot_coordinate = Coordinate(0, 0)
         self.pos_pictures = []
         self.game_board = []
         self.__build_board()
-        self.__add_obstacles(obstacle_builder)
 
     def set_robot_position(self, pos_x, pos_y):
         self.robot_coordinate.set_tag(Tag.CAN_PASS)
@@ -59,33 +59,25 @@ class GameBoard:
                 row.append(coord)
             self.game_board.append(row)
 
-    def __add_obstacles(self, obstacle_builder):
-        obstacles = obstacle_builder.build(self.width, self.length)
+    def add_obstacle(self, obstacle_value_object):
+        obstacles = self.obstacles_builder.build(obstacle_value_object, self.width, self.length)
         for obstacle in obstacles:
             self.game_board[obstacle.pos_x][obstacle.pos_y] = obstacle
 
 
 class ObstacleBuilder:
 
-    def __init__(self):
-        self.obstacles = []
-
-    def add_obtacle(self, obstacle_value_object):
-        self.obstacles.append(obstacle_value_object)
-
-    def build(self, width, length):
+    def build(self, obstacle, width, length):
         obstacle_coord = []
-        for obstacle in self.obstacles:
-            startx_pos = self.__verify_start_x(obstacle)
-            starty_pos = self.__verify_start_y(obstacle)
-            endx_pos = self.__verify_end_x(obstacle, width)
-            endy_pos = self.__verify_end_y(obstacle, length)
-            for i in range(startx_pos, endx_pos):
-                for j in range(starty_pos, endy_pos):
-                    new_obstacle_coord = Coordinate(i, j)
-                    new_obstacle_coord.set_tag(Tag.OBSTACLE)
-                    obstacle_coord.append(new_obstacle_coord)
-
+        startx_pos = self.__verify_start_x(obstacle)
+        starty_pos = self.__verify_start_y(obstacle)
+        endx_pos = self.__verify_end_x(obstacle, width)
+        endy_pos = self.__verify_end_y(obstacle, length)
+        for i in range(startx_pos, endx_pos):
+            for j in range(starty_pos, endy_pos):
+                new_obstacle_coord = Coordinate(i, j)
+                new_obstacle_coord.set_tag(Tag.OBSTACLE)
+                obstacle_coord.append(new_obstacle_coord)
         return obstacle_coord
 
     def __verify_start_x(self, obstacle):

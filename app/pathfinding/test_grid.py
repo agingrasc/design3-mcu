@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock
 from unittest.mock import Mock
-from app.pathfinding.graph import Grid
+from app.pathfinding.grid import Grid
 from app.gameboard.gameboard import Coordinate
 from app.gameboard.gameboard import GameBoard
 
