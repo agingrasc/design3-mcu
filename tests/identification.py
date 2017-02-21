@@ -53,6 +53,7 @@ def direction_test(motors_id: tuple, consigne, retroaction):
 
 
 def set_consigne(cmd, companion_id, direction, main_id):
+
     ser.write(protocol.generate_manual_speed_command(main_id, cmd, direction))
     ser.read(2)
     ser.write(protocol.generate_manual_speed_command(companion_id, COMPANION_COMMAND, direction))
@@ -62,10 +63,15 @@ def set_consigne(cmd, companion_id, direction, main_id):
 def main(motors_id: tuple):
     ser.write(protocol.generate_toggle_pid())
     ser.read()
+    for motorx in protocol.Motors:
+        ser.write(protocol.generate_manual_speed_command(motorx, 1, protocol.MotorsDirection.FORWARD))
     consigne = []
     retroaction = []
     direction_test(motors_id, consigne, retroaction)
     ser.write(protocol.generate_toggle_pid())
+
+    for motorx in protocol.Motors:
+        ser.write(protocol.generate_manual_speed_command(motorx, 1, protocol.MotorsDirection.FORWARD))
 
     with open(fname+'.csv', 'w') as f:
         writer = csv.writer(f, delimiter=',')
