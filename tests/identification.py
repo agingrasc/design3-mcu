@@ -48,7 +48,7 @@ def direction_test(motors_id: tuple, consigne, retroaction):
                     print("({}) val: {}".format(delta_t, speed))
                 id_time = now - begin
 
-    set_consigne(0, companion_id, direction, main_id)
+    set_consigne(0, companion_id, protocol.MotorsDirection.FORWARD, main_id)
     print("{}\n{}".format(consigne, retroaction))
 
 
