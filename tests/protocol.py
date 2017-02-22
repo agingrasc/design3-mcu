@@ -40,9 +40,9 @@ class PencilStatus(Enum):
 
 
 class Motors(Enum):
-    FRONT_X = 3 - 1
     REAR_X = 1 - 1
     FRONT_Y = 2 - 1
+    FRONT_X = 3 - 1
     REAR_Y = 4 - 1
 
 

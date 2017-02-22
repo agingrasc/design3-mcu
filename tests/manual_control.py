@@ -10,6 +10,7 @@ ser = serial.Serial("/dev/ttySTM32")
 
 DEFAULT_SPEED = 40
 DEFAULT_DIRECTION = protocol.MotorsDirection.FORWARD
+DEFAULT_COMM_SLEEP = 0.005
 WAIT_DELTA = 0.100
 
 motors_id = {1: protocol.Motors.REAR_X,
@@ -67,7 +68,7 @@ def motor(screen):
     ser.write(protocol.generate_manual_speed_command(motor_id, speed, direction))
     sub_run = True
     while sub_run:
-        time.sleep(0.005)
+        time.sleep(DEFAULT_COMM_SLEEP)
         motor_speed = read_encoder(motor_id, ser)
         draw_motor_menu(direction, motor_speed, screen, speed)
         try:
@@ -106,6 +107,86 @@ def motor(screen):
     return None
 
 
+def all_motors(screen):
+    screen.clear()
+    screen.addstr("Vitesse: ")
+    screen.nodelay(False)
+    curses.echo()
+    try:
+        speed = int(screen.getstr(3))
+    except ValueError:
+        speed = DEFAULT_SPEED
+
+    screen.addstr(1, 0, "Direction (f|b): ")
+    try:
+        dir_key = screen.getkey()
+        direction = directions[dir_key]
+    except KeyError:
+        direction = DEFAULT_DIRECTION
+
+    screen.nodelay(True)
+    curses.noecho()
+    screen.clear()
+
+    sub_run = True
+    while sub_run:
+        try:
+            user_key = screen.getkey()
+        except curses.error:
+            user_key = -1
+
+        draw_all_motor_menu(direction, screen, speed)
+
+        if user_key in ['q', 'Q', 'c', 'C']:
+            sub_run = False
+        elif user_key == 's':
+            screen.nodelay(False)
+            curses.echo()
+            screen.clear()
+            try:
+                speed = int(screen.getstr(3))
+            except ValueError:
+                pass
+            screen.nodelay(True)
+            curses.noecho()
+            update_all_motor_cmd(speed, direction)
+            draw_all_motor_menu(direction, screen, speed)
+        elif user_key == 'd':
+            screen.nodelay(False)
+            curses.echo()
+            screen.clear()
+            try:
+                dir_key = screen.getkey()
+                direction = directions[dir_key]
+            except KeyError:
+                pass
+            screen.nodelay(True)
+            curses.noecho()
+            update_all_motor_cmd(speed, direction)
+            draw_all_motor_menu(direction, screen, speed)
+
+    return None
+
+
+def update_all_motor_cmd(speed, direction):
+    for motor_id in protocol.Motors:
+        ser.write(protocol.generate_manual_speed_command(motor_id, speed, direction))
+        time.sleep(DEFAULT_COMM_SLEEP)
+
+
+def draw_all_motor_menu(direction, screen, speed):
+    screen.addstr(0, 0, "Commande de {} avec une direction {}".format(speed, direction))
+    for idx, motor_id in enumerate(protocol.Motors):
+        time.sleep(DEFAULT_COMM_SLEEP)
+        motor_speed = read_encoder(motor_id, ser)
+        screen.addstr(idx * 2 + 1, 0, "Moteur {}: ".format(idx, motor_speed))
+    display_busy_wait(screen, 8)
+    screen.addstr(9, 0, "Appuyer sur 's' pour changer la vitesse.")
+    screen.addstr(10, 0, "Appuyer sur 'd' pour changer la direction.")
+    screen.addstr(11, 0, "Appuyer sur 'q' pour revenir au menu principal")
+    screen.move(12, 0)
+
+
 def draw_motor_menu(direction, motor_speed, screen, speed):
     screen.addstr(0, 0,
                   "Vitesse du moteur: {} -- avec une commande de {} et une direction {}".format(motor_speed, speed,
@@ -115,29 +196,6 @@ def draw_motor_menu(direction, motor_speed, screen, speed):
     screen.addstr(3, 0, "Appuyer sur 'd' pour changer la direction")
     display_busy_wait(screen, 5)
     screen.move(4, 0)
-
-
-def all_motors():
-    speed = DEFAULT_SPEED
-    try:
-        speed = int(sys.argv[2])
-    except IndexError:
-        pass
-
-    for idx in protocol.Motors:
-        print("Setting motor {} speed to {}.".format(idx.value + 1, speed))
-        ser.write(protocol.generate_manual_speed_command(idx, speed, protocol.MotorsDirection.FORWARD))
-
-    input("Press 'Enter' to exit.")
-
-    for idx in protocol.Motors:
-        print("Stopping motor {}.".format(idx.value + 1))
-        ser.write(protocol.generate_manual_speed_command(idx, 0, protocol.MotorsDirection.FORWARD))
-
-
-dispatch = {'keyboard': keyboard,
-            'motor': motor,
-            'all-motors': all_motors}
 
 
 def display_menu(screen):
@@ -154,6 +212,11 @@ def display_busy_wait(screen, row):
         screen.addstr(row, 0, wait[wait_idx])
         wait_idx = (wait_idx + 1) % len(wait)
         last_wait_update = now
+
+
+dispatch = {'keyboard': keyboard,
+            'motor': motor,
+            'all-motors': all_motors}
 
 
 def main(screen):
@@ -175,7 +238,8 @@ def main(screen):
             motor(screen)
             display_menu(screen)
         elif user_input == 'A':
-            pass
+            all_motors(screen)
+            display_menu(screen)
         elif user_input == 'K':
             pass
 
