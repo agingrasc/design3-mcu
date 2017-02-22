@@ -1,13 +1,28 @@
-import time
+import curses
 import sys
+import time
 
-from util import *
 import protocol
+from encodeur import read_encoder
+from util import *
 
 ser = serial.Serial("/dev/ttySTM32")
 
 DEFAULT_SPEED = 40
 DEFAULT_DIRECTION = protocol.MotorsDirection.FORWARD
+WAIT_DELTA = 0.100
+
+motors_id = {1: protocol.Motors.REAR_X,
+             2: protocol.Motors.FRONT_Y,
+             3: protocol.Motors.FRONT_X,
+             4: protocol.Motors.REAR_Y}
+
+directions = {'f': protocol.MotorsDirection.FORWARD,
+              'b': protocol.MotorsDirection.BACKWARD}
+
+wait = ['|', '/', '-', '\\', '|', '/', '-', '\\']
+wait_idx = 0
+last_wait_update = time.time()
 
 
 def init():
@@ -25,40 +40,81 @@ def keyboard():
     pass
 
 
-def motor():
-    motors_id = {1: protocol.Motors.REAR_X,
-                 2: protocol.Motors.FRONT_Y,
-                 3: protocol.Motors.FRONT_X,
-                 4: protocol.Motors.REAR_Y}
-    motor_id = 0
-
+def motor(screen):
+    global directions
+    screen.nodelay(False)
+    screen.clear()
+    curses.echo()
+    screen.addstr("ID du moteur [1-4]: ")
+    motor_id = int(screen.getkey())
+    motor_id = motors_id[motor_id]
+    screen.addstr(1, 0, "Vitesse du moteur [0-100]: ")
     try:
-        motor_id = motors_id[int(sys.argv[2])]
-    except IndexError:
-        print("You need to input the motor id [1, 4].")
-        exit()
-
-    speed = DEFAULT_SPEED
+        speed = int(screen.getstr(3))
+    except ValueError:
+        speed = DEFAULT_SPEED
+    screen.addstr(2, 0, "Direction [f|b]: ")
     try:
-        speed = int(sys.argv[3])
-    except IndexError:
-        pass
-
-    direction_dispatch = {'clockwise': protocol.MotorsDirection.FORWARD,
-                          'counter-clockwise': protocol.MotorsDirection.BACKWARD}
-    direction = DEFAULT_DIRECTION
-    try:
-        direction = direction_dispatch[sys.argv[4]]
-    except IndexError:
-        pass
+        dir_key = screen.getkey()
+        direction = directions[dir_key]
     except KeyError:
-        print("Valeur de la direction invalide: use 'clockwise' or 'counter-clockwise'")
+        direction = DEFAULT_DIRECTION
 
-    print("Setting motor {} speed to {}".format(motor_id.value + 1, speed))
+    curses.noecho()
+    screen.clear()
+    screen.nodelay(True)
+
     ser.write(protocol.generate_manual_speed_command(motor_id, speed, direction))
-    input("Press 'Enter' to exit.")
-    print("Stopping motor {}.".format(motor_id.value + 1))
-    ser.write(protocol.generate_manual_speed_command(motor_id, 0, protocol.MotorsDirection.FORWARD))
+    sub_run = True
+    while sub_run:
+        time.sleep(0.005)
+        motor_speed = read_encoder(motor_id, ser)
+        draw_motor_menu(direction, motor_speed, screen, speed)
+        try:
+            user_key = screen.getkey()
+        except curses.error:
+            user_key = -1
+
+        if user_key in ['c', 'C', 'q', 'Q']:
+            sub_run = False
+        elif user_key in ['s', 'S']:
+            screen.nodelay(False)
+            screen.clear()
+            curses.echo()
+            try:
+                screen.move(0, 0)
+                speed = int(screen.getstr(3))
+            except ValueError:
+                screen.addstr(4, 0, "La vitesse doit etre un nombre valide.")
+            curses.noecho()
+            screen.nodelay(True)
+        elif user_key in ['d', 'D']:
+            screen.nodelay(False)
+            screen.clear()
+            curses.echo()
+            try:
+                screen.move(0, 0)
+                dir_key = screen.getkey()
+                direction = directions[dir_key]
+            except KeyError:
+                screen.addstr(4, 0, "La direction doit etre soit 'c' ou soit 'cc'.")
+            curses.noecho()
+            screen.nodelay(True)
+
+    ser.write(protocol.generate_manual_speed_command(motor_id, 0, direction))
+
+    return None
+
+
+def draw_motor_menu(direction, motor_speed, screen, speed):
+    screen.addstr(0, 0,
+                  "Vitesse du moteur: {} -- avec une commande de {} et une direction {}".format(motor_speed, speed,
+                                                                                                direction))
+    screen.addstr(1, 0, "Appuyer sur 'q' pour revenir au menu principal")
+    screen.addstr(2, 0, "Appuyer sur 's' pour changer la vitesse")
+    screen.addstr(3, 0, "Appuyer sur 'd' pour changer la direction")
+    display_busy_wait(screen, 5)
+    screen.move(4, 0)
 
 
 def all_motors():
@@ -84,32 +140,47 @@ dispatch = {'keyboard': keyboard,
             'all-motors': all_motors}
 
 
-def print_help():
-    help_msg = """cmd extra-parameters
-    motor idx [speed]
-    all-motors [speed]
-    keyboard [max-speed]"""
-    print(help_msg)
+def display_menu(screen):
+    screen.clear()
+    screen.addstr("Motor|All-motors|Keyboard")
+    screen.move(1, 0)
 
 
-def main():
+def display_busy_wait(screen, row):
+    global last_wait_update
+    now = time.time()
+    if now - last_wait_update > WAIT_DELTA:
+        global wait_idx
+        screen.addstr(row, 0, wait[wait_idx])
+        wait_idx = (wait_idx + 1) % len(wait)
+        last_wait_update = now
+
+
+def main(screen):
     init()
-    try:
-        dispatch[sys.argv[1]]()
-    except KeyError:
-        print("Commande invalide: 'keyboard', 'motor' ou 'all-motors'")
-        print_help()
+    run = True
+    screen.nodelay(True)
+    display_menu(screen)
+    while run:
+        display_busy_wait(screen, 2)
+        screen.move(1, 0)
+        try:
+            user_input = screen.getkey()
+        except curses.error:
+            user_input = -1
+
+        if user_input in ['q', 'Q']:
+            run = False
+        elif user_input == 'M':
+            motor(screen)
+            display_menu(screen)
+        elif user_input == 'A':
+            pass
+        elif user_input == 'K':
+            pass
 
     deinit()
 
 
 if __name__ == "__main__":
-    try:
-        cmd = sys.argv[1]
-        if cmd == "-h" or cmd == "--help":
-            print_help()
-            exit()
-    except IndexError:
-        print_help()
-        exit()
-    main()
+    curses.wrapper(main)

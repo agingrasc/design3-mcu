@@ -30,9 +30,9 @@ def print_encoder(msg: str, motor_id: protocol.Motors):
     print("Speed of {} ({}): {}".format(msg, motor_id.value + 1, speed))
 
 
-def read_encoder(motor_id: protocol.Motors) -> int:
+def read_encoder(motor_id: protocol.Motors, ser=ser) -> int:
     ser.write(protocol.generate_read_encoder(motor_id))
-    print_code(HEADER_W, ser)
+    ser.read(1)
     speed = ser.read(2)
     return int.from_bytes(speed, byteorder='big')
 
