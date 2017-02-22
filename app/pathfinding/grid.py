@@ -1,8 +1,8 @@
 from app.gameboard.gameboard import GameBoard
 
 class Grid(GameBoard):
-    def __init__(self, width, length):
-        GameBoard.__init__(self, width, length)
+    def __init__(self, width, length, obstacles):
+        GameBoard.__init__(self, width, length, obstacles)
 
     def neighbors(self, position):
         neighbors = []

@@ -58,7 +58,8 @@ def initialise_weight(grid, begin_position, increment_size):
         for neighbor in neighbors:
             if neighbor.weight == -1:
                 tmp_neibhbors = [
-                    x for x in grid.neighbors(neighbor) if x.weight != -1 and x.weight != sys.maxsize
+                    x for x in grid.neighbors(neighbor)
+                    if x.weight != -1 and x.weight != sys.maxsize
                 ]
                 new_weight = find_minimum(tmp_neibhbors).weight + 1
                 neighbor.set_weight(new_weight)
