@@ -10,7 +10,7 @@
 #include "defines.h"
 
 // Init encoders channels
-// OK, after some ditching....
+// OK, after some ditching.... MOTOR 1
 #define MA_TIMER            TIM5
 #define MA_TIMER_CLK        RCC_APB1Periph_TIM5
 #define MA_ENCA_PIN            GPIO_Pin_0
@@ -24,7 +24,7 @@
 #define MA_ENCB_SOURCE        GPIO_PinSource1
 #define MA_ENCB_AF            GPIO_AF_TIM5
 
-// OK
+// OK MOTOR 2
 #define MB_TIMER            TIM4
 #define MB_TIMER_CLK        RCC_APB1Periph_TIM4
 #define MB_ENCA_PIN            GPIO_Pin_13
@@ -38,7 +38,7 @@
 #define MB_ENCB_SOURCE        GPIO_PinSource12
 #define MB_ENCB_AF            GPIO_AF_TIM4
 
-// OK
+// OK MOTOR 3
 #define MC_TIMER            TIM2
 #define MC_TIMER_CLK        RCC_APB1Periph_TIM2
 #define MC_ENCA_PIN            GPIO_Pin_5
@@ -52,7 +52,7 @@
 #define MC_ENCB_SOURCE        GPIO_PinSource3
 #define MC_ENCB_AF            GPIO_AF_TIM2
 
-// OK
+// OK MOTOR 4
 #define MD_TIMER            TIM1
 #define MD_TIMER_CLK        RCC_APB2Periph_TIM1
 #define MD_ENCA_PIN            GPIO_Pin_9

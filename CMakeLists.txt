@@ -30,9 +30,7 @@ set(SOURCE_FILES
         src/main.c
         src/manchester.c
         src/system_stm32f4xx.c
-        src/CommandHandler.c
         src/delay.c
-        src/id.c
         src/LCD.c
         src/MotorController.c
         src/MotorEncoder.c

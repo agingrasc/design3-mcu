@@ -10,7 +10,7 @@ from util import *
 IDENTIFICATION_TIME = 0.5
 STEP = 0.030
 COMMANDS = [20, 30, 40, 60, 70, 80]
-COMPANION_COMMAND = 40
+COMPANION_COMMAND = 60
 
 
 motors = {"frontx": (protocol.Motors.FRONT_X, protocol.Motors.REAR_X),
@@ -53,11 +53,13 @@ def direction_test(motors_id: tuple, consigne, retroaction):
 
 
 def set_consigne(cmd, companion_id, direction, main_id):
-
-    ser.write(protocol.generate_manual_speed_command(main_id, cmd, direction))
-    ser.read(2)
-    ser.write(protocol.generate_manual_speed_command(companion_id, COMPANION_COMMAND, direction))
-    ser.read(2)
+    #ser.write(protocol.generate_manual_speed_command(main_id, cmd, direction))
+    #ser.read(2)
+    for idx in protocol.Motors:
+        ser.write(protocol.generate_manual_speed_command(idx, COMPANION_COMMAND, direction))
+        ser.read(2)
+    #ser.write(protocol.generate_manual_speed_command(companion_id, COMPANION_COMMAND, direction))
+    #ser.read(2)
 
 
 def main(motors_id: tuple):

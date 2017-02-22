@@ -3,6 +3,8 @@
 #include <stm32f4xx_tim.h>
 #include <misc.h>
 #include "delay.h"
+#include "LCD.h"
+
 
 void initDelay(void) {
     SysTick_Config(SystemCoreClock/1000);

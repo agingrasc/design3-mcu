@@ -27,7 +27,7 @@ def main():
 def print_encoder(msg: str, motor_id: protocol.Motors):
     speed = read_encoder(motor_id)
     print("Expected: 0")
-    print("Speed of {}: {}".format(msg, speed))
+    print("Speed of {} ({}): {}".format(msg, motor_id.value + 1, speed))
 
 
 def read_encoder(motor_id: protocol.Motors) -> int:

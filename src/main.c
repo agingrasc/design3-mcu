@@ -26,7 +26,6 @@ void updateDisplay() {
 
     char buf1[16];
 
-    //sprintf(buf1, "%d %d", motors[current_motor].motor_speed_rpm, motors[current_motor].encoder_cnt);
     sprintf(buf1, "%d %d", motors[0].motor_speed, motors[1].motor_speed);
     for (int i = 0; i < 16; i++) {
         if (buf1[i] == '\0') break;
@@ -37,13 +36,12 @@ void updateDisplay() {
     lcd_set_cursor(1, 0);
 
     char buf2[16];
-    //sprintf(buf2, "%d %d", motors[current_motor].motor_speed_rpm, motors[current_motor].encoder_cnt);
-    sprintf(buf2, "%d %d%s", motors[2].motor_speed, motors[3].motor_speed, getIdTestStatus());
     for (int i = 0; i < 16; i++) {
         if (buf2[i] == '\0') break;
         lcd_putc(buf2[i]);
     }
 }
+
 
 void checkForVCP() {
     /* USB configured OK, drivers OK */
@@ -73,7 +71,6 @@ int main() {
     TM_USB_VCP_Init();
     pidInit();
     motorControllerInit();
-    //cmdHandlerInit();
     MotorEncodersInit();
     initDelay();
     initTimer();
@@ -82,9 +79,6 @@ int main() {
 #ifdef ID_MODE
     id_test_status = 0;
 #endif
-
-    initIdTest();
-    //startIdTest();
 
     unsigned int last_second = 0;
 
