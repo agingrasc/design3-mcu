@@ -7,6 +7,7 @@ import protocol
 ser = serial.Serial("/dev/ttySTM32")
 
 DEFAULT_SPEED = 40
+DEFAULT_DIRECTION = protocol.MotorsDirection.FORWARD
 
 
 def init():
@@ -43,8 +44,18 @@ def motor():
     except IndexError:
         pass
 
+    direction_dispatch = {'clockwise': protocol.MotorsDirection.FORWARD,
+                          'counter-clockwise': protocol.MotorsDirection.BACKWARD}
+    direction = DEFAULT_DIRECTION
+    try:
+        direction = direction_dispatch[sys.argv[4]]
+    except IndexError:
+        pass
+    except KeyError:
+        print("Valeur de la direction invalide: use 'clockwise' or 'counter-clockwise'")
+
     print("Setting motor {} speed to {}".format(motor_id.value + 1, speed))
-    ser.write(protocol.generate_manual_speed_command(motor_id, speed, protocol.MotorsDirection.FORWARD))
+    ser.write(protocol.generate_manual_speed_command(motor_id, speed, direction))
     input("Press 'Enter' to exit.")
     print("Stopping motor {}.".format(motor_id.value + 1))
     ser.write(protocol.generate_manual_speed_command(motor_id, 0, protocol.MotorsDirection.FORWARD))
@@ -83,7 +94,12 @@ def print_help():
 
 def main():
     init()
-    dispatch[sys.argv[1]]()
+    try:
+        dispatch[sys.argv[1]]()
+    except KeyError:
+        print("Commande invalide: 'keyboard', 'motor' ou 'all-motors'")
+        print_help()
+
     deinit()
 
 
