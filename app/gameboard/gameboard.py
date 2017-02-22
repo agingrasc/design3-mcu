@@ -115,6 +115,10 @@ class Coordinate(position.Position):
 
     def set_tag(self, new_tag):
         self.tag = new_tag
+        if self.tag == Tag.OBSTACLE:
+            self.weight = sys.maxsize 
+        else:
+            self.weight = weight
 
     def set_weight(self, weight):
         if self.tag == Tag.OBSTACLE:

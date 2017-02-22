@@ -9,15 +9,16 @@ from . import pathfinding
 class PathFindingITest(TestCase):
     def test_initialise_weight_one_obstacle(self):
         grid = Grid(13, 13)
-        obstacle = ObstacleValueObject(pos_x=4, pos_y=9, radius=1, tag='')
+        obstacle = ObstacleValueObject(
+            pos_x=4, pos_y=9, radius=2, tag=Tag.CANT_PASS_LEFT)
 
         end_position = grid.game_board[1][1]
         begin_position = grid.game_board[10][10]
 
         pathfinder = pathfinding.PathFinding(grid, begin_position,
                                              end_position)
-        pathfinder.add_obstacle(obstacle)
-        grid.print_game_board()
+        grid.add_obstacle(obstacle)
+        pathfinding.initialise_weight(grid, end_position, 1)
         grid.print_game_board_weight()
 
     def test_initialise_weight_no_obstacle(self):
@@ -25,6 +26,9 @@ class PathFindingITest(TestCase):
 
         grid.print_game_board()
         end_position = grid.game_board[1][1]
+        begin_position = grid.game_board[2][2]
+        pathfinder = pathfinding.PathFinding(grid, begin_position,
+                                             end_position)
 
         pathfinding.initialise_weight(grid, end_position, 1)
         grid.print_game_board_weight()
@@ -44,15 +48,14 @@ class PathFindingITest(TestCase):
 
     def test_find_obstacle(self):
         grid = Grid(30, 55)
-        obstacle = ObstacleValueObject(
-            pos_x=5, pos_y=19, radius=3, tag='')
+        obstacle = ObstacleValueObject(pos_x=5, pos_y=19, radius=3, tag='')
 
         end_position = grid.game_board[8][50]
         begin_position = grid.game_board[2][2]
 
         pathfinder = pathfinding.PathFinding(grid, begin_position,
                                              end_position)
-        pathfinder.add_obstacle(obstacle)
+        grid.add_obstacle(obstacle)
         pathfinder.find_path()
         grid.print_game_board()
 
@@ -66,7 +69,7 @@ class PathFindingITest(TestCase):
 
         pathfinder = pathfinding.PathFinding(grid, begin_position,
                                              end_position)
-        pathfinder.add_obstacle(obstacle)
+        grid.add_obstacle(obstacle)
         pathfinder.find_path()
         grid.print_game_board()
 
@@ -82,8 +85,8 @@ class PathFindingITest(TestCase):
 
         pathfinder = pathfinding.PathFinding(grid, begin_position,
                                              end_position)
-        pathfinder.add_obstacle(obstacle1)
-        pathfinder.add_obstacle(obstacle2)
+        grid.add_obstacle(obstacle1)
+        grid.add_obstacle(obstacle2)
         pathfinder.find_path()
         grid.print_game_board()
 
@@ -101,8 +104,8 @@ class PathFindingITest(TestCase):
 
         pathfinder = pathfinding.PathFinding(grid, begin_position,
                                              end_position)
-        pathfinder.add_obstacle(obstacle1)
-        pathfinder.add_obstacle(obstacle2)
-        pathfinder.add_obstacle(obstacle3)
+        grid.add_obstacle(obstacle1)
+        grid.add_obstacle(obstacle2)
+        grid.add_obstacle(obstacle3)
         pathfinder.find_path()
         grid.print_game_board()

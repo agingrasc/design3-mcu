@@ -1,3 +1,4 @@
+import sys
 from app.gameboard.position import Position
 from app.gameboard.gameboard import Tag
 
@@ -8,27 +9,14 @@ class PathFinding:
         self.begin_position = begin_position
         self.end_position = end_position
         self.end_position.set_weight(0)
+
+    def find_path(self):
         increment_size = 0
         if self.grid.length > self.grid.width:
             increment_size = self.grid.length
         else:
             increment_size = self.grid.width
-        initialise_weight(self.grid, end_position, increment_size)
-
-    def add_obstacle(self, obstacle):
-        self.grid.add_obstacle(obstacle)
-        if obstacle.tag == Tag.CANT_PASS_LEFT:
-            ajust_left_obstacle(self.grid,
-                                Position(obstacle.pos_x,
-                                         obstacle.pos_y), obstacle.radius,
-                                self.grid.width, self.grid.length)
-        elif obstacle.tag == Tag.CANT_PASS_RIGHT:
-            ajust_right_obstacle(self.grid,
-                                 Position(obstacle.pos_x,
-                                          obstacle.pos_y), obstacle.radius,
-                                 self.grid.width, self.grid.length)
-
-    def find_path(self):
+        initialise_weight(self.grid, self.end_position, increment_size)
         return find(self.grid, self.begin_position, self.end_position)
 
 
@@ -69,7 +57,11 @@ def initialise_weight(grid, begin_position, increment_size):
     while len(neighbors) > 0:
         for neighbor in neighbors:
             if neighbor.weight == -1:
-                neighbor.set_weight(next_weight)
+                tmp_neibhbors = [
+                    x for x in grid.neighbors(neighbor) if x.weight != -1 and x.weight != sys.maxsize
+                ]
+                new_weight = find_minimum(tmp_neibhbors).weight + 1
+                neighbor.set_weight(new_weight)
                 next_neighbors.append(neighbor)
         neighbors = []
         for next_neighbor in next_neighbors:
@@ -79,46 +71,3 @@ def initialise_weight(grid, begin_position, increment_size):
             neighbors += new_neighbors
         next_weight += increment_size
         neighbors = set(neighbors)
-
-
-def ajust_left_obstacle(grid, position, radius, width, length):
-    x_position = position.pos_x + radius
-    y_min_position = position.pos_y - radius
-    y_max_position = position.pos_y + radius
-    for x in range(x_position):
-        increment = x_position - x
-        for y in range(y_max_position, y_max_position + x_position - x):
-            if y >= 0 and x >= 0 and x < width and y < length:
-                node = grid.game_board[x][y]
-                node.set_weight(node.weight + increment)
-                increment -= 1
-        increment = x_position - x
-        for y in range(y_min_position, y_min_position - x_position + x, -1):
-            if y >= 0 and x >= 0 and x < width and y < length:
-                node = grid.game_board[x][y]
-                ajust_one_node(node, increment)
-                increment -= 1
-
-
-def ajust_right_obstacle(grid, position, radius, width, length):
-    x_position = position.pos_x - radius - 1
-    y_min_position = position.pos_y - radius
-    y_max_position = position.pos_y + radius
-    for x in range(width, x_position, -1):
-        increment = x - x_position
-        for y in range(y_max_position, y_max_position + x - x_position):
-            if y >= 0 and x >= 0 and x < width and y < length:
-                node = grid.game_board[x][y]
-                ajust_one_node(node, increment)
-                increment -= 1
-        increment = x - x_position
-        for y in range(y_min_position, y_min_position - x + x_position, -1):
-            if y >= 0 and x >= 0 and x < width and y < length:
-                node = grid.game_board[x][y]
-                ajust_one_node(node, increment)
-                increment -= 1
-
-
-def ajust_one_node(node, ajustement):
-    if node.weight != 0:
-        node.set_weight(node.weight + ajustement)
