@@ -128,5 +128,14 @@ int main() {
             cmd_header_ok = 0;
             cmd_payload_ok = 0;
         }
+
+        // Update time line, if necessary
+        /*unsigned int mstemp = (unsigned int)(timestamp / 1000);
+        if (mstemp != last_second) { // One second elapsed
+            // FIXME: sprintf in updateDisplay() crashes the MCU
+            updateDisplay(); // Update time on LCD
+            last_second = mstemp;
+
+        }*/
     }
 }

@@ -11,32 +11,35 @@
 #include "LCD.h"
 
 #define LCD_RS_PIN    4 // Pin number used for register select
-#define LCD_RW_PIN    5 // Pin number used for read/write
+#define LCD_RW_PIN    6 // Pin number used for read/write
 
 uint8_t col_remaining = MAX_COLS;
 
-// Uses GPIOB[5:0] pins
+#define GPIOCLKx	RCC_AHB1Periph_GPIOD
+#define GPIOx		GPIOD
+
+// Uses GPIOx[5:0] pins
 void lcd_init() {
     GPIO_InitTypeDef GPIO_InitStructure;
 
-    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+    RCC_AHB1PeriphClockCmd(GPIOCLKx, ENABLE);
 
     GPIO_StructInit(&GPIO_InitStructure);
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
     GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 
     // Motor A
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_5;
-    GPIO_Init(GPIOB, &GPIO_InitStructure);
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_4 | GPIO_Pin_6;
+    GPIO_Init(GPIOx, &GPIO_InitStructure);
 
-    // Enable clock for GPIOB port
-    //RCC->AHB1ENR |= RCC_AHB1Periph_GPIOB;
+    // Enable clock for GPIOx port
+    //RCC->AHB1ENR |= RCC_AHB1Periph_GPIOx;
 
-    // Set GPIOB[5:0] as output
-    //GPIOB->MODER = (uint32_t)0x555;
+    // Set GPIOx[5:0] as output
+    //GPIOx->MODER = (uint32_t)0x555;
 
     // Disable pullup/downs for 5:0
-    //GPIOB->PUPDR &= ~0xFFF;
+    //GPIOx->PUPDR &= ~0xFFF;
 
     // Wait a little bit until stabilization
     delay(45);
@@ -75,14 +78,14 @@ void lcd_send(uint8_t rs, uint8_t cmd) {
 // EN RS DB7 DB6 DB5 DB4
 // RS 0 = instr, 1 = data
 void lcd_send_4bits(uint8_t rs, uint8_t cmd) {
-    GPIOB->ODR &= ~0x3F; // Clear all outputs on 5:0
+    GPIOx->ODR &= ~0x3F; // Clear all outputs on 5:0
 
-    GPIOB->ODR |= (rs << LCD_RS_PIN);
-    GPIOB->ODR |= cmd;
+    GPIOx->ODR |= (rs << LCD_RS_PIN);
+    GPIOx->ODR |= cmd;
 
-    GPIOB->ODR |= (1 << LCD_RW_PIN);
+    GPIOx->ODR |= (1 << LCD_RW_PIN);
     udelay(20);
-    GPIOB->ODR &= ~(1 << LCD_RW_PIN);
+    GPIOx->ODR &= ~(1 << LCD_RW_PIN);
     udelay(20);
 }
 
