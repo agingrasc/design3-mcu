@@ -1,6 +1,6 @@
 import sys
-from app.gameboard.position import Position
-from app.gameboard.gameboard import Tag
+from app.domain.gameboard.position import Position
+from app.domain.gameboard.gameboard import Tag
 
 
 class PathFinding:

@@ -15,5 +15,5 @@ class Position:
     def get_angle(self):
         return math.atan(float(self.pos_y) / float(self.pos_x))
 
-    def print_position(self):
+    def str(self):
         print("x: " + str(self.pos_x) + " y : " + str(self.pos_y))

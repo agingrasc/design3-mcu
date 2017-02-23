@@ -1,6 +1,7 @@
 from unittest import TestCase
 from . import pathfinding
-from app.gameboard.gameboard import Coordinate
+from app.domain.gameboard.gameboard import Coordinate
+
 
 class PathFindingITest(TestCase):
     def test_already_visited_neighbors(self):

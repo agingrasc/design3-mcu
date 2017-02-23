@@ -1,8 +1,8 @@
 from unittest import TestCase
-from app.gameboard.gameboard import Coordinate
-from app.gameboard.gameboard import ObstacleValueObject
-from app.gameboard.gameboard import Tag
-from app.pathfinding.grid import Grid
+from app.domain.gameboard.gameboard import Coordinate
+from app.domain.gameboard.gameboard import ObstacleValueObject
+from app.domain.gameboard.gameboard import Tag
+from app.domain.pathfinding.grid import Grid
 from . import pathfinding
 
 

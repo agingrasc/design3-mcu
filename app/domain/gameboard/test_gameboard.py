@@ -1,5 +1,5 @@
 import unittest
-from app.gameboard import gameboard
+from app.domain.gameboard import gameboard
 
 VALID_ROBOT_X_POSITION = 11
 VALID_ROBOT_Y_POSITION = 22
@@ -11,7 +11,6 @@ VALID_RADIUS = 3
 
 
 class GameBoardTest(unittest.TestCase):
-
     def test_init_pos_unique(self):
         board = gameboard.GameBoard(VALID_MAX_X, VALID_MAX_Y, [])
 
