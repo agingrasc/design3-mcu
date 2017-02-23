@@ -39,6 +39,7 @@ def direction_test(motors_id: tuple, consigne, retroaction):
                 delta_t = now - last_tick
                 if delta_t > STEP:
                     last_tick = now
+                    ser.read(ser.inWaiting())
                     speed = read_encoder(main_id)
                     if dir_sign == '+':
                         consigne.append(cmd)
