@@ -1,11 +1,12 @@
 import sys
 from app.domain.gameboard.position import Position
 from app.domain.gameboard.gameboard import Tag
+from .grid import Grid
 
 
 class PathFinding:
-    def __init__(self, grid, begin_position, end_position):
-        self.grid = grid
+    def __init__(self, game_board, begin_position, end_position):
+        self.grid = Grid(game_board)
         self.begin_position = begin_position
         self.end_position = end_position
         self.end_position.set_weight(0)

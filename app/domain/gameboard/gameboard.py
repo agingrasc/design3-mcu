@@ -35,7 +35,7 @@ class GameBoard:
         for i in range(0, self.width):
             line = ""
             for j in range(0, self.length):
-                line += self.game_board[i][j].get_signe().value
+                line += self.game_board[i][j].get_tag().value
             print(line)
 
     def print_game_board_weight(self):
