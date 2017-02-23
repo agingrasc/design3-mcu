@@ -105,9 +105,9 @@ def set_motor_to_keyboard_speed(speed_x, speed_y):
     else:
         dir_y = protocol.MotorsDirection.FORWARD
     for motor_id in x_motors:
-        ser.write(protocol.generate_manual_speed_command(motor_id, speed_x, dir_x))
+        ser.write(protocol.generate_manual_speed_command(motor_id, abs(speed_x), dir_x))
     for motor_id in y_motors:
-        ser.write(protocol.generate_manual_speed_command(motor_id, speed_y, dir_y))
+        ser.write(protocol.generate_manual_speed_command(motor_id, abs(speed_y), dir_y))
 
 
 def motor(screen):
