@@ -36,9 +36,78 @@ def deinit():
     ser.write(protocol.generate_led_command(protocol.Leds.DOWN_GREEN))
 
 
-def keyboard():
-    print("Not implemented!")
-    pass
+def keyboard(screen):
+    screen.clear()
+    screen.nodelay(True)
+
+    speed_x = 0
+    speed_y = 0
+
+    sub_run = True
+    while sub_run:
+        time.sleep(0.060)
+        ser.read(ser.inWaiting())
+
+        try:
+            user_key = screen.getkey()
+        except curses.error:
+            user_key = -1
+
+        set_motor_to_keyboard_speed(speed_x, speed_y)
+
+        if user_key in ['q', 'Q']:
+            sub_run = False
+        elif user_key == 'w':
+            speed_x += 5
+        elif user_key == 's':
+            speed_x -= 5
+        elif user_key == 'd':
+            speed_y += 5
+        elif user_key == 'a':
+            speed_y -= 5
+        elif user_key in ['c']:
+            speed_x = 0
+            speed_y = 0
+
+        speed_x, speed_y = cap_speed(speed_x, speed_y)
+
+        screen.clear()
+        screen.addstr(0, 0, "Speed in x: {}".format(speed_x))
+        screen.addstr(1, 0, "Speed in y: {}".format(speed_y))
+        display_busy_wait(screen, 2)
+        screen.move(3, 0)
+
+    screen.nodelay(False)
+    return None
+
+
+def cap_speed(speed_x, speed_y):
+    if speed_x > 100:
+        speed_x = 100
+    elif speed_x < -100:
+        speed_x = -100
+    if speed_y > 100:
+        speed_y = 100
+    elif speed_y < -100:
+        speed_y = -100
+    return speed_x, speed_y
+
+
+def set_motor_to_keyboard_speed(speed_x, speed_y):
+    x_motors = (protocol.Motors.FRONT_X, protocol.Motors.REAR_X)
+    y_motors = (protocol.Motors.FRONT_Y, protocol.Motors.REAR_Y)
+    if speed_x < 0:
+        dir_x = protocol.MotorsDirection.BACKWARD
+    else:
+        dir_x = protocol.MotorsDirection.FORWARD
+    if speed_y < 0:
+        dir_y = protocol.MotorsDirection.BACKWARD
+    else:
+        dir_y = protocol.MotorsDirection.FORWARD
+    for motor_id in x_motors:
+        ser.write(protocol.generate_manual_speed_command(motor_id, speed_x, dir_x))
+    for motor_id in y_motors:
+        ser.write(protocol.generate_manual_speed_command(motor_id, speed_y, dir_y))
 
 
 def motor(screen):
@@ -253,7 +322,8 @@ def main(screen):
             all_motors(screen)
             display_menu(screen)
         elif user_input == 'K':
-            pass
+            keyboard(screen)
+            display_menu(screen)
 
     deinit()
 

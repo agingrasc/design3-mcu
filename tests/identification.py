@@ -10,7 +10,7 @@ from util import *
 IDENTIFICATION_TIME = 0.5
 STEP = 0.030
 COMMANDS = [20, 30, 40, 60, 70, 80]
-COMPANION_COMMAND = 30
+COMPANION_COMMAND = 60
 
 
 motors = {"frontx": (protocol.Motors.FRONT_X, protocol.Motors.REAR_X),
