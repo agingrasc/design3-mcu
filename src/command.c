@@ -76,11 +76,17 @@ int cmd_manual_speed(command *cmd) {
     short direction = payload[2];
 
     uint8_t dir = MC_DIR_BGND;
-    if (direction == 0) {
+    if (direction == 0 && (motor_id == 2 || motor_id == 3)) {
         dir = MC_DIR_CW;
     }
-    else if (direction == 1) {
+    else if (direction == 0 && (motor_id == 0 || motor_id == 1)) {
         dir = MC_DIR_CCW;
+    }
+    else if (direction == 1 && (motor_id == 2 || motor_id == 3)) {
+        dir = MC_DIR_CCW;
+    }
+    else if (direction == 1 && (motor_id == 0 || motor_id == 1)) {
+        dir = MC_DIR_CW;
     }
 
     motorSetDirection(motor_id, dir);
