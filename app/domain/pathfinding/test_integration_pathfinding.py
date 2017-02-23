@@ -1,3 +1,4 @@
+import sys
 from unittest import TestCase
 from app.domain.gameboard.gameboard import Coordinate
 from app.domain.gameboard.gameboard import ObstacleValueObject
@@ -43,7 +44,7 @@ class PathFindingITest(TestCase):
 
         pathfinder = pathfinding.PathFinding(game_board, begin_position,
                                              end_position)
-        pathfinder.find_path()
+        self.validate_path(pathfinder.find_path())
         game_board.print_game_board_weight()
         game_board.print_game_board()
 
@@ -57,6 +58,7 @@ class PathFindingITest(TestCase):
         pathfinder = pathfinding.PathFinding(game_board, begin_position,
                                              end_position)
         pathfinder.find_path()
+        self.validate_path(pathfinder.find_path())
         game_board.print_game_board()
 
     def test_find_left_obstacle(self):
@@ -69,7 +71,7 @@ class PathFindingITest(TestCase):
 
         pathfinder = pathfinding.PathFinding(game_board, begin_position,
                                              end_position)
-        pathfinder.find_path()
+        self.validate_path(pathfinder.find_path())
         game_board.print_game_board()
 
     def test_find_extrem_left_right_obstacles(self):
@@ -84,7 +86,7 @@ class PathFindingITest(TestCase):
 
         pathfinder = pathfinding.PathFinding(game_board, begin_position,
                                              end_position)
-        pathfinder.find_path()
+        self.validate_path(pathfinder.find_path())
         game_board.print_game_board()
 
     def test_find_left_rightx2_obstacles(self):
@@ -101,5 +103,11 @@ class PathFindingITest(TestCase):
 
         pathfinder = pathfinding.PathFinding(game_board, begin_position,
                                              end_position)
-        pathfinder.find_path()
+        self.validate_path(pathfinder.find_path())
         game_board.print_game_board()
+
+    def validate_path(self, path):
+        previous_weight = sys.maxsize
+        for position in path:
+            self.assertTrue(previous_weight > position.weight)
+        self.assertTrue(path[len(path) - 1].weight == 0)
