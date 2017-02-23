@@ -10,7 +10,7 @@ ser = serial.Serial("/dev/ttySTM32")
 
 DEFAULT_SPEED = 40
 DEFAULT_DIRECTION = protocol.MotorsDirection.FORWARD
-DEFAULT_COMM_SLEEP = 0.005
+DEFAULT_COMM_SLEEP = 0.050
 WAIT_DELTA = 0.100
 
 motors_id = {1: protocol.Motors.REAR_X,
@@ -68,7 +68,9 @@ def motor(screen):
     ser.write(protocol.generate_manual_speed_command(motor_id, speed, direction))
     sub_run = True
     while sub_run:
-        time.sleep(DEFAULT_COMM_SLEEP)
+        ser.read(ser.inWaiting())
+        time.sleep(0.050)
+        screen.clear()
         motor_speed = read_encoder(motor_id, ser)
         draw_motor_menu(direction, motor_speed, screen, speed)
         try:
@@ -108,6 +110,7 @@ def motor(screen):
 
 
 def all_motors(screen):
+    ser.read(ser.inWaiting())
     screen.clear()
     screen.addstr("Vitesse: ")
     screen.nodelay(False)
@@ -127,6 +130,10 @@ def all_motors(screen):
     screen.nodelay(True)
     curses.noecho()
     screen.clear()
+    for motor_id in protocol.Motors:
+        ser.write(protocol.generate_manual_speed_command(motor_id, speed, direction))
+        ser.read(1)
+        time.sleep(DEFAULT_COMM_SLEEP)
 
     sub_run = True
     while sub_run:
@@ -165,6 +172,10 @@ def all_motors(screen):
             update_all_motor_cmd(speed, direction)
             draw_all_motor_menu(direction, screen, speed)
 
+    for motor_id in protocol.Motors:
+        ser.write(protocol.generate_manual_speed_command(motor_id, 0, direction))
+        time.sleep(DEFAULT_COMM_SLEEP)
+
     return None
 
 
@@ -179,11 +190,12 @@ def draw_all_motor_menu(direction, screen, speed):
     for idx, motor_id in enumerate(protocol.Motors):
         time.sleep(DEFAULT_COMM_SLEEP)
         motor_speed = read_encoder(motor_id, ser)
-        screen.addstr(idx * 2 + 1, 0, "Moteur {}: ".format(idx, motor_speed))
-    display_busy_wait(screen, 8)
+        ser.read(1)
+        screen.addstr(idx * 2 + 1, 0, "Moteur {}: {}".format(idx, motor_speed))
     screen.addstr(9, 0, "Appuyer sur 's' pour changer la vitesse.")
     screen.addstr(10, 0, "Appuyer sur 'd' pour changer la direction.")
     screen.addstr(11, 0, "Appuyer sur 'q' pour revenir au menu principal")
+    display_busy_wait(screen, 8)
     screen.move(12, 0)
 
 

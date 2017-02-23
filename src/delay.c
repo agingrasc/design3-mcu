@@ -28,12 +28,13 @@ void initTimer(void) {
     TIM_ITConfig(TIM7, TIM_IT_Update, ENABLE);
     TIM_Cmd(TIM7, ENABLE);
 
+    // timer pour la micro seconde
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM9, ENABLE);
     TIM_TimeBaseInitTypeDef tim9_init_struct;
     tim9_init_struct.TIM_CounterMode = TIM_CounterMode_Up;
     tim9_init_struct.TIM_ClockDivision = TIM_CKD_DIV1;
-    tim9_init_struct.TIM_Prescaler = 9990;
-    tim9_init_struct.TIM_Period = 1670;
+    tim9_init_struct.TIM_Prescaler = 2799;
+    tim9_init_struct.TIM_Period = 999;
     TIM_TimeBaseInit(TIM9, &tim9_init_struct);
     TIM_ITConfig(TIM9, TIM_IT_Update, ENABLE);
     TIM_Cmd(TIM9, ENABLE);
@@ -61,6 +62,7 @@ void TIM7_IRQHandler(void) {
 }
 
 void TIM9Handler(void) {
+    u_timestamp++;
     TIM_ClearITPendingBit(TIM9, TIM_IT_Update);
 }
 
@@ -74,6 +76,6 @@ void delay(uint32_t wait) {
 }
 
 void udelay(uint16_t wait) {
-
+    delay(1);
 }
 

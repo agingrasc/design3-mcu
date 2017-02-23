@@ -25,7 +25,7 @@ void updateDisplay() {
       }*/
 
     char buf1[16];
-
+    buf1[15] = '\0';
     sprintf(buf1, "%d %d", motors[0].motor_speed, motors[1].motor_speed);
     for (int i = 0; i < 16; i++) {
         if (buf1[i] == '\0') break;
@@ -36,6 +36,8 @@ void updateDisplay() {
     lcd_set_cursor(1, 0);
 
     char buf2[16];
+    buf2[15] = '\0';
+    sprintf(buf2, "%d %d", motors[2].motor_speed, motors[3].motor_speed);
     for (int i = 0; i < 16; i++) {
         if (buf2[i] == '\0') break;
         lcd_putc(buf2[i]);
@@ -74,7 +76,7 @@ int main() {
     MotorEncodersInit();
     initDelay();
     initTimer();
-    lcd_init();
+    //lcd_init();
 
 #ifdef ID_MODE
     id_test_status = 0;
@@ -87,6 +89,7 @@ int main() {
     while (1) {
         // Check for VCP connection
         checkForVCP();
+        //updateDisplay();
 
         command cmd;
         if (!cmd_header_ok && !TM_USB_VCP_BufferEmpty()) {
