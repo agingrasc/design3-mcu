@@ -20,7 +20,7 @@ class PathFindingITest(TestCase):
 
         pathfinder = pathfinding.PathFinding(grid, begin_position,
                                              end_position)
-        pathfinding.initialise_weight(grid, end_position, 1)
+        pathfinding.initialise_weight(grid, end_position)
         game_board.print_game_board_weight()
 
     def test_initialise_weight_no_obstacle(self):
@@ -32,7 +32,7 @@ class PathFindingITest(TestCase):
         pathfinder = pathfinding.PathFinding(grid, begin_position,
                                              end_position)
 
-        pathfinding.initialise_weight(grid, end_position, 1)
+        pathfinding.initialise_weight(grid, end_position)
         game_board.print_game_board_weight()
 
     def test_find_no_obstacle(self):

@@ -12,12 +12,7 @@ class PathFinding:
         self.end_position.set_weight(0)
 
     def find_path(self):
-        increment_size = 0
-        if self.grid.length > self.grid.width:
-            increment_size = self.grid.length
-        else:
-            increment_size = self.grid.width
-        initialise_weight(self.grid, self.end_position, increment_size)
+        initialise_weight(self.grid, self.end_position)
         return find(self.grid, self.begin_position, self.end_position)
 
 
@@ -51,9 +46,8 @@ def removed_already_visited_neighbors(neighbors, path):
     return new_neighbors
 
 
-def initialise_weight(grid, begin_position, increment_size):
+def initialise_weight(grid, begin_position):
     neighbors = set(grid.neighbors(begin_position))
-    next_weight = begin_position.weight + increment_size
     next_neighbors = []
     while len(neighbors) > 0:
         for neighbor in neighbors:
@@ -71,5 +65,4 @@ def initialise_weight(grid, begin_position, increment_size):
                 x for x in grid.neighbors(next_neighbor) if x.weight == -1
             ]
             neighbors += new_neighbors
-        next_weight += increment_size
         neighbors = set(neighbors)
