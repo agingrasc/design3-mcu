@@ -1,5 +1,5 @@
 import unittest
-from app.gameboard import gameboard
+from app.domain.gameboard import gameboard
 
 VALID_ROBOT_X_POSITION = 11
 VALID_ROBOT_Y_POSITION = 22
@@ -11,12 +11,8 @@ VALID_RADIUS = 3
 
 
 class GameBoardTest(unittest.TestCase):
-
-    def setUp(self):
-        self.obstacle_builder = gameboard.ObstacleBuilder()
-
     def test_init_pos_unique(self):
-        board = gameboard.GameBoard(VALID_MAX_X, VALID_MAX_Y, self.obstacle_builder)
+        board = gameboard.GameBoard(VALID_MAX_X, VALID_MAX_Y, [])
 
         for i in range(0, VALID_MAX_X):
             for j in range(0, VALID_MAX_Y):
@@ -24,32 +20,13 @@ class GameBoardTest(unittest.TestCase):
                 self.assertEqual(i, coord.pos_x)
                 self.assertEqual(j, coord.pos_y)
 
-    def test_set_robot_pos(self):
-        board = gameboard.GameBoard(VALID_MAX_X, VALID_MAX_Y, self.obstacle_builder)
-        board.set_robot_position(VALID_ROBOT_X_POSITION, VALID_ROBOT_Y_POSITION)
-
-        self.assertEqual(VALID_ROBOT_X_POSITION,
-                         board.robot_coordinate.pos_x)
-        self.assertEqual(VALID_ROBOT_Y_POSITION,
-                         board.robot_coordinate.pos_y)
-
-    def test_set_robot_unique(self):
-        board = gameboard.GameBoard(VALID_MAX_X, VALID_MAX_Y, self.obstacle_builder)
-        board.set_robot_position(VALID_ROBOT_X_POSITION, VALID_ROBOT_Y_POSITION)
-
-        for i in range(0, VALID_MAX_X):
-            for j in range(0, VALID_MAX_Y):
-                if i != VALID_ROBOT_X_POSITION or j != VALID_ROBOT_Y_POSITION:
-                    self.assertNotEqual(board.game_board[i][j].tag, gameboard.Tag.ROBOT)
-
     def test_set_notag_obstacle(self):
         obstacle = gameboard.ObstacleValueObject(
             pos_x=VALID_OBSTACLE_X_POSITION,
             pos_y=VALID_OBSTACLE_Y_POSITION,
             radius=VALID_RADIUS,
             tag='')
-        self.obstacle_builder.add_obtacle(obstacle)
-        board = gameboard.GameBoard(VALID_MAX_X, VALID_MAX_Y, self.obstacle_builder)
+        board = gameboard.GameBoard(VALID_MAX_X, VALID_MAX_Y, [obstacle])
 
         max_x = VALID_OBSTACLE_X_POSITION + VALID_RADIUS - 1
         min_x = VALID_OBSTACLE_X_POSITION - VALID_RADIUS - 1
@@ -69,8 +46,7 @@ class GameBoardTest(unittest.TestCase):
             pos_y=VALID_OBSTACLE_Y_POSITION,
             radius=VALID_RADIUS,
             tag=gameboard.Tag.CANT_PASS_LEFT)
-        self.obstacle_builder.add_obtacle(obstacle)
-        board = gameboard.GameBoard(VALID_MAX_X, VALID_MAX_Y, self.obstacle_builder)
+        board = gameboard.GameBoard(VALID_MAX_X, VALID_MAX_Y, [obstacle])
 
         max_x = VALID_OBSTACLE_X_POSITION + VALID_RADIUS - 1
         min_x = VALID_OBSTACLE_X_POSITION - VALID_RADIUS - 1
@@ -90,8 +66,7 @@ class GameBoardTest(unittest.TestCase):
             pos_y=VALID_OBSTACLE_Y_POSITION,
             radius=VALID_RADIUS,
             tag=gameboard.Tag.CANT_PASS_RIGHT)
-        self.obstacle_builder.add_obtacle(obstacle)
-        board = gameboard.GameBoard(VALID_MAX_X, VALID_MAX_Y, self.obstacle_builder)
+        board = gameboard.GameBoard(VALID_MAX_X, VALID_MAX_Y, [obstacle])
 
         max_x = VALID_OBSTACLE_X_POSITION + VALID_RADIUS - 1
         min_x = VALID_OBSTACLE_X_POSITION - VALID_RADIUS - 1
