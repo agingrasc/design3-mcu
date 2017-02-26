@@ -36,9 +36,9 @@ class GameBoardTest(unittest.TestCase):
         coord_min_x = board.game_board[min_x][VALID_OBSTACLE_Y_POSITION]
         coord_lim_x = board.game_board[lim_x][VALID_OBSTACLE_Y_POSITION]
 
-        self.assertEqual(gameboard.Tag.CAN_PASS, coord_min_x.get_signe())
-        self.assertEqual(gameboard.Tag.OBSTACLE, coord_max_x.get_signe())
-        self.assertEqual(gameboard.Tag.CAN_PASS, coord_lim_x.get_signe())
+        self.assertEqual(gameboard.Tag.CAN_PASS, coord_min_x.get_tag())
+        self.assertEqual(gameboard.Tag.OBSTACLE, coord_max_x.get_tag())
+        self.assertEqual(gameboard.Tag.CAN_PASS, coord_lim_x.get_tag())
 
     def test_set_left_obstacle(self):
         obstacle = gameboard.ObstacleValueObject(
@@ -56,9 +56,9 @@ class GameBoardTest(unittest.TestCase):
         coord_min_x = board.game_board[min_x][VALID_OBSTACLE_Y_POSITION]
         coord_lim_x = board.game_board[lim_x][VALID_OBSTACLE_Y_POSITION]
 
-        self.assertEqual(gameboard.Tag.OBSTACLE, coord_min_x.get_signe())
-        self.assertEqual(gameboard.Tag.OBSTACLE, coord_max_x.get_signe())
-        self.assertEqual(gameboard.Tag.CAN_PASS, coord_lim_x.get_signe())
+        self.assertEqual(gameboard.Tag.OBSTACLE, coord_min_x.get_tag())
+        self.assertEqual(gameboard.Tag.OBSTACLE, coord_max_x.get_tag())
+        self.assertEqual(gameboard.Tag.CAN_PASS, coord_lim_x.get_tag())
 
     def test_set_right_obstacle(self):
         obstacle = gameboard.ObstacleValueObject(
@@ -76,6 +76,6 @@ class GameBoardTest(unittest.TestCase):
         coord_min_x = board.game_board[min_x][VALID_OBSTACLE_Y_POSITION]
         coord_lim_x = board.game_board[lim_x][VALID_OBSTACLE_Y_POSITION]
 
-        self.assertEqual(gameboard.Tag.CAN_PASS, coord_min_x.get_signe())
-        self.assertEqual(gameboard.Tag.OBSTACLE, coord_max_x.get_signe())
-        self.assertEqual(gameboard.Tag.OBSTACLE, coord_lim_x.get_signe())
+        self.assertEqual(gameboard.Tag.CAN_PASS, coord_min_x.get_tag())
+        self.assertEqual(gameboard.Tag.OBSTACLE, coord_max_x.get_tag())
+        self.assertEqual(gameboard.Tag.OBSTACLE, coord_lim_x.get_tag())
