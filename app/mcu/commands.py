@@ -37,7 +37,7 @@ class PositionRegulator(object):
 
     @set_point.setter
     def set_point(self, set_point):
-        if self.set_point != set_point:
+        if self._set_point != set_point:
             self.accumulator = 0, 0, 0
             self._set_point = set_point
 
@@ -48,14 +48,16 @@ class PositionRegulator(object):
 
         cmd_x = err_x / MAX_X * self.constants.kp
         cmd_y = err_y / MAX_Y * self.constants.kp
-        cmd_x= self._relinearize(cmd_x)
-        cmd_y= self._relinearize(cmd_y)
-        cmd_x, cmd_y = _correct_for_referential_frame(cmd_x, cmd_y, actual_position)
-        command = cmd_x, cmd_y, err_theta
+        cmd_x = self._relinearize(cmd_x)
+        cmd_y = self._relinearize(cmd_y)
+        cmd_x, cmd_y = _correct_for_referential_frame(cmd_x, cmd_y, actual_theta)
+        saturated_cmd = []
+        for cmd in [cmd_x, cmd_y, err_theta]:
+            saturated_cmd.append(self._saturate_cmd(cmd))
 
         if math.sqrt(err_x**2 + err_y**2) < DEADZONE:
-            command = 0, 0, 0
-        return command
+            saturated_cmd = 0, 0, 0
+        return saturated_cmd
 
     def _relinearize(self, cmd):
         """" Force la valeur de cmd dans [deadzone_cmd, max_cmd] ou 0 si dans [-min_cmd, min_cmd]"""
@@ -65,6 +67,14 @@ class PositionRegulator(object):
             return -self.constants.deadzone_cmd
         elif -self.constants.min_cmd <= cmd <= self.constants.min_cmd:
             return 0
+        else:
+            return cmd
+
+    def _saturate_cmd(self, cmd):
+        if cmd > self.constants.max_cmd:
+            return self.constants.max_cmd
+        elif cmd < -self.constants.max_cmd:
+            return -self.constants.max_cmd
         else:
             return cmd
 

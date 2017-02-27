@@ -19,8 +19,8 @@ def go_to_position_():
         return make_response(jsonify(), 400)
 
     print("Reception (theta actuel): {}, {}".format(pos_x, pos_y, theta))
-    regulator.set_point(tuple(pos_x, pos_y, 0))
-    x, y, t = regulator.next_speed_command(tuple(0, 0, theta))
+    regulator.set_point = pos_x, pos_y, 0
+    x, y, t = regulator.next_speed_command([0, 0, theta])
     set_motor_speed(x, y)
     print("Vitesse calcule: {}, {}".format(x, y))
     return make_response(jsonify({'x': pos_x, 'y': pos_y}), 200)
