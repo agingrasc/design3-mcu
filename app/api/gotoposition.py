@@ -1,8 +1,8 @@
 from flask import Blueprint, request, make_response, jsonify
 
-from ..mcu.robotcontroller import robot_controller
-from ..mcu.commands import regulator, Move
-from ..mcu import protocol
+from mcu.robotcontroller import robot_controller
+from mcu.commands import regulator, Move
+from mcu import protocol
 
 go_to_position = Blueprint('go-to-position', __name__)
 
@@ -38,8 +38,8 @@ def set_motor_speed(speed_x, speed_y):
     else:
         dir_y = protocol.MotorsDirection.FORWARD
     for motor_id in x_motors:
-        robot_controller.ser.write(protocol.generate_manual_speed_command(motor_id, speed_x, dir_x))
+        robot_controller.ser.write(protocol.generate_manual_speed_command(motor_id, abs(speed_x), dir_x))
     for motor_id in y_motors:
-        robot_controller.ser.write(protocol.generate_manual_speed_command(motor_id, speed_y, dir_y))
+        robot_controller.ser.write(protocol.generate_manual_speed_command(motor_id, abs(speed_y), dir_y))
 
 

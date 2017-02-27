@@ -11,11 +11,24 @@ else:
 
 SERIAL_DEV_NAME = "ttySTM32"
 
+class SerialMock():
+
+    def write(self, arg, byteorder='little'):
+        print("Serial mock: {} -- ".format(arg, byteorder))
+        return -1
+
+    def read(self, nbr_byte):
+        print("Serial mock reading! ({})".format(nbr_byte))
+        return b'\x00'
 
 class RobotController(object):
 
     def __init__(self):
-        self.ser = serial.Serial("/dev/{}".format(SERIAL_DEV_NAME))
+        try:
+            self.ser = serial.Serial("/dev/{}".format(SERIAL_DEV_NAME))
+        except serial.serialutil.SerialException:
+            print("No serial link!")
+            self.ser = SerialMock()
 
     def send_command(self, cmd: Command):
         self.ser.write(cmd.pack_command())
