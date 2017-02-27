@@ -8,18 +8,28 @@ from . import protocol
 from .protocol import PencilStatus, Leds
 
 
-PIDConstants = namedtuple("PIDConstatns", 'k_gain i_gain d_gain max_cmd min_cmd')
+PIDConstants = namedtuple("PIDConstatns", 'kp ki kd max_cmd deadzone_cmd min_cmd')
 DEADZONE = 15
-DEFAULT_DELTA_T = 0.030  # 30ms, a modifier
+DEFAULT_DELTA_T = 0.067  # 30ms, a modifier
+MAX_X = 200
+MAX_Y = 100
+
+DEFAULT_KP = 100
+DEFAULT_KI = 0
+DEFAULT_KD = 0
+DEFAULT_MAX_CMD = 80
+DEFAULT_DEADZONE_CMD = 40
+DEFAULT_MIN_CMD = 10
 
 
 class PositionRegulator(object):
     """ Implémente un régulateur PI qui agit avec une rétroaction en position et génère une commande de vitesse."""
 
-    def __init__(self):
+    def __init__(self, kp=DEFAULT_KP, ki=DEFAULT_KI, kd=DEFAULT_KD, max_cmd=DEFAULT_MAX_CMD,
+                 deadzone_cmd=DEFAULT_DEADZONE_CMD, min_cmd=DEFAULT_MIN_CMD):
         self._set_point = 0, 0, 0
         self.accumulator = 0, 0, 0
-        self.constants = PIDConstants(1, 0, 0, 125, 0)
+        self.constants = PIDConstants(kp, ki, kd, max_cmd, deadzone_cmd, min_cmd)
 
     @property
     def set_point(self):
@@ -36,33 +46,37 @@ class PositionRegulator(object):
         dest_x, dest_y, dest_theta = self.set_point
         err_x, err_y, err_theta = dest_x - actual_x, dest_y - actual_y, dest_theta - actual_theta
 
-        # Proportionnel 1:1 (completement inutile)
-        command = err_x, err_y, err_theta
-        saturated_command = self._saturate_command(command)
-        # TODO: ajuster le x et y en fonction de l'orientation
+        cmd_x = err_x / MAX_X * self.constants.kp
+        cmd_y = err_y / MAX_Y * self.constants.kp
+        cmd_x= self._relinearize(cmd_x)
+        cmd_y= self._relinearize(cmd_y)
+        cmd_x, cmd_y = _correct_for_referential_frame(cmd_x, cmd_y, actual_position)
+        command = cmd_x, cmd_y, err_theta
 
         if math.sqrt(err_x**2 + err_y**2) < DEADZONE:
-            saturated_command = 0, 0, 0
-        return saturated_command
+            command = 0, 0, 0
+        return command
 
-    def _saturate_command(self, command):
-        """"
-        S'assure que chaque composante de la commande est dans l'interval [-max_cmd, -min_cmd] or [min_cmd, max_cmd]
-        Args:
-            :command tuple(x, y, t): composantes de la commande
-        Returns:
-            La commande saturée
-        """
-        saturated_command = [0, 0, 0]
-        for idx, cmd_part in enumerate(command):
-            if cmd_part < -self.constants.max_cmd:
-                saturated_command[idx] = -self.constants.max_cmd
-            elif cmd_part > self.constants.max_cmd:
-                saturated_command[idx] = self.constants.max_cmd
-            elif -self.constants.min_cmd < cmd_part < self.constants.min_cmd:
-                # FIXME: il faudra probablement relineariser si la commande n'est pas au minimum
-                saturated_command[idx] = 0
-        return tuple(saturated_command)
+    def _relinearize(self, cmd):
+        """" Force la valeur de cmd dans [deadzone_cmd, max_cmd] ou 0 si dans [-min_cmd, min_cmd]"""
+        if self.constants.min_cmd < cmd < self.constants.deadzone_cmd:
+            return self.constants.deadzone_cmd
+        elif -self.constants.deadzone_cmd < cmd < -self.constants.min_cmd:
+            return -self.constants.deadzone_cmd
+        elif -self.constants.min_cmd <= cmd <= self.constants.min_cmd:
+            return 0
+        else:
+            return cmd
+
+
+def _correct_for_referential_frame(x, y, t):
+
+    cos = math.cos(t)
+    sin = math.sin(t)
+
+    corrected_x = (x * cos - y * sin)
+    corrected_y = (y * cos + x * sin)
+    return corrected_x, corrected_y
 
 
 # regulator static et persistent
