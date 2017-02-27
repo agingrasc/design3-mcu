@@ -14,16 +14,19 @@ def go_to_position_():
         pos_x = request.json["x"]
         pos_y = request.json["y"]
         theta = request.json['theta']
-    except KeyError:
+    except Exception as e:
+        print(e)
         print("mauvais payload")
         return make_response(jsonify(), 400)
 
-    print("Reception (theta actuel): {}, {}".format(pos_x, pos_y, theta))
+    print("Reception (theta actuel: {}): {}, {}".format(theta, pos_x, pos_y))
     regulator.set_point = pos_x, pos_y, 0
+    print("set_point ok!")
     x, y, t = regulator.next_speed_command([0, 0, theta])
-    set_motor_speed(x, y)
     print("Vitesse calcule: {}, {}".format(x, y))
-    return make_response(jsonify({'x': pos_x, 'y': pos_y}), 200)
+    set_motor_speed(x, y)
+    print("Motor set!")
+    return make_response(jsonify({'x': int(pos_x), 'y': int(pos_y)}), 200)
 
 
 def set_motor_speed(speed_x, speed_y):

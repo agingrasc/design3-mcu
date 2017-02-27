@@ -57,7 +57,11 @@ class PositionRegulator(object):
 
         if math.sqrt(err_x**2 + err_y**2) < DEADZONE:
             saturated_cmd = 0, 0, 0
-        return saturated_cmd
+
+        command = []
+        for cmd in saturated_cmd:
+            command.append(int(cmd))
+        return command
 
     def _relinearize(self, cmd):
         """" Force la valeur de cmd dans [deadzone_cmd, max_cmd] ou 0 si dans [-min_cmd, min_cmd]"""
