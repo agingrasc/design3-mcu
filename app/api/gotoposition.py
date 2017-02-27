@@ -26,7 +26,7 @@ def go_to_position_():
     print("Vitesse calcule: {}, {}".format(x, y))
     set_motor_speed(x, y)
     print("Motor set!")
-    return make_response(jsonify({'x': int(pos_x), 'y': int(pos_y)}), 200)
+    return make_response(jsonify({'x': int(x), 'y': int(y)}), 200)
 
 
 def set_motor_speed(speed_x, speed_y):
