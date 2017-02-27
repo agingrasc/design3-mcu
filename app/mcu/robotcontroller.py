@@ -2,6 +2,8 @@
 import serial
 import time
 
+from mcu import protocol
+
 if __name__ == "__main__":
     from mcu.protocol import Leds
     from mcu.commands import Command, Led
@@ -43,6 +45,7 @@ class RobotController(object):
         time.sleep(1)
         cmd = Led(Leds.DOWN_GREEN)
         self.send_command(cmd)
+        self.ser.write(protocol.generate_toggle_pid())
 
     def _get_return_code(self):
         return int.from_bytes(self.ser.read(1), byteorder='little')
