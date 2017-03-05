@@ -2,6 +2,7 @@
 #include <stm32f4xx_conf.h>
 #include <tm_stm32f4_usb_vcp.h>
 #include <delay.h>
+#include <string.h>
 #include "command.h"
 
 #define MOVE_CMD 0x00
@@ -10,10 +11,16 @@
 #define LED_CMD 0x03
 #define MANUAL_SPEED_CMD 0xa0
 #define READ_ENCODER 0xa1
-#define TOGGLE_PID 0xa2
+#define SET_PID_MODE 0xa2
 
 #define GREEN_LED GPIO_Pin_15
 #define RED_LED GPIO_Pin_14
+
+uint16_t read_uint16(char* arg) {
+    uint16_t data = 0;
+    memcpy(&data, arg, 2);
+    return data;
+}
 
 void cmd_led(command *cmd) {
     switch (cmd->payload[0]) {
@@ -105,6 +112,13 @@ int cmd_read_encoder(command *cmd) {
     TM_USB_VCP_Putc(CMD_EXECUTE_OK);
 }
 
+int cmd_set_pid_mode(command *cmd) {
+    uint16_t status = read_uint16(cmd->payload);
+    PID_mode = status;
+    TM_USB_VCP_Putc(CMD_EXECUTE_OK);
+    return 0;
+}
+
 int command_execute(command *cmd) {
     switch (cmd->header.type) {
         case (uint8_t) MOVE_CMD:
@@ -125,8 +139,8 @@ int command_execute(command *cmd) {
         case (uint8_t) READ_ENCODER:
             cmd_read_encoder(cmd);
             break;
-        case (uint8_t) TOGGLE_PID:
-            PID_mode = !PID_mode;
+        case (uint8_t) SET_PID_MODE:
+            cmd_set_pid_mode(cmd);
             break;
         default:
             break;

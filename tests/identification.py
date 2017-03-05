@@ -61,14 +61,14 @@ def set_consigne(cmd, companion_id, direction, main_id):
 
 
 def main(motors_id: tuple):
-    ser.write(protocol.generate_toggle_pid())
+    ser.write(protocol.generate_set_pid_mode(protocol.PIDStatus.OFF))
     ser.read()
     for motorx in protocol.Motors:
         ser.write(protocol.generate_manual_speed_command(motorx, 1, protocol.MotorsDirection.FORWARD))
     consigne = []
     retroaction = []
     direction_test(motors_id, consigne, retroaction)
-    ser.write(protocol.generate_toggle_pid())
+    ser.write(protocol.generate_set_pid_mode(protocol.PIDStatus.ON))
 
     for motorx in protocol.Motors:
         ser.write(protocol.generate_manual_speed_command(motorx, 1, protocol.MotorsDirection.FORWARD))

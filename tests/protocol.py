@@ -46,6 +46,11 @@ class Motors(Enum):
     REAR_Y = 4 - 1
 
 
+class PIDStatus(Enum):
+    OFF = 0
+    ON = 1
+
+
 class MotorsDirection(Enum):
     FORWARD = 0
     BACKWARD = 1
@@ -107,9 +112,10 @@ def generate_read_encoder(motor: Motors):
     return header + payload
 
 
-def generate_toggle_pid():
+def generate_set_pid_mode(mode: PIDStatus):
     header = _generate_header(CommandType.TOGGLE_PID, PayloadLength.TOGGLE_PID)
-    return header
+    payload = _generate_payload([mode.value])
+    return header + payload
 
 
 def _generate_payload(payload: list) -> bytes:

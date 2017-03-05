@@ -27,12 +27,12 @@ last_wait_update = time.time()
 
 
 def init():
-    ser.write(protocol.generate_toggle_pid())
+    ser.write(protocol.generate_set_pid_mode(protocol.PIDStatus.OFF))
     ser.write(protocol.generate_led_command(protocol.Leds.UP_GREEN))
 
 
 def deinit():
-    ser.write(protocol.generate_toggle_pid())
+    ser.write(protocol.generate_set_pid_mode(protocol.PIDStatus.ON))
     ser.write(protocol.generate_led_command(protocol.Leds.DOWN_GREEN))
 
 
