@@ -3,7 +3,7 @@ from abc import abstractmethod, ABCMeta
 from collections import namedtuple
 
 import math
-from typing import List
+from typing import List, Tuple
 
 from . import protocol
 from .protocol import PencilStatus, Leds
@@ -43,7 +43,7 @@ class PositionRegulator(object):
             self.accumulator = 0, 0, 0
             self._set_point = set_point
 
-    def next_speed_command(self, actual_position: tuple[float], delta_t: float=DEFAULT_DELTA_T) -> \
+    def next_speed_command(self, actual_position: Tuple[float], delta_t: float=DEFAULT_DELTA_T) -> \
             List[int]:
         """"
         Calcul une iteration du PID.
@@ -94,7 +94,7 @@ class PositionRegulator(object):
             return cmd
 
 
-def _correct_for_referential_frame(x: float, y: float, t: float) -> tuple[float]:
+def _correct_for_referential_frame(x: float, y: float, t: float) -> Tuple[float]:
     """"
     Rotation du vecteur (x, y) dans le plan monde pour l'orienter avec l'angle t du robot.
     Args:
