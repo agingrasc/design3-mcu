@@ -3,6 +3,7 @@ from abc import abstractmethod, ABCMeta
 from collections import namedtuple
 
 import math
+from typing import List
 
 from . import protocol
 from .protocol import PencilStatus, Leds
@@ -37,11 +38,21 @@ class PositionRegulator(object):
 
     @set_point.setter
     def set_point(self, set_point):
+        """" Assigne une consigne au regulateur. Effet de bord: reinitialise les accumulateurs. """
         if self._set_point != set_point:
             self.accumulator = 0, 0, 0
             self._set_point = set_point
 
-    def next_speed_command(self, actual_position, delta_t=DEFAULT_DELTA_T):
+    def next_speed_command(self, actual_position: tuple[float], delta_t: float=DEFAULT_DELTA_T) -> \
+            List[int]:
+        """"
+        Calcul une iteration du PID.
+        Args:
+            :actual_position: Retroaction de la position du robot.
+            :delta_t: Temps ecoule depuis le dernier appel ou la derniere assignation de consigne en secondes.
+        Returns:
+            La vitesse en x, y et en theta.
+        """
         actual_x, actual_y, actual_theta = actual_position
         dest_x, dest_y, dest_theta = self.set_point
         err_x, err_y, err_theta = dest_x - actual_x, dest_y - actual_y, dest_theta - actual_theta
@@ -83,8 +94,16 @@ class PositionRegulator(object):
             return cmd
 
 
-def _correct_for_referential_frame(x, y, t):
-
+def _correct_for_referential_frame(x: float, y: float, t: float) -> tuple[float]:
+    """"
+    Rotation du vecteur (x, y) dans le plan monde pour l'orienter avec l'angle t du robot.
+    Args:
+        :x: Composante x du vecteur, dans le plan monde
+        :y: Composante y du vecteur, dans le plan monde
+        :t: Orientation du robot en radians dans le plan monde
+    Returns:
+        Un tuple contenant les composantes x et y selon le plan du robot.
+    """
     cos = math.cos(t)
     sin = math.sin(t)
 
@@ -93,21 +112,30 @@ def _correct_for_referential_frame(x, y, t):
     return corrected_x, corrected_y
 
 
-# regulator static et persistent
+""" Regulateur de position persistent."""
 regulator = PositionRegulator()
 
 
 class Command(metaclass=ABCMeta):
+    """" Interface pour une commande de robot."""
     def __init__(self):
         pass
 
     @abstractmethod
     def pack_command(self) -> bytes:
+        """" Indique comment prendre les informations de l'objet et des serialiser pour l'envoyer au robot."""
         pass
 
 
 class Move(Command):
+    """" Une commande Move permet de deplacer le robot a une position (x, y) et avec une orientation theta."""
     def __init__(self, x, y, theta):
+        """"
+        Args:
+            :x: Position x sur le plan monde
+            :y: Position y sur le plan monde
+            :theta: Orientation du robot en radians
+        """
         super().__init__()
         self.x = x
         self.y = y
@@ -121,7 +149,13 @@ class Move(Command):
 
 
 class Camera(Command):
+    """" Une commande Camera permet de changer l'orientation horizontale ou verticale de la camera embarquee."""
     def __init__(self, x_theta, y_theta):
+        """"
+        Args:
+            :x_theta: Orientation horizontale en radians.
+            :y_theta: Orientation verticale en radians.
+        """
         super().__init__()
         self.x_theta = x_theta
         self.y_theta = y_theta
@@ -131,6 +165,7 @@ class Camera(Command):
 
 
 class Pencil(Command):
+    """" Une commande Pencil permet de controler le status du prehenseur."""
     def __init__(self, status: PencilStatus):
         super().__init__()
         self.status = status
@@ -140,6 +175,7 @@ class Pencil(Command):
 
 
 class Led(Command):
+    """" Une commande Led permet d'activer une DEL, soit la rouge, soit la verte."""
     def __init__(self, led: Leds):
         super().__init__()
         self.led = led

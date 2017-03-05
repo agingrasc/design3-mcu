@@ -15,21 +15,23 @@ def go_to_position_():
         pos_y = request.json["y"]
         theta = request.json['theta']
     except Exception as e:
-        print(e)
-        print("mauvais payload")
         return make_response(jsonify(), 400)
 
-    print("Reception (theta actuel: {}): {}, {}".format(theta, pos_x, pos_y))
     regulator.set_point = pos_x, pos_y, 0
-    print("set_point ok!")
     x, y, t = regulator.next_speed_command([0, 0, theta])
-    print("Vitesse calcule: {}, {}".format(x, y))
-    set_motor_speed(x, y)
-    print("Motor set!")
+    _set_motor_speed(x, y)
     return make_response(jsonify({'x': int(x), 'y': int(y)}), 200)
 
 
-def set_motor_speed(speed_x, speed_y):
+def _set_motor_speed(speed_x: int, speed_y: int):
+    """"
+    Methode utilitaire pour activer manuellement les moteur dans la bonne orientation.
+    Args:
+        :speed_x: Vitesse dans l'axe x en pourcentage de PWM [-100, 100], doit etre un entier
+        :speed_y: Vitesse dans l'axe y ...
+    Returns:
+        None
+    """
     x_motors = (protocol.Motors.FRONT_X, protocol.Motors.REAR_X)
     y_motors = (protocol.Motors.FRONT_Y, protocol.Motors.REAR_Y)
     if speed_x < 0:
