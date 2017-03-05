@@ -12,7 +12,7 @@ class PayloadLength(Enum):
     CAMERA = 4
     MANUAL_SPEED = 6
     READ_ENCODER = 2
-    TOGGLE_PID = 0
+    TOGGLE_PID = 2
 
 
 class CommandType(Enum):

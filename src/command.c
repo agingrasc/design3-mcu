@@ -113,7 +113,7 @@ int cmd_read_encoder(command *cmd) {
 }
 
 int cmd_set_pid_mode(command *cmd) {
-    uint16_t status = read_uint16(cmd->payload);
+    short status = cmd->payload[0];
     PID_mode = status;
     TM_USB_VCP_Putc(CMD_EXECUTE_OK);
     return 0;
