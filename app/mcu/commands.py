@@ -9,7 +9,7 @@ from . import protocol
 from .protocol import PencilStatus, Leds
 
 
-PIDConstants = namedtuple("PIDConstatns", 'kp ki kd max_cmd deadzone_cmd min_cmd')
+PIDConstants = namedtuple("PIDConstants", 'kp ki kd max_cmd deadzone_cmd min_cmd')
 DEADZONE = 15
 DEFAULT_DELTA_T = 0.067  # 30ms, a modifier
 MAX_X = 200
