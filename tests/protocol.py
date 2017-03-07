@@ -16,6 +16,7 @@ class PayloadLength(Enum):
     READ_ENCODER = 2
     TOGGLE_PID = 2
     SET_PID_CONSTANTS = 8
+    TEST_PID = 6
 
 
 class CommandType(Enum):
@@ -27,6 +28,7 @@ class CommandType(Enum):
     MANUAL_SPEED = 0xa0
     READ_ENCODER = 0xa1
     TOGGLE_PID = 0xa2
+    TEST_PID = 0xa3
 
 
 class Leds(Enum):
@@ -125,6 +127,12 @@ def generate_set_pid_mode(mode: PIDStatus):
 def generate_set_pid_constant(motor: Motors, ki: float, kp: float, kd: float):
     header = _generate_header(CommandType.SET_PID_CONSTANTS, PayloadLength.SET_PID_CONSTANTS)
     payload = _generate_payload([motor.value] + [int(ki*PID_SCALING), int(kp*PID_SCALING), int(kd*PID_SCALING)])
+    return header + payload
+
+
+def generate_test_pid(motor: Motors, delta_t: int, current_speed: int):
+    header = _generate_header(CommandType.TEST_PID, PayloadLength.TEST_PID)
+    payload = _generate_payload([motor.value, delta_t, current_speed])
     return header + payload
 
 

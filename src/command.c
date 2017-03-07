@@ -13,6 +13,7 @@
 #define MANUAL_SPEED_CMD 0xa0
 #define READ_ENCODER 0xa1
 #define SET_PID_MODE 0xa2
+#define TEST_PID 0xa3
 
 #define GREEN_LED GPIO_Pin_15
 #define RED_LED GPIO_Pin_14
@@ -67,14 +68,16 @@ void cmd_move(command* cmd) {
     short y = payload[1];
     short t = payload[2];
 
+    // transformer la vitesse mm/s en tick/s
+
     // on distribue la rotation en creant des differentiels en x et y
     short partial_t = t/4;
 
-    // FIXME: verifier que les bon moteurs recoivent les bonnes consignes
-    pid_setpoint(&motors[0], x + partial_t);
-    pid_setpoint(&motors[1], x - partial_t);
-    pid_setpoint(&motors[2], y + partial_t);
-    pid_setpoint(&motors[3], y - partial_t);
+    // Les moteurs FRONT recoivent le diff negatif par convention arbitraire
+    pid_setpoint(&motors[0], x + partial_t); // REAR_X
+    pid_setpoint(&motors[2], x - partial_t); // FRONT_X
+    pid_setpoint(&motors[3], y + partial_t); // REAR_Y
+    pid_setpoint(&motors[1], y - partial_t); // FRONT_Y
 
     TM_USB_VCP_Putc(CMD_EXECUTE_OK);
 }
@@ -137,6 +140,21 @@ int cmd_set_pid_constant(command *cmd) {
     return 0;
 }
 
+int cmd_test_pid(command *cmd) {
+
+    short motor = cmd->payload[0];
+    short delta_t = cmd->payload[1];
+    short current_speed = cmd->payload[2];
+
+    PIDData *pid = &PID_data[motor];
+    uint32_t target_speed = motors[motor].input_consigne;
+    int output = pid_compute_cmd(pid, 0, delta_t, target_speed, current_speed);
+    char usb_out = output & 0xff;
+    TM_USB_VCP_Putc(usb_out);
+    TM_USB_VCP_Putc(CMD_EXECUTE_OK);
+    return 0;
+}
+
 int command_execute(command *cmd) {
     switch (cmd->header.type) {
         case (uint8_t) MOVE_CMD:
@@ -163,6 +181,8 @@ int command_execute(command *cmd) {
         case (uint8_t) SET_PID_MODE:
             cmd_set_pid_mode(cmd);
             break;
+        case (uint8_t) TEST_PID:
+            cmd_test_pid(cmd);
         default:
             break;
     }
