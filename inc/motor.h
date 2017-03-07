@@ -11,7 +11,7 @@
 typedef struct motor {
     // PWM (speed)
     __IO uint32_t *duty_cycle;
-    int input_consigne;
+    float input_consigne;
     uint32_t consigne_pulse;
     char old_consigne_percent;
     char consigne_percent;

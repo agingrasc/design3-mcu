@@ -69,7 +69,7 @@
 // MOTOR INFO
 #define TICK_PER_ROT    6400
 #define MILLI_PER_MN    60000
-#define WHEEL_RADIUS    3.5    // mm
+#define WHEEL_RADIUS    35    // mm
 
 // Functions
 

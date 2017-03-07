@@ -1,6 +1,5 @@
 // pid.c
 
-#include <stdlib.h>
 #include "pid.h"
 
 #define P_GAIN 1
@@ -11,6 +10,15 @@
 
 #define MAX_SETPOINT 16767
 #define MAX_TICK_PER_SECOND 12000
+
+int abs(float p) {
+    if (p < 0) {
+        return (int) p * -1;
+    }
+    else {
+        return (int) p;
+    }
+}
 
 
 /**
@@ -28,8 +36,17 @@ void pid_init(void) {
     PID_mode = 1;
 }
 
-void pid_setpoint(Motor *motor, short setpoint) {
+void pid_setpoint(int motor_idx, float setpoint) {
+    Motor *motor = &motors[motor_idx];
+    PIDData *pid = &PID_data[motor_idx];
+    int new_consigne = abs(setpoint);
+    int old_consigne = abs(motor->input_consigne);
     motor->input_consigne = setpoint;
+
+    // on reset l'accumulateur si la consigne a change
+    if (abs(new_consigne - old_consigne) > 10) {
+        pid->accumulator = 0;
+    }
 }
 
 /**
@@ -80,10 +97,17 @@ float clamp_accumulator(PIDData *pidData, float accVal) {
 }
 
 float relinearize_command(float cmd) {
-    if (cmd > 0) {
-        return cmd + MIN_COMMAND;
-    } else {
-        return cmd - MIN_COMMAND;
+    if (cmd > 1 && cmd < MIN_COMMAND) {
+        return MIN_COMMAND;
+    }
+    else if (cmd < -1 && cmd > -MIN_COMMAND) {
+        return -MIN_COMMAND;
+    }
+    else if (cmd < 1 && cmd > -1) {
+        return 0;
+    }
+    else {
+        return cmd;
     }
 }
 
@@ -99,21 +123,21 @@ float relinearize_command(float cmd) {
  * La commande -12000 à 12000 en nombre de tick par seconde
  */
 short
-pid_compute_cmd(PIDData *pidData, float last_timestamp, float timestamp, int target_speed, int current_speed) {
+pid_compute_cmd(PIDData *pid_data, float last_timestamp, float timestamp, float target_speed, int current_speed) {
     float timescale = DELTA_T_TIMESCALE;
-    float delta_t = ((float) (timestamp - last_timestamp) / timescale);
+    float delta_t = (timestamp - last_timestamp) / timescale;
     int error = target_speed - current_speed;
-    float pCmd = pidData->kp * error;
-    float iCmd = pidData->accumulator + pidData->ki * error * delta_t;
-    iCmd = clamp_accumulator(pidData, iCmd);
+    float pCmd = pid_data->kp * error;
+    float iCmd = pid_data->accumulator + pid_data->ki * error * delta_t;
+    iCmd = clamp_accumulator(pid_data, iCmd);
 
     float naiveCmd = pCmd + iCmd;
-    float cmd = clamp_command(naiveCmd);
+    float cmd = relinearize_command(naiveCmd);
+    cmd = clamp_command(cmd);
 
-    cmd = relinearize_command(cmd);
     //sauvegarde donnee pour prochain calcul
-    pidData->previous_input = current_speed;
-    pidData->last_timestamp = timestamp;
+    pid_data->previous_input = current_speed;
+    pid_data->last_timestamp = timestamp;
     return (int) cmd;
 }
 

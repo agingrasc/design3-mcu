@@ -23,4 +23,6 @@
 
 #define USB_USE_DEVICE
 
+#define PI 3.1415
+
 #endif /* DEFINES_H_ */
