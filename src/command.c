@@ -150,7 +150,7 @@ int cmd_test_pid(command *cmd) {
     short current_speed = cmd->payload[2];
 
     PIDData *pid = &PID_data[motor];
-    uint32_t target_speed = motors[motor].input_consigne;
+    float target_speed = motors[motor].input_consigne;
     int output = pid_compute_cmd(pid, 0, delta_t, target_speed, current_speed);
     TM_USB_VCP_Putc(output & 0xff);
     TM_USB_VCP_Putc(CMD_EXECUTE_OK);
