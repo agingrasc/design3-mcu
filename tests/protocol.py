@@ -4,6 +4,8 @@ from enum import Enum
 
 import struct
 
+PID_SCALING = 100000
+
 
 class PayloadLength(Enum):
     MOVE = 6
@@ -13,6 +15,7 @@ class PayloadLength(Enum):
     MANUAL_SPEED = 6
     READ_ENCODER = 2
     TOGGLE_PID = 2
+    SET_PID_CONSTANTS = 8
 
 
 class CommandType(Enum):
@@ -20,6 +23,7 @@ class CommandType(Enum):
     CAMERA = 0x01
     PENCIL = 0x02
     LED = 0x03
+    SET_PID_CONSTANTS = 0x04
     MANUAL_SPEED = 0xa0
     READ_ENCODER = 0xa1
     TOGGLE_PID = 0xa2
@@ -115,6 +119,12 @@ def generate_read_encoder(motor: Motors):
 def generate_set_pid_mode(mode: PIDStatus):
     header = _generate_header(CommandType.TOGGLE_PID, PayloadLength.TOGGLE_PID)
     payload = _generate_payload([mode.value])
+    return header + payload
+
+
+def generate_set_pid_constant(motor: Motors, ki: float, kp: float, kd: float):
+    header = _generate_header(CommandType.SET_PID_CONSTANTS, PayloadLength.SET_PID_CONSTANTS)
+    payload = _generate_payload([motor.value] + [int(ki*PID_SCALING), int(kp*PID_SCALING), int(kd*PID_SCALING)])
     return header + payload
 
 

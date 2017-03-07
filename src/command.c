@@ -9,12 +9,15 @@
 #define CAMERA_CMD 0x01
 #define PENCIL_CMD 0x02
 #define LED_CMD 0x03
+#define SET_PID_CONSTANT 0x04
 #define MANUAL_SPEED_CMD 0xa0
 #define READ_ENCODER 0xa1
 #define SET_PID_MODE 0xa2
 
 #define GREEN_LED GPIO_Pin_15
 #define RED_LED GPIO_Pin_14
+
+#define PID_SCALING 100000
 
 uint16_t read_uint16(char* arg) {
     uint16_t data = 0;
@@ -42,7 +45,7 @@ void cmd_led(command *cmd) {
             break;
         case 4:
             GPIO_SetBits(GPIOD, RED_LED);
-            delay(1);
+            delay(1000);
             GPIO_ResetBits(GPIOD, RED_LED);
             TM_USB_VCP_Putc(CMD_EXECUTE_OK);
             break;
@@ -119,6 +122,21 @@ int cmd_set_pid_mode(command *cmd) {
     return 0;
 }
 
+int cmd_set_pid_constant(command *cmd) {
+    short motor = cmd->payload[0];
+    short kp = cmd->payload[1];
+    short ki = cmd->payload[2];
+    short kd = cmd->payload[3];
+
+    PIDData* pid = &PID_data[motor];
+    pid->kp = ((float) kp)/PID_SCALING;
+    pid->ki = ((float) ki)/PID_SCALING;
+    pid->kd = ((float) kd)/PID_SCALING;
+
+    TM_USB_VCP_Putc(CMD_EXECUTE_OK);
+    return 0;
+}
+
 int command_execute(command *cmd) {
     switch (cmd->header.type) {
         case (uint8_t) MOVE_CMD:
@@ -132,6 +150,9 @@ int command_execute(command *cmd) {
             break;
         case (uint8_t) LED_CMD:
             cmd_led(cmd);
+            break;
+        case (uint8_t) SET_PID_CONSTANT:
+            cmd_set_pid_constant(cmd);
             break;
         case (uint8_t) MANUAL_SPEED_CMD:
             cmd_manual_speed(cmd);

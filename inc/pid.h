@@ -10,17 +10,18 @@
 //doc: http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-introduction/
 
 typedef struct PIDData {
-    short proportionalGain;
-    short integralGain;
-    short previousInput;
+    float kp;
+    float ki;
+    float kd;
+    short previous_input;
     short accumulator;
-    uint32_t lastTimestamp;
+    uint32_t last_timestamp;
 } PIDData;
 
 PIDData PID_data[MOTOR_COUNT];
 
-void pidInit(void);
+void pid_init(void);
 void pid_setpoint(Motor*, short);
-void updatePID(void);
+void pid_update(void);
 
 #endif

@@ -57,7 +57,7 @@ void initTimer(void) {
 
 void TIM7_IRQHandler(void) {
     MotorEncodersRead();
-    updatePID();
+    pid_update();
     TIM_ClearITPendingBit(TIM7, TIM_IT_Update);
 }
 

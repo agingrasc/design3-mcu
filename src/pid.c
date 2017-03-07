@@ -18,13 +18,15 @@ short pid_compute_cmd(PIDData*, uint32_t, int, int);
 /**
  * Initialise le PID
  */
-void pidInit(void) {
+void pid_init(void) {
     // Init structure
-    PID_data[current_motor].proportionalGain = P_GAIN;
-    PID_data[current_motor].integralGain = I_GAIN;
-    PID_data[current_motor].previousInput = 0;
-    PID_data[current_motor].accumulator = 0;
-    PID_data[current_motor].lastTimestamp = 0;
+    for (int current_motor = 0; current_motor < MOTOR_COUNT; current_motor++) {
+        PID_data[current_motor].kp = P_GAIN;
+        PID_data[current_motor].ki = I_GAIN;
+        PID_data[current_motor].previous_input = 0;
+        PID_data[current_motor].accumulator = 0;
+        PID_data[current_motor].last_timestamp = 0;
+    }
     PID_mode = 1;
 }
 
@@ -35,7 +37,7 @@ void pid_setpoint(Motor *motor, short setpoint) {
 /**
  * Boucle du PID de l'interruption
  */
-void updatePID(void) {
+void pid_update(void) {
     for (int i = 0; i < MOTOR_COUNT; i++) {
         uint32_t work_timestamp = timestamp;
         if (PID_mode) {
@@ -67,7 +69,7 @@ float clampCommand(short naiveCommand) {
  * Limite la valeur de l'accumulateur
  */
 int clampAccumulator(PIDData *pidData, float accVal) {
-    int maxAccumulator = MAX_COMMAND / pidData->integralGain;
+    int maxAccumulator = MAX_COMMAND / pidData->ki;
     if (accVal > maxAccumulator) {
         pidData->accumulator = maxAccumulator;
         return maxAccumulator;
@@ -100,10 +102,10 @@ int relinearize_command(int cmd) {
  * La commande -12000 à 12000 en nombre de tick par seconde
  */
 short pid_compute_cmd(PIDData *pidData, uint32_t timestamp, int targetSpeed, int current_speed) {
-    uint32_t delta_t = (timestamp - pidData->lastTimestamp) / DELTA_T_TIMESCALE;
+    uint32_t delta_t = (timestamp - pidData->last_timestamp) / DELTA_T_TIMESCALE;
     int error = targetSpeed - current_speed;
-    int pCmd = pidData->proportionalGain * error;
-    int iCmd = pidData->accumulator + pidData->integralGain * error * delta_t;
+    int pCmd = pidData->kp * error;
+    int iCmd = pidData->accumulator + pidData->ki * error * delta_t;
     iCmd = clampAccumulator(pidData, iCmd);
 
     int naiveCmd = pCmd + iCmd;
@@ -111,8 +113,8 @@ short pid_compute_cmd(PIDData *pidData, uint32_t timestamp, int targetSpeed, int
 
     cmd = relinearize_command(cmd);
     //sauvegarde donnee pour prochain calcul
-    pidData->previousInput = current_speed;
-    pidData->lastTimestamp = timestamp;
+    pidData->previous_input = current_speed;
+    pidData->last_timestamp = timestamp;
     return cmd;
 }
 

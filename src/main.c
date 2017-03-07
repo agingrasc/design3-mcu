@@ -71,7 +71,7 @@ int main() {
     initLed();
     /* Initialize USB virtual COM port */
     TM_USB_VCP_Init();
-    pidInit();
+    pid_init();
     motorControllerInit();
     MotorEncodersInit();
     initDelay();
