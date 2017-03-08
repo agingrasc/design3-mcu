@@ -152,9 +152,9 @@ def keyboard_speed(screen):
         screen.addstr(1, 0, "Speed in y: {}mm/s ({:0.0f} tick/s)".format(speed_y, convert_to_tick(speed_y)))
 
         front_x = read_encoder(protocol.Motors.FRONT_X, ser)
-        rear_x = read_encoder(protocol.Motors.FRONT_X, ser)
-        front_y = read_encoder(protocol.Motors.FRONT_X, ser)
-        rear_y = read_encoder(protocol.Motors.FRONT_X, ser)
+        rear_x = read_encoder(protocol.Motors.REAR_X, ser)
+        front_y = read_encoder(protocol.Motors.FRONT_Y, ser)
+        rear_y = read_encoder(protocol.Motors.REAR_Y, ser)
         screen.addstr(2, 0, "Moteur FRONT_X: {} tick/s".format(front_x))
         screen.addstr(3, 0, "Moteur REAR_X: {} tick/s".format(rear_x))
         screen.addstr(4, 0, "Moteur FRONT_Y: {} tick/s".format(front_y))
