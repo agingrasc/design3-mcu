@@ -39,8 +39,8 @@ void pid_init(void) {
 void pid_setpoint(int motor_idx, float setpoint) {
     Motor *motor = &motors[motor_idx];
     PIDData *pid = &PID_data[motor_idx];
-    int new_consigne = abs(setpoint);
-    int old_consigne = abs(motor->input_consigne);
+    int new_consigne = setpoint;
+    int old_consigne = motor->input_consigne;
     motor->input_consigne = setpoint;
 
     // on reset l'accumulateur si la consigne a change
@@ -123,7 +123,7 @@ float relinearize_command(float cmd) {
  * La commande -12000 à 12000 en nombre de tick par seconde
  */
 short
-pid_compute_cmd(PIDData *pid_data, float last_timestamp, float timestamp, float target_speed, int current_speed) {
+pid_compute_cmd(PIDData *pid_data, float last_timestamp, float timestamp, float target_speed, int32_t current_speed) {
     float timescale = DELTA_T_TIMESCALE;
     float delta_t = (timestamp - last_timestamp) / timescale;
     int error = target_speed - current_speed;
