@@ -34,6 +34,7 @@ def print_encoder(msg: str, motor_id: protocol.Motors):
 
 
 def read_encoder(motor_id: protocol.Motors, ser=ser) -> int:
+    ser.read(ser.inWaiting())
     ser.write(protocol.generate_read_encoder(motor_id))
     ser.read(1)
     speed = ser.read(2)

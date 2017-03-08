@@ -2,6 +2,8 @@ import curses
 import sys
 import time
 
+import math
+
 import protocol
 from encodeur import read_encoder
 from util import *
@@ -81,6 +83,66 @@ def keyboard(screen):
     return None
 
 
+def convert_to_tick(speed):
+    return (6400/2*math.pi*35) * speed
+
+
+def keyboard_speed(screen):
+    screen.clear()
+    screen.nodelay(True)
+    ser.write(protocol.generate_set_pid_mode(protocol.PIDStatus.ON))
+
+    speed_x = 0
+    speed_y = 0
+
+    sub_run = True
+    while sub_run:
+        time.sleep(0.060)
+        ser.read(ser.inWaiting())
+
+        try:
+            user_key = screen.getkey()
+        except curses.error:
+            user_key = -1
+
+        set_motor_to_keyboard_speed(speed_x, speed_y)
+
+        if user_key in ['q', 'Q']:
+            sub_run = False
+        elif user_key == 'w':
+            speed_x += 10
+        elif user_key == 's':
+            speed_x -= 10
+        elif user_key == 'd':
+            speed_y += 10
+        elif user_key == 'a':
+            speed_y -= 10
+        elif user_key in ['c']:
+            speed_x = 0
+            speed_y = 0
+
+        speed_x, speed_y = cap_pid_speed(speed_x, speed_y)
+
+        screen.clear()
+        screen.addstr(0, 0, "Speed in x: {}mm/s ({} tick/s)".format(speed_x, convert_to_tick(speed_x)))
+        screen.addstr(1, 0, "Speed in y: {}mm/s ({} tick/s)".format(speed_y, convert_to_tick(speed_y)))
+
+        front_x = read_encoder(protocol.Motors.FRONT_X, ser)
+        rear_x = read_encoder(protocol.Motors.FRONT_X, ser)
+        front_y = read_encoder(protocol.Motors.FRONT_X, ser)
+        rear_y = read_encoder(protocol.Motors.FRONT_X, ser)
+        screen.addstr(2, 0, "Moteur FRONT_X: {} tick/s".format(front_x))
+        screen.addstr(3, 0, "Moteur REAR_X: {} tick/s".format(rear_x))
+        screen.addstr(4, 0, "Moteur FRONT_Y: {} tick/s".format(front_y))
+        screen.addstr(5, 0, "Moteur REAR_Y: {} tick/s".format(rear_y))
+        display_busy_wait(screen, 6)
+        screen.move(3, 0)
+
+    screen.nodelay(False)
+    ser.write(protocol.generate_set_pid_mode(protocol.PIDStatus.OFF))
+    return None
+
+
 def cap_speed(speed_x, speed_y):
     if speed_x > 100:
         speed_x = 100
@@ -93,21 +155,30 @@ def cap_speed(speed_x, speed_y):
     return speed_x, speed_y
 
 
+def cap_pid_speed(speed_x, speed_y):
+    if speed_x > 300:
+        speed_x = 300
+    elif speed_x < -300:
+        speed_x = -300
+    if speed_y > 300:
+        speed_y = 300
+    elif speed_y < -300:
+        speed_y = -300
+    return speed_x, speed_y
+
+
 def set_motor_to_keyboard_speed(speed_x, speed_y):
     x_motors = (protocol.Motors.FRONT_X, protocol.Motors.REAR_X)
     y_motors = (protocol.Motors.FRONT_Y, protocol.Motors.REAR_Y)
-    if speed_x < 0:
-        dir_x = protocol.MotorsDirection.BACKWARD
-    else:
-        dir_x = protocol.MotorsDirection.FORWARD
-    if speed_y < 0:
-        dir_y = protocol.MotorsDirection.BACKWARD
-    else:
-        dir_y = protocol.MotorsDirection.FORWARD
+
     for motor_id in x_motors:
-        ser.write(protocol.generate_manual_speed_command(motor_id, abs(speed_x), dir_x))
+        ser.write(protocol.generate_manual_speed_command(motor_id, speed_x))
     for motor_id in y_motors:
-        ser.write(protocol.generate_manual_speed_command(motor_id, abs(speed_y), dir_y))
+        ser.write(protocol.generate_manual_speed_command(motor_id, speed_y))
+
+
+def set_pid_to_keyboard_speed(speed_x, speed_y):
+    ser.write(protocol.generate_move_command(speed_x, speed_y, 0))
 
 
 def motor(screen):
@@ -281,7 +352,7 @@ def draw_motor_menu(direction, motor_speed, screen, speed):
 
 def display_menu(screen):
     screen.clear()
-    screen.addstr("Motor|All-motors|Keyboard")
+    screen.addstr("Motor|All-motors|Keyboard|Speed")
     screen.move(1, 0)
 
 
@@ -323,6 +394,9 @@ def main(screen):
             display_menu(screen)
         elif user_input == 'K':
             keyboard(screen)
+            display_menu(screen)
+        elif user_input == 'S':
+            keyboard_speed(screen)
             display_menu(screen)
 
     deinit()
