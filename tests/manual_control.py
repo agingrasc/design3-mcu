@@ -169,8 +169,9 @@ def keyboard_speed(screen):
         screen.addstr(6, 0, "Moteur FRONT_X last cmd: {} ".format(last_cmd_front_x))
         screen.addstr(7, 0, "Moteur REAR_X last cmd: {} ".format(last_cmd_rear_x))
         screen.addstr(8, 0, "Moteur FRONT_Y last cmd: {} ".format(last_cmd_front_y))
+        screen.addstr(9, 0, "Moteur REAR_Y last cmd: {} ".format(last_cmd_rear_y))
 
-        display_busy_wait(screen, 6)
+        display_busy_wait(screen, 10)
         screen.move(3, 0)
 
     screen.nodelay(False)
