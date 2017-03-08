@@ -17,6 +17,7 @@ class PayloadLength(Enum):
     TOGGLE_PID = 2
     SET_PID_CONSTANTS = 8
     TEST_PID = 6
+    READ_PID_LAST_CMD = 2
 
 
 class CommandType(Enum):
@@ -29,6 +30,7 @@ class CommandType(Enum):
     READ_ENCODER = 0xa1
     TOGGLE_PID = 0xa2
     TEST_PID = 0xa3
+    READ_PID_LAST_CMD = 0xa4
 
 
 class Leds(Enum):
@@ -140,6 +142,10 @@ def generate_test_pid(motor: Motors, delta_t: int, current_speed: int):
     payload = _generate_payload([motor.value, delta_t, current_speed])
     return header + payload
 
+def generate_read_pid_last_cmd(motor: Motors):
+    header = _generate_header(CommandType.READ_PID_LAST_CMD, PayloadLength.READ_PID_LAST_CMD)
+    payload = _generate_payload([motor.value])
+    return header + payload
 
 def _generate_payload(payload: list) -> bytes:
     """"

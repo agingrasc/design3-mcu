@@ -14,6 +14,7 @@ typedef struct PIDData {
     float ki;
     float kd;
     short previous_input;
+    int last_command;
     float accumulator;
     uint32_t last_timestamp;
 } PIDData;

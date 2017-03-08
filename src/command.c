@@ -15,6 +15,7 @@
 #define READ_ENCODER 0xa1
 #define SET_PID_MODE 0xa2
 #define TEST_PID 0xa3
+#define READ_PID_LAST_CMD   0xa4
 
 #define GREEN_LED GPIO_Pin_15
 #define RED_LED GPIO_Pin_14
@@ -158,6 +159,16 @@ int cmd_test_pid(command *cmd) {
     return 0;
 }
 
+int cmd_read_pid_last_cmd(command *cmd) {
+    short motor = cmd->payload[0];
+    int16_t last_command = (int16_t) PID_data[motor].last_command;
+    char high = (last_command >> 8) & 0xff;
+    char low = last_command & 0xff;
+    TM_USB_VCP_Putc(high);
+    TM_USB_VCP_Putc(low);
+    TM_USB_VCP_Putc(CMD_EXECUTE_OK);
+}
+
 int command_execute(command *cmd) {
     switch (cmd->header.type) {
         case (uint8_t) MOVE_CMD:
@@ -186,6 +197,8 @@ int command_execute(command *cmd) {
             break;
         case (uint8_t) TEST_PID:
             cmd_test_pid(cmd);
+        case (uint8_t) READ_PID_LAST_CMD:
+            cmd_read_pid_last_cmd(cmd);
         default:
             break;
     }

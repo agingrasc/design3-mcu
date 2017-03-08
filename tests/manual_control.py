@@ -155,10 +155,21 @@ def keyboard_speed(screen):
         rear_x = read_encoder(protocol.Motors.REAR_X, ser)
         front_y = read_encoder(protocol.Motors.FRONT_Y, ser)
         rear_y = read_encoder(protocol.Motors.REAR_Y, ser)
+
+        last_cmd_front_x = read_pid_last_cmd(protocol.Motors.FRONT_X, ser)
+        last_cmd_rear_x = read_pid_last_cmd(protocol.Motors.REAR_X, ser)
+        last_cmd_front_y = read_pid_last_cmd(protocol.Motors.FRONT_Y, ser)
+        last_cmd_rear_y = read_pid_last_cmd(protocol.Motors.REAR_Y, ser)
+
         screen.addstr(2, 0, "Moteur FRONT_X: {} tick/s".format(front_x))
         screen.addstr(3, 0, "Moteur REAR_X: {} tick/s".format(rear_x))
         screen.addstr(4, 0, "Moteur FRONT_Y: {} tick/s".format(front_y))
         screen.addstr(5, 0, "Moteur REAR_Y: {} tick/s".format(rear_y))
+
+        screen.addstr(6, 0, "Moteur FRONT_X last cmd: {} ".format(last_cmd_front_x))
+        screen.addstr(7, 0, "Moteur REAR_X last cmd: {} ".format(last_cmd_rear_x))
+        screen.addstr(8, 0, "Moteur FRONT_Y last cmd: {} ".format(last_cmd_front_y))
+
         display_busy_wait(screen, 6)
         screen.move(3, 0)
 
@@ -204,6 +215,12 @@ def set_motor_to_keyboard_speed(speed_x, speed_y):
 def set_pid_to_keyboard_speed(speed_x, speed_y):
     ser.write(protocol.generate_move_command(speed_x, speed_y, 0))
 
+def read_pid_last_cmd(motor_id: protocol.Motors, ser=ser) -> int:
+    ser.read(ser.inWaiting())
+    ser.write(protocol.generate_read_pid_last_cmd(motor_id))
+    ser.read(1)
+    last_cmd = ser.read(2)
+    return int.from_bytes(last_cmd, byteorder='big')
 
 def motor(screen):
     global directions

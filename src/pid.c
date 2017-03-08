@@ -140,6 +140,8 @@ pid_compute_cmd(PIDData *pid_data, float last_timestamp, float timestamp, float 
     //sauvegarde donnee pour prochain calcul
     pid_data->previous_input = current_speed;
     pid_data->last_timestamp = timestamp;
+    pid_data->last_command = cmd;
+
     return (int) cmd;
 }
 
