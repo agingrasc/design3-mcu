@@ -3,6 +3,7 @@
 #include <tm_stm32f4_usb_vcp.h>
 #include <delay.h>
 #include <string.h>
+#include <util.h>
 #include "command.h"
 
 #define MOVE_CMD 0x00
@@ -105,8 +106,8 @@ int cmd_manual_speed(command *cmd) {
         dir = MC_DIR_CW;
     }
 
-    motorSetDirection(motor_id, dir);
-    motors[motor_id].consigne_percent = pwm;
+    motor_set_direction(motor_id, pwm);
+    motors[motor_id].consigne_percent = abs(pwm);
 
     TM_USB_VCP_Putc(CMD_EXECUTE_OK);
 }

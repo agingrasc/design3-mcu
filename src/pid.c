@@ -60,9 +60,10 @@ void pid_update(void) {
             short speed_cmd = pid_compute_cmd(&PID_data[i], last_timestamp, work_timestamp, motors[i].input_consigne,
                                               motors[i].motor_speed);
             int new_consig = (speed_cmd / MAX_COMMAND) * 100;
-            setupPWMPercentage(i, new_consig);
+            motor_set_direction(i, new_consig);
+            motor_set_pwm_percentage(i, abs(new_consig));
         } else {
-            setupPWMPercentage(i, motors[i].consigne_percent);
+            motor_set_pwm_percentage(i, motors[i].consigne_percent);
         }
     }
 }
@@ -112,9 +113,9 @@ float relinearize_command(float cmd) {
 }
 
 /**
- * Calcul une commande de [0, 1] pour atteindre et maintenir la consigne.
+ * Calcul une commande de [-100, 100] pour atteindre et maintenir la consigne.
  * Args:
- * - pidData -> struct des données du pid calculé
+ * - pid_data -> struct des données du pid calculé
  * - delta_t -> le timestamp du systeme, doit respecter le DELTA_T_TIMESCALE
  * - target_speed -> la consigne en nombre de tick/s
  * - current_speed -> l'état actuel du plant en tick/s

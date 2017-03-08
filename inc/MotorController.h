@@ -66,16 +66,9 @@
 #define PWM_PULSE_LENGTH    8399
 #define MAX_PULSE_LENGTH    PWM_PULSE_LENGTH*MAX_CONSIGNE/100
 
-void motorControllerInit(void);
 
-void setupPWMTimer(void);
-
-void setPWMConsigne(uint8_t, uint32_t);
-
-void setupPWMPercentage(uint8_t, uint32_t);
-
-uint32_t motorGetTarget(uint8_t);
-
-uint8_t motorSetDirection(uint8_t, uint8_t);
+void motor_controller_init(void);
+void motor_set_pwm_percentage(uint8_t, uint32_t);
+int motor_set_direction(uint8_t, int32_t);
 
 #endif

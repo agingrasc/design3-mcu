@@ -2,18 +2,7 @@
 
 #include "MotorController.h"
 
-void motorControllerInit(void) {
-    int i;
-    for (i = 0; i < MOTOR_COUNT; i++) {
-        motors[i].input_consigne = 0x0;
-        motors[i].consigne_percent = 0x0;
-        motors[i].old_consigne_percent = 0x0;
-    }
-
-    setupPWMTimer();
-}
-
-void setMotorPin1Direction(uint8_t engine_no, GPIO_TypeDef *port, uint32_t clk, uint16_t pin) {
+void motor_set_pin_1_direction(uint8_t engine_no, GPIO_TypeDef *port, uint32_t clk, uint16_t pin) {
     RCC_AHB1PeriphClockCmd(clk, ENABLE);
     GPIO_InitTypeDef init_gpio_struct;
     init_gpio_struct.GPIO_Pin = pin;
@@ -27,7 +16,7 @@ void setMotorPin1Direction(uint8_t engine_no, GPIO_TypeDef *port, uint32_t clk, 
     motors[engine_no].dir_pin1 = pin;
 }
 
-void setMotorPin2Direction(uint8_t engine_no, GPIO_TypeDef *port, uint32_t clk, uint16_t pin) {
+void motor_set_pin_2_direction(uint8_t engine_no, GPIO_TypeDef *port, uint32_t clk, uint16_t pin) {
     RCC_AHB1PeriphClockCmd(clk, ENABLE);
     GPIO_InitTypeDef init_gpio_struct;
     init_gpio_struct.GPIO_Pin = pin;
@@ -41,19 +30,19 @@ void setMotorPin2Direction(uint8_t engine_no, GPIO_TypeDef *port, uint32_t clk, 
     motors[engine_no].dir_pin2 = pin;
 }
 
-void setupPWMTimer(void) {
+void _motor_setup_pwm_timer(void) {
     // Direction setup
     GPIO_InitTypeDef init_gpio_struct;
 
     // Enable motor pin controls
-    setMotorPin1Direction(MOTOR_A, MCD_A_PIN1_PORT, MCD_A_PIN1_CLK_PORT, MCD_A_PIN1);
-    setMotorPin2Direction(MOTOR_A, MCD_A_PIN2_PORT, MCD_A_PIN2_CLK_PORT, MCD_A_PIN2);
-    setMotorPin1Direction(MOTOR_B, MCD_B_PIN1_PORT, MCD_B_PIN1_CLK_PORT, MCD_B_PIN1);
-    setMotorPin2Direction(MOTOR_B, MCD_B_PIN2_PORT, MCD_B_PIN2_CLK_PORT, MCD_B_PIN2);
-    setMotorPin1Direction(MOTOR_C, MCD_C_PIN1_PORT, MCD_C_PIN1_CLK_PORT, MCD_C_PIN1);
-    setMotorPin2Direction(MOTOR_C, MCD_C_PIN2_PORT, MCD_C_PIN2_CLK_PORT, MCD_C_PIN2);
-    setMotorPin1Direction(MOTOR_D, MCD_D_PIN1_PORT, MCD_D_PIN1_CLK_PORT, MCD_D_PIN1);
-    setMotorPin2Direction(MOTOR_D, MCD_D_PIN2_PORT, MCD_D_PIN2_CLK_PORT, MCD_D_PIN2);
+    motor_set_pin_1_direction(MOTOR_A, MCD_A_PIN1_PORT, MCD_A_PIN1_CLK_PORT, MCD_A_PIN1);
+    motor_set_pin_2_direction(MOTOR_A, MCD_A_PIN2_PORT, MCD_A_PIN2_CLK_PORT, MCD_A_PIN2);
+    motor_set_pin_1_direction(MOTOR_B, MCD_B_PIN1_PORT, MCD_B_PIN1_CLK_PORT, MCD_B_PIN1);
+    motor_set_pin_2_direction(MOTOR_B, MCD_B_PIN2_PORT, MCD_B_PIN2_CLK_PORT, MCD_B_PIN2);
+    motor_set_pin_1_direction(MOTOR_C, MCD_C_PIN1_PORT, MCD_C_PIN1_CLK_PORT, MCD_C_PIN1);
+    motor_set_pin_2_direction(MOTOR_C, MCD_C_PIN2_PORT, MCD_C_PIN2_CLK_PORT, MCD_C_PIN2);
+    motor_set_pin_1_direction(MOTOR_D, MCD_D_PIN1_PORT, MCD_D_PIN1_CLK_PORT, MCD_D_PIN1);
+    motor_set_pin_2_direction(MOTOR_D, MCD_D_PIN2_PORT, MCD_D_PIN2_CLK_PORT, MCD_D_PIN2);
 
     // PWM setup
     RCC_AHB1PeriphClockCmd(MCS_PIN_CLK, ENABLE);
@@ -108,28 +97,7 @@ void setupPWMTimer(void) {
     *(motors[3].duty_cycle) = 0;
 }
 
-void setPWMConsigne(uint8_t motor_id, uint32_t consigne) {
-    if (consigne > PWM_PULSE_LENGTH * MAX_CONSIGNE / 100)
-        consigne = PWM_PULSE_LENGTH * MAX_CONSIGNE / 100;
-    motors[motor_id].consigne_pulse = consigne;
-    //MC_PWM_CLK->CCR1 = consigne;
-    *(motors[motor_id].duty_cycle) = consigne;
-}
-
-void setupPWMPercentage(uint8_t motor_id, uint32_t percentage) {
-    if ((char) percentage > MAX_CONSIGNE) percentage = MAX_CONSIGNE;
-    if ((char) percentage != motors[motor_id].old_consigne_percent) {
-        motors[motor_id].old_consigne_percent = percentage;
-        //MC_PWM_CLK->CCR1 = PWM_PULSE_LENGTH * percentage / 100;
-        *(motors[motor_id].duty_cycle) = PWM_PULSE_LENGTH * percentage / 100;
-    }
-}
-
-uint32_t motorGetTarget(uint8_t motor_id) {
-    return motors[motor_id].consigne_pulse;
-}
-
-uint8_t motorSetDirection(uint8_t motor_id, uint8_t motor_dir) {
+uint8_t _motor_set_direction_pin(uint8_t motor_id, uint8_t motor_dir) {
     BitAction pv1, pv2;
 
     switch (motor_dir) {
@@ -162,3 +130,57 @@ uint8_t motorSetDirection(uint8_t motor_id, uint8_t motor_dir) {
 
     return 0;
 }
+
+/*
+ * ##### Public Section
+ **/
+void motor_controller_init(void) {
+    int i;
+    for (i = 0; i < MOTOR_COUNT; i++) {
+        motors[i].input_consigne = 0x0;
+        motors[i].consigne_percent = 0x0;
+        motors[i].old_consigne_percent = 0x0;
+    }
+
+    _motor_setup_pwm_timer();
+}
+
+
+void motor_set_pwm_percentage(uint8_t motor_id, uint32_t percentage) {
+    if ((char) percentage > MAX_CONSIGNE) percentage = MAX_CONSIGNE;
+    if ((char) percentage != motors[motor_id].old_consigne_percent) {
+        motors[motor_id].old_consigne_percent = percentage;
+        //MC_PWM_CLK->CCR1 = PWM_PULSE_LENGTH * percentage / 100;
+        *(motors[motor_id].duty_cycle) = PWM_PULSE_LENGTH * percentage / 100;
+    }
+}
+
+int motor_set_direction(uint8_t motor_id, int32_t consigne) {
+    short direction = -1;
+
+    if (consigne > 0) {
+        direction = 0;
+    }
+    else if (consigne < 0) {
+        direction = 1;
+    }
+
+    uint8_t dir = MC_DIR_BGND;
+    if (direction == 0 && (motor_id == 2 || motor_id == 3)) {
+        dir = MC_DIR_CW;
+    }
+    else if (direction == 0 && (motor_id == 0 || motor_id == 1)) {
+        dir = MC_DIR_CCW;
+    }
+    else if (direction == 1 && (motor_id == 2 || motor_id == 3)) {
+        dir = MC_DIR_CCW;
+    }
+    else if (direction == 1 && (motor_id == 0 || motor_id == 1)) {
+        dir = MC_DIR_CW;
+    }
+
+    _motor_set_direction_pin(motor_id, dir);
+
+    return 0;
+}
+
