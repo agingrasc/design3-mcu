@@ -28,6 +28,14 @@ wait_idx = 0
 last_wait_update = time.time()
 
 
+# kp, ki, kd
+constants = [(0.014279, 0.03122, 0),  # REAR X
+             (0.016946, 0.033344, 0),  # FRONT Y
+             (0.016877, 0.03873, 0),  # FRONT X
+             (0.01679, 0.035129, 0)  # REAR Y
+             ]
+
+
 def init():
     ser.write(protocol.generate_set_pid_mode(protocol.PIDStatus.OFF))
     ser.write(protocol.generate_led_command(protocol.Leds.UP_GREEN))
@@ -83,6 +91,13 @@ def keyboard(screen):
     return None
 
 
+def set_pid_constants():
+    for motor in protocol.Motors:
+        kp, ki, kd = constants[motor.value]
+        cmd = protocol.generate_set_pid_constant(motor, kp, ki, kd)
+        ser.write(cmd)
+
+
 def convert_to_tick(speed):
     return (6400/(2*math.pi*35)) * speed
 
@@ -90,6 +105,7 @@ def convert_to_tick(speed):
 def keyboard_speed(screen):
     screen.clear()
     screen.nodelay(True)
+    set_pid_constants()
     ser.write(protocol.generate_set_pid_mode(protocol.PIDStatus.ON))
 
     speed_x = 0
