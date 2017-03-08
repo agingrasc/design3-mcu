@@ -2,7 +2,7 @@
 
 #include "pid.h"
 
-#define P_GAIN 1
+#define P_GAIN 0
 #define I_GAIN 0
 #define MAX_COMMAND 85
 #define MIN_COMMAND 35
