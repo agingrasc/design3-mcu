@@ -84,7 +84,7 @@ def keyboard(screen):
 
 
 def convert_to_tick(speed):
-    return (6400/2*math.pi*35) * speed
+    return (6400/(2*math.pi*35)) * speed
 
 
 def keyboard_speed(screen):
@@ -95,6 +95,7 @@ def keyboard_speed(screen):
     speed_x = 0
     speed_y = 0
 
+    target_changed = False
     sub_run = True
     while sub_run:
         time.sleep(0.060)
@@ -105,27 +106,34 @@ def keyboard_speed(screen):
         except curses.error:
             user_key = -1
 
-        set_motor_to_keyboard_speed(speed_x, speed_y)
+        if target_changed:
+            set_pid_to_keyboard_speed(speed_x, speed_y)
+        target_changed = False
 
         if user_key in ['q', 'Q']:
             sub_run = False
         elif user_key == 'w':
             speed_x += 10
+            target_changed = True
         elif user_key == 's':
             speed_x -= 10
+            target_changed = True
         elif user_key == 'd':
             speed_y += 10
+            target_changed = True
         elif user_key == 'a':
             speed_y -= 10
+            target_changed = True
         elif user_key in ['c']:
             speed_x = 0
             speed_y = 0
+            target_changed = True
 
         speed_x, speed_y = cap_pid_speed(speed_x, speed_y)
 
         screen.clear()
-        screen.addstr(0, 0, "Speed in x: {}mm/s ({} tick/s)".format(speed_x, convert_to_tick(speed_x)))
-        screen.addstr(1, 0, "Speed in y: {}mm/s ({} tick/s)".format(speed_y, convert_to_tick(speed_y)))
+        screen.addstr(0, 0, "Speed in x: {}mm/s ({:0.0f} tick/s)".format(speed_x, convert_to_tick(speed_x)))
+        screen.addstr(1, 0, "Speed in y: {}mm/s ({:0.0f} tick/s)".format(speed_y, convert_to_tick(speed_y)))
 
         front_x = read_encoder(protocol.Motors.FRONT_X, ser)
         rear_x = read_encoder(protocol.Motors.FRONT_X, ser)
