@@ -12,7 +12,7 @@ class PayloadLength(Enum):
     LED = 2
     PENCIL = 2
     CAMERA = 4
-    MANUAL_SPEED = 6
+    MANUAL_SPEED = 4
     READ_ENCODER = 2
     TOGGLE_PID = 2
     SET_PID_CONSTANTS = 8
@@ -90,7 +90,7 @@ def generate_camera_command(x_theta: int, y_theta: int) -> bytes:
     return header + payload
 
 
-def generate_manual_speed_command(motor: Motors, pwm_percentage: int, direction: MotorsDirection):
+def generate_manual_speed_command(motor: Motors, pwm_percentage: int, direction: MotorsDirection = None):
     """"
     Genere une commande directe en pourcentage de PWM pour un moteur
     Args:
@@ -100,8 +100,13 @@ def generate_manual_speed_command(motor: Motors, pwm_percentage: int, direction:
     Return:
         :cmd bytes: La commande serialise
     """
+    if direction and direction == MotorsDirection.BACKWARD:
+        # legacy code, avant la direction etait precise, on se contente de rendre negatif le pourcentage, le mcu
+        # s'occupe de choisir la bonne direction
+        pwm_percentage = -pwm_percentage
+
     header = _generate_header(CommandType.MANUAL_SPEED, PayloadLength.MANUAL_SPEED)
-    payload = _generate_payload([motor.value, pwm_percentage, direction.value])
+    payload = _generate_payload([motor.value, pwm_percentage])
     return header + payload
 
 
