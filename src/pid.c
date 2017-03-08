@@ -91,6 +91,7 @@ float clamp_accumulator(PIDData *pidData, float accVal) {
         return maxAccumulator;
     } else if (accVal < -maxAccumulator) {
         pidData->accumulator = -maxAccumulator;
+        return -maxAccumulator;
     } else {
         pidData->accumulator = accVal;
         return accVal;
