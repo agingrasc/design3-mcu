@@ -27,7 +27,8 @@ void updateDisplay() {
     // FIXME: sprintf works fine. It's when we use %d, %s, etc that makes the cpu crash.
     char buf1[16];
     buf1[15] = '\0';
-    sprintf(buf1, "Hello, I am");
+
+   // sprintf(buf1, "Hello, I am");
     for (int i = 0; i < 16; i++) {
         if (buf1[i] == '\0') break;
         lcd_putc(buf1[i]);

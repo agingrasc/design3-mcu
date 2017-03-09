@@ -148,7 +148,7 @@ void motor_controller_init(void) {
 }
 
 
-void motor_set_pwm_percentage(uint8_t motor_id, uint32_t percentage) {
+void motor_set_pwm_percentage(uint8_t motor_id, float percentage) {
     if ((char) percentage > MAX_CONSIGNE) percentage = MAX_CONSIGNE;
     if ((char) percentage != motors[motor_id].old_consigne_percent) {
         motors[motor_id].old_consigne_percent = percentage;
@@ -157,7 +157,7 @@ void motor_set_pwm_percentage(uint8_t motor_id, uint32_t percentage) {
     }
 }
 
-int motor_set_direction(uint8_t motor_id, int32_t consigne) {
+int motor_set_direction(uint8_t motor_id, float consigne) {
     short direction = -1;
 
     if (consigne > 0) {

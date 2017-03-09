@@ -68,7 +68,7 @@
 
 
 void motor_controller_init(void);
-void motor_set_pwm_percentage(uint8_t, uint32_t);
-int motor_set_direction(uint8_t, int32_t);
+void motor_set_pwm_percentage(uint8_t, float);
+int motor_set_direction(uint8_t, float);
 
 #endif

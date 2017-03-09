@@ -4,19 +4,19 @@
 
 #define P_GAIN 0
 #define I_GAIN 0
-#define MAX_COMMAND 85
-#define MIN_COMMAND 35
+#define MAX_COMMAND 40//85
+#define MIN_COMMAND 15 //35
 #define DELTA_T_TIMESCALE 1000 //ms
 
 #define MAX_SETPOINT 16767
 #define MAX_TICK_PER_SECOND 12000
 
-int abs(float p) {
+float abs(float p) {
     if (p < 0) {
-        return (int) p * -1;
+        return p * -1;
     }
     else {
-        return (int) p;
+        return p;
     }
 }
 
@@ -57,9 +57,12 @@ void pid_update(void) {
         uint32_t work_timestamp = timestamp;
         if (PID_mode) {
             uint32_t last_timestamp = PID_data[i].last_timestamp;
-            short speed_cmd = pid_compute_cmd(&PID_data[i], last_timestamp, work_timestamp, motors[i].input_consigne,
+            float speed_cmd = pid_compute_cmd(&PID_data[i], last_timestamp, work_timestamp, motors[i].input_consigne,
                                               motors[i].motor_speed);
-            motor_set_direction(i, speed_cmd);
+
+            if (speed_cmd < 0) speed_cmd = 0;
+            else
+                motor_set_direction(i, speed_cmd);
             motor_set_pwm_percentage(i, abs(speed_cmd));
 
             PID_data[i].last_command = speed_cmd;
@@ -87,7 +90,7 @@ float clamp_command(float naiveCommand) {
  * Limite la valeur de l'accumulateur
  */
 float clamp_accumulator(PIDData *pidData, float accVal) {
-    int maxAccumulator = MAX_COMMAND / pidData->ki;
+    float maxAccumulator = MAX_COMMAND / pidData->ki;
     if (accVal > maxAccumulator) {
         pidData->accumulator = maxAccumulator;
         return maxAccumulator;
@@ -123,11 +126,11 @@ float relinearize_command(float cmd) {
  * Return:
  * La commande -12000 à 12000 en nombre de tick par seconde
  */
-short
-pid_compute_cmd(PIDData *pid_data, float last_timestamp, float timestamp, float target_speed, int32_t current_speed) {
+float
+pid_compute_cmd(PIDData *pid_data, float last_timestamp, float timestamp, float target_speed, float current_speed) {
     float timescale = DELTA_T_TIMESCALE;
     float delta_t = (timestamp - last_timestamp) / timescale;
-    int error = target_speed - current_speed;
+    float error = target_speed - current_speed;
     float pCmd = pid_data->kp * error;
     float iCmd = pid_data->accumulator + pid_data->ki * error * delta_t;
     iCmd = clamp_accumulator(pid_data, iCmd);
@@ -141,6 +144,6 @@ pid_compute_cmd(PIDData *pid_data, float last_timestamp, float timestamp, float 
     pid_data->last_timestamp = timestamp;
     pid_data->last_command = cmd;
 
-    return (int) cmd;
+    return cmd;
 }
 

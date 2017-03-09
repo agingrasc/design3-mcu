@@ -14,7 +14,7 @@ typedef struct PIDData {
     float ki;
     float kd;
     short previous_input;
-    int last_command;
+    float last_command;
     float accumulator;
     uint32_t last_timestamp;
 } PIDData;
@@ -24,6 +24,6 @@ PIDData PID_data[MOTOR_COUNT];
 void pid_init(void);
 void pid_setpoint(int, float);
 void pid_update(void);
-short pid_compute_cmd(PIDData *, float, float, float, int32_t);
+float pid_compute_cmd(PIDData *, float, float, float, float);
 
 #endif
