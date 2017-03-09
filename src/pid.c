@@ -59,9 +59,8 @@ void pid_update(void) {
             uint32_t last_timestamp = PID_data[i].last_timestamp;
             short speed_cmd = pid_compute_cmd(&PID_data[i], last_timestamp, work_timestamp, motors[i].input_consigne,
                                               motors[i].motor_speed);
-            int new_consig = (speed_cmd / MAX_COMMAND) * 100;
-            motor_set_direction(i, new_consig);
-            motor_set_pwm_percentage(i, abs(new_consig));
+            motor_set_direction(i, speed_cmd);
+            motor_set_pwm_percentage(i, abs(speed_cmd));
         } else {
             motor_set_pwm_percentage(i, motors[i].consigne_percent);
         }
@@ -99,14 +98,11 @@ float clamp_accumulator(PIDData *pidData, float accVal) {
 }
 
 float relinearize_command(float cmd) {
-    if (cmd > 1 && cmd < MIN_COMMAND) {
-        return MIN_COMMAND;
+    if (cmd > 0) {
+        return cmd + MIN_COMMAND;
     }
-    else if (cmd < -1 && cmd > -MIN_COMMAND) {
-        return -MIN_COMMAND;
-    }
-    else if (cmd < 1 && cmd > -1) {
-        return 0;
+    else if (cmd < 0) {
+        return cmd - MIN_COMMAND;
     }
     else {
         return cmd;
