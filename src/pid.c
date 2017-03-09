@@ -59,6 +59,9 @@ void pid_update(void) {
             uint32_t last_timestamp = PID_data[i].last_timestamp;
             short speed_cmd = pid_compute_cmd(&PID_data[i], last_timestamp, work_timestamp, motors[i].input_consigne,
                                               motors[i].motor_speed);
+
+            PID_data[i].last_command = speed_cmd;
+
             int new_consig = (speed_cmd / MAX_COMMAND) * 100;
             motor_set_direction(i, new_consig);
             motor_set_pwm_percentage(i, abs(new_consig));

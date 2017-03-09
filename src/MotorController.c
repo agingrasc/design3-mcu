@@ -1,5 +1,6 @@
 // MotorController.c
 
+#include <stm32f4xx_tim.h>
 #include "MotorController.h"
 
 void motor_set_pin_1_direction(uint8_t engine_no, GPIO_TypeDef *port, uint32_t clk, uint16_t pin) {
@@ -60,7 +61,8 @@ void _motor_setup_pwm_timer(void) {
 
     TIM_TimeBaseInitTypeDef init_base_struct;
     RCC_APB1PeriphClockCmd(MCS_PWM_CLK_PORT, ENABLE);
-    init_base_struct.TIM_Prescaler = (uint16_t) ((SystemCoreClock / 2) / 28000000) - 1;
+    //init_base_struct.TIM_Prescaler = (uint16_t) ((SystemCoreClock / 2) / 28000000) - 1; // Around 10k
+    init_base_struct.TIM_Prescaler = 50; //50; //(uint16_t) ((SystemCoreClock / 2) / )
     init_base_struct.TIM_ClockDivision = 0;
     init_base_struct.TIM_CounterMode = TIM_CounterMode_Up;
     init_base_struct.TIM_Period = PWM_PULSE_LENGTH;
