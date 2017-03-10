@@ -20,6 +20,23 @@ float abs(float p) {
     }
 }
 
+/**
+ * Retourne 1 si la direction et le setpoint corresponde
+ * @param setpoint
+ * @return
+ */
+int _pid_is_direction_corresponding_setpoint(int motor_id, float setpoint) {
+    int direction = motors[motor_id].motor_direction;
+
+    if (setpoint > 0 && direction == MOTOR_FORWARD) {
+        return 1;
+    }
+    else if (setpoint < 0 && direction == MOTOR_BACKWARD) {
+        return 1;
+    }
+    return 0;
+}
+
 
 /**
  * Initialise le PID
@@ -57,13 +74,27 @@ void pid_update(void) {
         uint32_t work_timestamp = timestamp;
         if (PID_mode) {
             uint32_t last_timestamp = PID_data[i].last_timestamp;
-            float speed_cmd = pid_compute_cmd(&PID_data[i], last_timestamp, work_timestamp, motors[i].input_consigne,
+
+            float setpoint = motors[i].input_consigne;
+
+            if (!_pid_is_direction_corresponding_setpoint(i, setpoint)) {
+                if (motors[i].motor_speed == 0) {
+                    motor_set_direction(i, setpoint);
+                }
+                else {
+                    setpoint = 0;
+                    motor_set_direction_pin(i, MC_DIR_BGND);
+                    motors[i].motor_direction = MOTOR_BREAK;
+                }
+            }
+
+            float speed_cmd = pid_compute_cmd(&PID_data[i], last_timestamp, work_timestamp, abs(setpoint),
                                               motors[i].motor_speed);
 
-            if (speed_cmd < 0) speed_cmd = 0;
-            else
-                motor_set_direction(i, speed_cmd);
-            motor_set_pwm_percentage(i, abs(speed_cmd));
+            if (speed_cmd < 0) {
+                speed_cmd = 0;
+            }
+            motor_set_pwm_percentage(i, speed_cmd);
 
             PID_data[i].last_command = speed_cmd;
 

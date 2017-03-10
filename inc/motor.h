@@ -8,6 +8,10 @@
 #define MOTOR_C        0x2
 #define MOTOR_D        0x3
 
+#define MOTOR_FORWARD 0
+#define MOTOR_BACKWARD 1
+#define MOTOR_BREAK 100
+
 typedef struct motor {
     // PWM (speed)
     __IO uint32_t *duty_cycle;
@@ -26,6 +30,7 @@ typedef struct motor {
     volatile uint32_t old_timestamp;
     volatile uint32_t encoder_cnt;
     volatile uint32_t old_encoder_cnt;
+    int motor_direction;
 } Motor;
 
 Motor motors[MOTOR_COUNT];

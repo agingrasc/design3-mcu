@@ -99,7 +99,63 @@ void _motor_setup_pwm_timer(void) {
     *(motors[3].duty_cycle) = 0;
 }
 
-uint8_t _motor_set_direction_pin(uint8_t motor_id, uint8_t motor_dir) {
+/*
+ * ##### Public Section
+ **/
+void motor_controller_init(void) {
+    int i;
+    for (i = 0; i < MOTOR_COUNT; i++) {
+        motors[i].input_consigne = 0x0;
+        motors[i].consigne_percent = 0x0;
+        motors[i].old_consigne_percent = 0x0;
+        motors[i].motor_direction = MOTOR_FORWARD;
+    }
+
+    _motor_setup_pwm_timer();
+}
+
+
+void motor_set_pwm_percentage(uint8_t motor_id, float percentage) {
+    if ((char) percentage > MAX_CONSIGNE) percentage = MAX_CONSIGNE;
+    if ((char) percentage != motors[motor_id].old_consigne_percent) {
+        motors[motor_id].old_consigne_percent = percentage;
+        //MC_PWM_CLK->CCR1 = PWM_PULSE_LENGTH * percentage / 100;
+        *(motors[motor_id].duty_cycle) = PWM_PULSE_LENGTH * percentage / 100;
+    }
+}
+
+int motor_set_direction(uint8_t motor_id, float consigne) {
+    short direction = -1;
+
+    if (consigne > 0) {
+        direction = 0;
+        motors[motor_id].motor_direction = MOTOR_FORWARD;
+    }
+    else if (consigne < 0) {
+        direction = 1;
+        motors[motor_id].motor_direction = MOTOR_BACKWARD;
+    }
+
+    uint8_t dir = MC_DIR_BGND;
+    if (direction == 0 && (motor_id == 2 || motor_id == 3)) {
+        dir = MC_DIR_CW;
+    }
+    else if (direction == 0 && (motor_id == 0 || motor_id == 1)) {
+        dir = MC_DIR_CCW;
+    }
+    else if (direction == 1 && (motor_id == 2 || motor_id == 3)) {
+        dir = MC_DIR_CCW;
+    }
+    else if (direction == 1 && (motor_id == 0 || motor_id == 1)) {
+        dir = MC_DIR_CW;
+    }
+
+    motor_set_direction_pin(motor_id, dir);
+
+    return 0;
+}
+
+int motor_set_direction_pin(uint8_t motor_id, uint8_t motor_dir) {
     BitAction pv1, pv2;
 
     switch (motor_dir) {
@@ -129,59 +185,6 @@ uint8_t _motor_set_direction_pin(uint8_t motor_id, uint8_t motor_dir) {
 
     GPIO_WriteBit(motors[motor_id].DIRx_pin1, motors[motor_id].dir_pin1, pv1);
     GPIO_WriteBit(motors[motor_id].DIRx_pin2, motors[motor_id].dir_pin2, pv2);
-
-    return 0;
-}
-
-/*
- * ##### Public Section
- **/
-void motor_controller_init(void) {
-    int i;
-    for (i = 0; i < MOTOR_COUNT; i++) {
-        motors[i].input_consigne = 0x0;
-        motors[i].consigne_percent = 0x0;
-        motors[i].old_consigne_percent = 0x0;
-    }
-
-    _motor_setup_pwm_timer();
-}
-
-
-void motor_set_pwm_percentage(uint8_t motor_id, float percentage) {
-    if ((char) percentage > MAX_CONSIGNE) percentage = MAX_CONSIGNE;
-    if ((char) percentage != motors[motor_id].old_consigne_percent) {
-        motors[motor_id].old_consigne_percent = percentage;
-        //MC_PWM_CLK->CCR1 = PWM_PULSE_LENGTH * percentage / 100;
-        *(motors[motor_id].duty_cycle) = PWM_PULSE_LENGTH * percentage / 100;
-    }
-}
-
-int motor_set_direction(uint8_t motor_id, float consigne) {
-    short direction = -1;
-
-    if (consigne > 0) {
-        direction = 0;
-    }
-    else if (consigne < 0) {
-        direction = 1;
-    }
-
-    uint8_t dir = MC_DIR_BGND;
-    if (direction == 0 && (motor_id == 2 || motor_id == 3)) {
-        dir = MC_DIR_CW;
-    }
-    else if (direction == 0 && (motor_id == 0 || motor_id == 1)) {
-        dir = MC_DIR_CCW;
-    }
-    else if (direction == 1 && (motor_id == 2 || motor_id == 3)) {
-        dir = MC_DIR_CCW;
-    }
-    else if (direction == 1 && (motor_id == 0 || motor_id == 1)) {
-        dir = MC_DIR_CW;
-    }
-
-    _motor_set_direction_pin(motor_id, dir);
 
     return 0;
 }
