@@ -29,10 +29,10 @@ last_wait_update = time.time()
 
 
 # kp, ki, kd
-constants = [(0.027069, 0.040708, 0),  # REAR X
-             (0.0095292, 0.029466, 0),  # FRONT Y
-             (0.015431, 0.042286, 0),  # FRONT X
-             (0.030357, 0.02766, 0)  # REAR Y
+constants = [(0.027069, 0.040708, 0, 14),  # REAR X
+             (0.0095292, 0.029466, 0, 13),  # FRONT Y
+             (0.015431, 0.042286, 0, 15),  # FRONT X
+             (0.030357, 0.02766, 0, 13)  # REAR Y
              ]
 
 
@@ -93,8 +93,8 @@ def keyboard(screen):
 
 def set_pid_constants():
     for motor in protocol.Motors:
-        kp, ki, kd = constants[motor.value]
-        cmd = protocol.generate_set_pid_constant(motor, kp, ki, kd)
+        kp, ki, kd, dz = constants[motor.value]
+        cmd = protocol.generate_set_pid_constant(motor, kp, ki, kd, dz)
         ser.write(cmd)
 
 

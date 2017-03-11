@@ -135,11 +135,13 @@ int cmd_set_pid_constant(command *cmd) {
     short kp = cmd->payload[1];
     short ki = cmd->payload[2];
     short kd = cmd->payload[3];
+    short dz = cmd->payload[4];
 
     PIDData* pid = &PID_data[motor];
     pid->kp = ((float) kp)/PID_SCALING;
     pid->ki = ((float) ki)/PID_SCALING;
     pid->kd = ((float) kd)/PID_SCALING;
+    pid->deadzone = dz;
 
     TM_USB_VCP_Putc(CMD_EXECUTE_OK);
     return 0;

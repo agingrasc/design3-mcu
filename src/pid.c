@@ -4,6 +4,7 @@
 
 #define P_GAIN 0
 #define I_GAIN 0
+#define DEFAULT_DEADZONE 15
 #define MAX_COMMAND 40//85
 #define MIN_COMMAND 15 //35
 #define DELTA_T_TIMESCALE 1000 //ms
@@ -46,6 +47,7 @@ void pid_init(void) {
     for (int current_motor = 0; current_motor < MOTOR_COUNT; current_motor++) {
         PID_data[current_motor].kp = P_GAIN;
         PID_data[current_motor].ki = I_GAIN;
+        PID_data[current_motor].deadzone = DEFAULT_DEADZONE;
         PID_data[current_motor].previous_input = 0;
         PID_data[current_motor].accumulator = 0;
         PID_data[current_motor].last_timestamp = 0;
@@ -134,12 +136,12 @@ float clamp_accumulator(PIDData *pidData, float accVal) {
     }
 }
 
-float relinearize_command(float cmd) {
+float relinearize_command(float cmd, short dz) {
     if (cmd > 0) {
-        return cmd + MIN_COMMAND;
+        return cmd + dz;
     }
     else if (cmd < 0) {
-        return cmd - MIN_COMMAND;
+        return cmd - dz;
     }
     else {
         return cmd;
@@ -167,7 +169,7 @@ pid_compute_cmd(PIDData *pid_data, float last_timestamp, float timestamp, float 
     iCmd = clamp_accumulator(pid_data, iCmd);
 
     float naiveCmd = pCmd + iCmd;
-    float cmd = relinearize_command(naiveCmd);
+    float cmd = relinearize_command(naiveCmd, pid_data->deadzone);
     cmd = clamp_command(cmd);
 
     //sauvegarde donnee pour prochain calcul

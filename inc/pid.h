@@ -13,6 +13,7 @@ typedef struct PIDData {
     float kp;
     float ki;
     float kd;
+    short deadzone;
     short previous_input;
     float last_command;
     float accumulator;

@@ -15,7 +15,7 @@ class PayloadLength(Enum):
     MANUAL_SPEED = 4
     READ_ENCODER = 2
     TOGGLE_PID = 2
-    SET_PID_CONSTANTS = 8
+    SET_PID_CONSTANTS = 10
     TEST_PID = 6
     READ_PID_LAST_CMD = 2
 
@@ -134,9 +134,16 @@ def generate_set_pid_mode(mode: PIDStatus):
     return header + payload
 
 
-def generate_set_pid_constant(motor: Motors, ki: float, kp: float, kd: float):
+def generate_set_pid_constant(motor: Motors, ki: float, kp: float, kd: float, dz: int):
+    """"
+    Args:
+        :ki: gain integral
+        :kp: gain proportionnel
+        :kd: gain differentiel
+        :dz: deadzone
+    """
     header = _generate_header(CommandType.SET_PID_CONSTANTS, PayloadLength.SET_PID_CONSTANTS)
-    payload = _generate_payload([motor.value] + [int(ki*PID_SCALING), int(kp*PID_SCALING), int(kd*PID_SCALING)])
+    payload = _generate_payload([motor.value] + [int(ki*PID_SCALING), int(kp*PID_SCALING), int(kd*PID_SCALING)] + [dz])
     return header + payload
 
 
