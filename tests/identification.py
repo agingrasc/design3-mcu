@@ -6,12 +6,24 @@ import protocol
 from encodeur import read_encoder
 from util import *
 
+# Deadzone id
+#  - without charge
+#    - forward
+#      frontx: 8%
+#      rearx: 8%
+#      fronty: 8%
+#      reary: 9%    *
+#    - backward
+#      frontx: -8%
+#      rearx: -8%
+#      fronty: -8%
+#      reary: -9%   *
 
-IDENTIFICATION_TIME = 0.5
+IDENTIFICATION_TIME = 2.5
 STEP = 0.030
-COMMANDS = [20, 30, 40, 60, 70, 80]
+COMMANDS = [5, 6, 7, 8, 9, 10, 15]
 COMPANION_COMMAND = 60
-
+DEADZONE = False # Whether or deadzone per axis is tested
 
 motors = {"frontx": (protocol.Motors.FRONT_X, protocol.Motors.REAR_X),
           "rearx": (protocol.Motors.REAR_X, protocol.Motors.FRONT_X),
