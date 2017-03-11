@@ -47,17 +47,24 @@ ser = serial.Serial("/dev/ttySTM32")
 def rotation_test(motors_id: tuple, consigne, retroaction):
     main_id, companion_id = motors_id
     companion_sign = '+'
+    companion_direction = protocol.MotorsDirection.FORWARD
     main_sign = '-';
-    for direction in protocol.MotorsRotation:
-        if direction == protocol.MotorsDirection.CLOCKWISE:
+    main_direction = protocol.MotorsDirection.BACKWARD
+
+    for rotation in protocol.MotorsRotation:
+        if rotation == protocol.MotorsRotation.CLOCKWISE:
             companion_sign = '+'
             main_sign = '-'
+            companion_direction = protocol.MotorsDirection.FORWARD
+            main_direction = protocol.MotorsDirection.BACKWARD
         else:
             companion_sign = '-'
             main_sign = '+'
+            companion_direction = protocol.MotorsDirection.BACKWARD
+            main_direction = protocol.MotorsDirection.FORWARD
 
         for cmd in COMMANDS:
-            set_consigne(cmd, companion_id, companion_sign, main_id)
+            set_consigne(cmd, companion_id, companion_direction, main_id, main_direction)
             begin = time.time()
             id_time = time.time() - begin
             last_tick = time.time()
@@ -76,7 +83,7 @@ def rotation_test(motors_id: tuple, consigne, retroaction):
                     print("({}) val: {}".format(delta_t, speed))
                 id_time = now - begin
 
-    set_consigne(0, companion_id, protocol.MotorsDirection.FORWARD, main_id)
+    set_consigne(0, companion_id, protocol.MotorsDirection.FORWARD, main_id, protocol.MotorsDirection.FORWARD)
     print("{}\n{}".format(consigne, retroaction))
 
 def direction_test(motors_id: tuple, consigne, retroaction):
@@ -88,7 +95,7 @@ def direction_test(motors_id: tuple, consigne, retroaction):
         else:
             dir_sign = '-'
         for cmd in COMMANDS:
-            set_consigne(cmd, companion_id, direction, main_id)
+            set_consigne(cmd, companion_id, direction, main_id, direction)
             begin = time.time()
             id_time = time.time() - begin
             last_tick = time.time()
@@ -107,14 +114,14 @@ def direction_test(motors_id: tuple, consigne, retroaction):
                     print("({}) val: {}".format(delta_t, speed))
                 id_time = now - begin
 
-    set_consigne(0, companion_id, protocol.MotorsDirection.FORWARD, main_id)
+    set_consigne(0, companion_id, protocol.MotorsDirection.FORWARD, main_id, protocol.MotorsDirection.FORWARD)
     print("{}\n{}".format(consigne, retroaction))
 
 
-def set_consigne(cmd, companion_id, direction, main_id):
-    ser.write(protocol.generate_manual_speed_command(main_id, cmd, direction))
+def set_consigne(cmd, companion_id, companion_direction, main_id, main_direction):
+    ser.write(protocol.generate_manual_speed_command(main_id, cmd, main_direction))
     ser.read(2)
-    ser.write(protocol.generate_manual_speed_command(companion_id, COMPANION_COMMAND, direction))
+    ser.write(protocol.generate_manual_speed_command(companion_id, COMPANION_COMMAND, companion_direction))
     ser.read(2)
 
 
