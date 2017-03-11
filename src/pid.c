@@ -63,7 +63,7 @@ void pid_setpoint(int motor_idx, float setpoint) {
     motor->input_consigne = setpoint;
 
     // on reset l'accumulateur si la consigne a change
-    if (abs(new_consigne - old_consigne) > 10) {
+    if (new_consigne == 0) {
         pid->accumulator = 0;
     }
 }
@@ -94,7 +94,7 @@ void pid_update(void) {
                                               motors[i].motor_speed);
 
             if (speed_cmd < 0) {
-                speed_cmd = 0;
+                speed_cmd = PID_data[i].deadzone;
             }
             motor_set_pwm_percentage(i, speed_cmd);
 
