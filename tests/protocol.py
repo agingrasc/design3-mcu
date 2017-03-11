@@ -63,6 +63,9 @@ class MotorsDirection(Enum):
     FORWARD = 0
     BACKWARD = 1
 
+class MotorsRotation(Enum):
+    CLOCKWISE = 0
+    COUNTERCLOCKWISE = 1
 
 def generate_move_command(x, y, theta) -> bytes:
     header = _generate_header(CommandType.MOVE, PayloadLength.MOVE)
