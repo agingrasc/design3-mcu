@@ -5,13 +5,14 @@ from collections import namedtuple
 import math
 from typing import List, Tuple
 
+from domain.gameboard.position import Position
 from . import protocol
 from .protocol import PencilStatus, Leds
 
 
 PIDConstants = namedtuple("PIDConstants", 'kp ki kd max_cmd deadzone_cmd min_cmd')
 DEADZONE = 15
-DEFAULT_DELTA_T = 0.067  # 30ms, a modifier
+DEFAULT_DELTA_T = 0.067  # en secondes
 MAX_X = 200
 MAX_Y = 100
 
@@ -23,12 +24,12 @@ DEFAULT_DEADZONE_CMD = 40
 DEFAULT_MIN_CMD = 10
 
 
-class PositionRegulator(object):
+class PIPositionRegulator(object):
     """ Implémente un régulateur PI qui agit avec une rétroaction en position et génère une commande de vitesse."""
 
     def __init__(self, kp=DEFAULT_KP, ki=DEFAULT_KI, kd=DEFAULT_KD, max_cmd=DEFAULT_MAX_CMD,
                  deadzone_cmd=DEFAULT_DEADZONE_CMD, min_cmd=DEFAULT_MIN_CMD):
-        self._set_point = 0, 0, 0
+        self._set_point : Position = Position()
         self.accumulator = 0, 0, 0
         self.constants = PIDConstants(kp, ki, kd, max_cmd, deadzone_cmd, min_cmd)
 
@@ -37,14 +38,13 @@ class PositionRegulator(object):
         return self._set_point
 
     @set_point.setter
-    def set_point(self, set_point):
+    def set_point(self, new_set_point):
         """" Assigne une consigne au regulateur. Effet de bord: reinitialise les accumulateurs. """
-        if self._set_point != set_point:
+        if self._set_point != new_set_point:
             self.accumulator = 0, 0, 0
-            self._set_point = set_point
+            self._set_point = new_set_point
 
-    def next_speed_command(self, actual_position: Tuple[float], delta_t: float=DEFAULT_DELTA_T) -> \
-            List[int]:
+    def next_speed_command(self, actual_position: Position, delta_t: float=DEFAULT_DELTA_T) -> List[int]:
         """"
         Calcul une iteration du PID.
         Args:
@@ -53,8 +53,12 @@ class PositionRegulator(object):
         Returns:
             La vitesse en x, y et en theta.
         """
-        actual_x, actual_y, actual_theta = actual_position
-        dest_x, dest_y, dest_theta = self.set_point
+        actual_x = actual_position.pos_x
+        actual_y = actual_position.pos_y
+        actual_theta = actual_position.theta
+        dest_x = self.set_point.pos_x
+        dest_y = self.set_point.pos_y
+        dest_theta = self.set_point.theta
         err_x, err_y, err_theta = dest_x - actual_x, dest_y - actual_y, dest_theta - actual_theta
 
         cmd_x = err_x / MAX_X * self.constants.kp
@@ -113,11 +117,10 @@ def _correct_for_referential_frame(x: float, y: float, t: float) -> Tuple[float]
 
 
 """ Regulateur de position persistent."""
-regulator = PositionRegulator()
+regulator = PIPositionRegulator()
 
 
-class Command(metaclass=ABCMeta):
-    """" Interface pour une commande de robot."""
+class ICommand(metaclass=ABCMeta):
     def __init__(self):
         pass
 
@@ -127,8 +130,7 @@ class Command(metaclass=ABCMeta):
         pass
 
 
-class Move(Command):
-    """" Une commande Move permet de deplacer le robot a une position (x, y) et avec une orientation theta."""
+class MoveCommand(ICommand):
     def __init__(self, x, y, theta):
         """"
         Args:
@@ -148,8 +150,7 @@ class Move(Command):
         return protocol.generate_move_command(*regulated_command)
 
 
-class Camera(Command):
-    """" Une commande Camera permet de changer l'orientation horizontale ou verticale de la camera embarquee."""
+class CameraOrientationCommand(ICommand):
     def __init__(self, x_theta, y_theta):
         """"
         Args:
@@ -164,7 +165,7 @@ class Camera(Command):
         return protocol.generate_camera_command(self.x_theta, self.y_theta)
 
 
-class Pencil(Command):
+class PencilRaiseLowerCommand(ICommand):
     """" Une commande Pencil permet de controler le status du prehenseur."""
     def __init__(self, status: PencilStatus):
         super().__init__()
@@ -174,8 +175,7 @@ class Pencil(Command):
         return protocol.generate_pencil_command(self.status)
 
 
-class Led(Command):
-    """" Une commande Led permet d'activer une DEL, soit la rouge, soit la verte."""
+class LedCommand(ICommand):
     def __init__(self, led: Leds):
         super().__init__()
         self.led = led
