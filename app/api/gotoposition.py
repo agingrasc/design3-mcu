@@ -24,9 +24,10 @@ def go_to_position_():
     except Exception as e:
         return make_response(jsonify(), 400)
     robot = req_info["robot"]
-    robot_x = robot["x"]
-    robot_y = robot["y"]
-    theta = robot['theta']
+    robot_pos = robot['position']
+    robot_x = robot_pos["x"]
+    robot_y = robot_pos["y"]
+    theta = robot_pos['theta']
     obstacles = req_info["obstacles"]
     width = request["width"]
     length = request["length"]
