@@ -1,6 +1,6 @@
 import sys
-from app.domain.gameboard.position import Position
-from app.domain.gameboard.gameboard import Tag
+from domain.gameboard.position import Position
+from domain.gameboard.gameboard import Tag
 from .grid import Grid
 
 

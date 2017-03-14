@@ -88,7 +88,6 @@ class RobotController(object):
         time.sleep(1)
         cmd = LedCommand(Leds.DOWN_GREEN)
         self.send_command(cmd)
-        self.ser_mcu.write(protocol.generate_toggle_pid())
 
     def _get_return_code(self):
         return int.from_bytes(self.ser_mcu.read(1), byteorder='little')

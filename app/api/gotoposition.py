@@ -1,15 +1,15 @@
 from flask import Blueprint, request, make_response, jsonify
-from app.service import pathfinding_application_service
-from app.domain.gameboard.position import Position
-from app.domain.pathfinding import get_segments
-from app.domain.command.commandcontroller import CommandController
-from app.mcu import robotcontroller
+from service import pathfinding_application_service
+from domain.gameboard.position import Position
+from domain.pathfinding import get_segments
+from domain.command.commandcontroller import CommandController
+from mcu import robotcontroller
 
 from domain.gameboard.position import Position
 from mcu.robotcontroller import robot_controller
 from mcu.commands import regulator, MoveCommand
 from mcu import protocol
-from app.domain.command.visionregulation import vision_regulator
+from domain.command.visionregulation import vision_regulator
 
 go_to_position = Blueprint('go-to-position', __name__)
 

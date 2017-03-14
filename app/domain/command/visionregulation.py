@@ -1,8 +1,8 @@
 import time
 from websocket import create_connection
-from app.mcu.robotcontroller import robot_controller, set_move_destination
-from app.domain.gameboard.position import Position
-from app.mcu.commands import regulator
+from mcu.robotcontroller import robot_controller, set_move_destination
+from domain.gameboard.position import Position
+from mcu.commands import regulator
 
 DELTA_T = 0.1
 

@@ -1,4 +1,4 @@
-from app.mcu.commands import Move
+from mcu.commands import MoveCommand
 
 
 class CommandController:

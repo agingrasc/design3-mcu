@@ -1,5 +1,5 @@
-from app.pathfinding.grid import Grid
-from app.pathfinding.pathfinding import PathFinding
+from domain.pathfinding.grid import Grid
+from domain.pathfinding.pathfinding import PathFinding
 
 
 def find(obstacles, width, length, robot_position, destination):
