@@ -10,13 +10,19 @@ class PayloadLength(Enum):
     LED = 2
     PENCIL = 2
     CAMERA = 4
+    MANUAL_SPEED = 6
+    READ_ENCODER = 2
+    TOGGLE_PID = 0
 
 
 class CommandType(Enum):
-    MOVE = 0x0
-    CAMERA = 0x1
-    PENCIL = 0x2
-    LED = 0x3
+    MOVE = 0x00
+    CAMERA = 0x01
+    PENCIL = 0x02
+    LED = 0x03
+    MANUAL_SPEED = 0xa0
+    READ_ENCODER = 0xa1
+    TOGGLE_PID = 0xa2
 
 
 class Leds(Enum):
@@ -31,6 +37,18 @@ class Leds(Enum):
 class PencilStatus(Enum):
     RAISED = 0
     LOWERED = 1
+
+
+class Motors(Enum):
+    REAR_X = 1 - 1
+    FRONT_Y = 2 - 1
+    FRONT_X = 3 - 1
+    REAR_Y = 4 - 1
+
+
+class MotorsDirection(Enum):
+    FORWARD = 0
+    BACKWARD = 1
 
 
 def generate_move_command(x, y, theta) -> bytes:
@@ -59,6 +77,39 @@ def generate_camera_command(x_theta: int, y_theta: int) -> bytes:
     header = _generate_header(CommandType.CAMERA, PayloadLength.CAMERA)
     payload = _generate_payload([x_theta, y_theta])
     return header + payload
+
+
+def generate_manual_speed_command(motor: Motors, pwm_percentage: int, direction: MotorsDirection):
+    """"
+    Genere une commande directe en pourcentage de PWM pour un moteur
+    Args:
+        :motor: Identifiant du moteur
+        :pwm_percentage [0, 100]: Pourcentage du PWM
+        :direction: Direction du moteur
+    Return:
+        :cmd bytes: La commande serialise
+    """
+    header = _generate_header(CommandType.MANUAL_SPEED, PayloadLength.MANUAL_SPEED)
+    payload = _generate_payload([motor.value, pwm_percentage, direction.value])
+    return header + payload
+
+
+def generate_read_encoder(motor: Motors):
+    """
+    Genere une commande qui effectue une lecture d'un encodeur.
+    Args:
+        :motor [0, 3]: Identifiant du moteur
+    Return:
+        :cmd bytes: La commande serialise
+    """
+    header = _generate_header(CommandType.READ_ENCODER, PayloadLength.READ_ENCODER)
+    payload = _generate_payload([motor.value])
+    return header + payload
+
+
+def generate_toggle_pid():
+    header = _generate_header(CommandType.TOGGLE_PID, PayloadLength.TOGGLE_PID)
+    return header
 
 
 def _generate_payload(payload: list) -> bytes:

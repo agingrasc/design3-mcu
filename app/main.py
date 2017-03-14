@@ -44,7 +44,6 @@ if __name__ == '__main__':
         print("AUTOMATIC MODE not implemented")
     elif status == MANUAL:
         print("MANUAL MODE")
-        robot_controller.startup_test()
         app.register_blueprint(go_to_position)
         app.register_blueprint(ledok.led_ok)
     else:
