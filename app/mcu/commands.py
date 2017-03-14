@@ -35,7 +35,7 @@ class PIPositionRegulator(object):
 
     @property
     def setpoint(self):
-        return self._set_point
+        return self._setpoint
 
     @setpoint.setter
     def setpoint(self, new_setpoint):

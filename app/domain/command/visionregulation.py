@@ -1,4 +1,5 @@
 import time
+import json
 from websocket import create_connection
 from mcu.robotcontroller import robot_controller, set_move_destination
 from domain.gameboard.position import Position
@@ -18,23 +19,33 @@ class VisionRegulation:
         data = {}
         data["headers"] = "pull_robot_position"
         data["data"] = {}
-        self.connection.send(data)
-        robot_position_info = self.connection.recv()
+        self.connection.send(json.dumps(data))
+        robot_position_json = self.connection.recv()
+        print("########DEBUG######\n" + str(robot_position_json))
 
-        robot_position = Position(robot_position_info["x"],
-                                  robot_position_info["y"])
+        robot_position_info = json.loads(robot_position_json)
+        pos_x = float(robot_position_info['x'])
+        pos_y = float(robot_position_info['y'])
+        robot_position = Position(int(pos_x), int(pos_y))
         set_move_destination(position)
 
         now = time.time()
         last_time = time.time()
-        while regulator._is_arrived(robot_position):
+        print("Starting position regulator loop!!!")
+
+        while not regulator._is_arrived(robot_position):
             now = time.time()
             if now - last_time > DELTA_T:
                 last_time = time.time()
-                self.connection.send(data)
-                robot_position_info = self.connection.recv()
-                robot_position = Position(robot_position_info["x"],
-                                          robot_position_info["y"])
+                self.connection.send(json.dumps(data))
+
+                robot_position_json = self.connection.recv()
+                robot_position_info = json.loads(robot_position_json)
+                pos_x = float(robot_position_info['x'])
+                pos_y = float(robot_position_info['y'])
+                print("Trying to move, actual position: {} -- {}".format(pos_x, pos_y))
+                robot_position = Position(int(pos_x), int(pos_y))
+
                 robot_controller.send_move_command(robot_position)
 
 

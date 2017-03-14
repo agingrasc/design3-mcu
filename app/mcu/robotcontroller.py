@@ -4,10 +4,11 @@ import time
 
 from domain.gameboard.position import Position
 from mcu import protocol
+from mcu.commands import regulator, MoveCommand
 
 if __name__ == "__main__":
     from mcu.protocol import Leds
-    from mcu.commands import ICommand, LedCommand, MoveCommand, regulator
+    from mcu.commands import ICommand, LedCommand, MoveCommand
 else:
     from mcu.protocol import Leds
     from .commands import ICommand, LedCommand

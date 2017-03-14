@@ -29,15 +29,15 @@ def go_to_position_():
     robot_y = robot_pos["y"]
     theta = robot_pos['theta']
     obstacles = req_info["obstacles"]
-    width = request["width"]
-    length = request["length"]
+    width = req_info["width"]
+    length = req_info["length"]
     robot_position = Position(robot_x, robot_y)
     destination = req_info["destination"]
     destination_x = destination["x"]
     destination_y = destination["y"]
     destination_position = Position(destination_x, destination_y, theta)
     path = pathfinding_application_service.find(obstacles, width, length,
-                                                robot_position, destination)
+                                                robot_position, destination_position)
     destinations = get_segments.get_filter_path(path)
     for point in destinations:
         vision_regulator.go_to_position(point)
