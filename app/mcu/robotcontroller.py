@@ -16,6 +16,12 @@ SERIAL_MCU_DEV_NAME = "ttySTM32"
 SERIAL_POLULU_DEV_NAME = "ttyPolulu"
 
 
+constants = [(0.027069, 0.040708, 0, 14),  # REAR X
+             (0.0095292, 0.029466, 0, 13),  # FRONT Y
+             (0.015431, 0.042286, 0, 15),  # FRONT X
+             (0.030357, 0.02766, 0, 13)]  # REAR Y
+
+
 class SerialMock:
     def write(self, arg, byteorder='little'):
         print("Serial mock: {} -- ".format(arg, byteorder))
@@ -42,6 +48,7 @@ class RobotController(object):
             print("No serial link for polulu!")
             self.ser_polulu = SerialMock()
 
+        self._init_mcu_pid()
         self._startup_test()
 
     def send_command(self, cmd: ICommand):
@@ -66,6 +73,12 @@ class RobotController(object):
 
     def raise_pencil(self):
         pass
+
+    def _init_mcu_pid(self):
+        for motor in protocol.Motors:
+            kp, ki, kd, dz = constants[motor.value]
+            cmd = protocol.generate_set_pid_constant(motor, kp, ki, kd, dz)
+            self.ser_mcu.write(cmd)
 
     def _startup_test(self):
         """ Effectue un test de base pour s'assurer que le MCU repond et met le MCU en mode de debogage."""

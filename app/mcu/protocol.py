@@ -4,15 +4,20 @@ from enum import Enum
 
 import struct
 
+PID_SCALING = 100000
+
 
 class PayloadLength(Enum):
     MOVE = 6
     LED = 2
     PENCIL = 2
     CAMERA = 4
-    MANUAL_SPEED = 6
+    MANUAL_SPEED = 4
     READ_ENCODER = 2
-    TOGGLE_PID = 0
+    TOGGLE_PID = 2
+    SET_PID_CONSTANTS = 10
+    TEST_PID = 6
+    READ_PID_LAST_CMD = 2
 
 
 class CommandType(Enum):
@@ -20,9 +25,12 @@ class CommandType(Enum):
     CAMERA = 0x01
     PENCIL = 0x02
     LED = 0x03
+    SET_PID_CONSTANTS = 0x04
     MANUAL_SPEED = 0xa0
     READ_ENCODER = 0xa1
     TOGGLE_PID = 0xa2
+    TEST_PID = 0xa3
+    READ_PID_LAST_CMD = 0xa4
 
 
 class Leds(Enum):
@@ -46,10 +54,18 @@ class Motors(Enum):
     REAR_Y = 4 - 1
 
 
+class PIDStatus(Enum):
+    OFF = 0
+    ON = 1
+
+
 class MotorsDirection(Enum):
     FORWARD = 0
     BACKWARD = 1
 
+class MotorsRotation(Enum):
+    CLOCKWISE = 0
+    COUNTERCLOCKWISE = 1
 
 def generate_move_command(x, y, theta) -> bytes:
     header = _generate_header(CommandType.MOVE, PayloadLength.MOVE)
@@ -79,7 +95,7 @@ def generate_camera_command(x_theta: int, y_theta: int) -> bytes:
     return header + payload
 
 
-def generate_manual_speed_command(motor: Motors, pwm_percentage: int, direction: MotorsDirection):
+def generate_manual_speed_command(motor: Motors, pwm_percentage: int, direction: MotorsDirection = None):
     """"
     Genere une commande directe en pourcentage de PWM pour un moteur
     Args:
@@ -89,8 +105,13 @@ def generate_manual_speed_command(motor: Motors, pwm_percentage: int, direction:
     Return:
         :cmd bytes: La commande serialise
     """
+    if direction and direction == MotorsDirection.BACKWARD:
+        # legacy code, avant la direction etait precise, on se contente de rendre negatif le pourcentage, le mcu
+        # s'occupe de choisir la bonne direction
+        pwm_percentage = -pwm_percentage
+
     header = _generate_header(CommandType.MANUAL_SPEED, PayloadLength.MANUAL_SPEED)
-    payload = _generate_payload([motor.value, pwm_percentage, direction.value])
+    payload = _generate_payload([motor.value, pwm_percentage])
     return header + payload
 
 
@@ -107,10 +128,34 @@ def generate_read_encoder(motor: Motors):
     return header + payload
 
 
-def generate_toggle_pid():
+def generate_set_pid_mode(mode: PIDStatus):
     header = _generate_header(CommandType.TOGGLE_PID, PayloadLength.TOGGLE_PID)
-    return header
+    payload = _generate_payload([mode.value])
+    return header + payload
 
+
+def generate_set_pid_constant(motor: Motors, ki: float, kp: float, kd: float, dz: int):
+    """"
+    Args:
+        :ki: gain integral
+        :kp: gain proportionnel
+        :kd: gain differentiel
+        :dz: deadzone
+    """
+    header = _generate_header(CommandType.SET_PID_CONSTANTS, PayloadLength.SET_PID_CONSTANTS)
+    payload = _generate_payload([motor.value] + [int(ki*PID_SCALING), int(kp*PID_SCALING), int(kd*PID_SCALING)] + [dz])
+    return header + payload
+
+
+def generate_test_pid(motor: Motors, delta_t: int, current_speed: int):
+    header = _generate_header(CommandType.TEST_PID, PayloadLength.TEST_PID)
+    payload = _generate_payload([motor.value, delta_t, current_speed])
+    return header + payload
+
+def generate_read_pid_last_cmd(motor: Motors):
+    header = _generate_header(CommandType.READ_PID_LAST_CMD, PayloadLength.READ_PID_LAST_CMD)
+    payload = _generate_payload([motor.value])
+    return header + payload
 
 def _generate_payload(payload: list) -> bytes:
     """"

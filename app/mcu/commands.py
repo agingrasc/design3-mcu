@@ -61,8 +61,8 @@ class PIPositionRegulator(object):
         dest_theta = self.setpoint.theta
         err_x, err_y, err_theta = dest_x - actual_x, dest_y - actual_y, dest_theta - actual_theta
 
-        cmd_x = err_x / MAX_X * self.constants.kp
-        cmd_y = err_y / MAX_Y * self.constants.kp
+        cmd_x = err_x * self.constants.kp
+        cmd_y = err_y * self.constants.kp
         cmd_x = self._relinearize(cmd_x)
         cmd_y = self._relinearize(cmd_y)
         cmd_x, cmd_y = _correct_for_referential_frame(cmd_x, cmd_y, actual_theta)
