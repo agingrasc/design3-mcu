@@ -33,8 +33,8 @@ void initTimer(void) {
     TIM_TimeBaseInitTypeDef tim9_init_struct;
     tim9_init_struct.TIM_CounterMode = TIM_CounterMode_Up;
     tim9_init_struct.TIM_ClockDivision = TIM_CKD_DIV1;
-    tim9_init_struct.TIM_Prescaler = 99;
-    tim9_init_struct.TIM_Period = 167;
+    tim9_init_struct.TIM_Prescaler = 999;
+    tim9_init_struct.TIM_Period = 839;
     TIM_TimeBaseInit(TIM9, &tim9_init_struct);
     TIM_ITConfig(TIM9, TIM_IT_Update, ENABLE);
     TIM_Cmd(TIM9, ENABLE);
