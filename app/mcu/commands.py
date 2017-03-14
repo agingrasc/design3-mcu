@@ -11,17 +11,17 @@ from .protocol import PencilStatus, Leds
 
 
 PIDConstants = namedtuple("PIDConstants", 'kp ki kd max_cmd deadzone_cmd min_cmd')
-DEADZONE = 15
-DEFAULT_DELTA_T = 0.067  # en secondes
+DEADZONE = 50
+DEFAULT_DELTA_T = 0.100  # en secondes
 MAX_X = 200
 MAX_Y = 100
 
-DEFAULT_KP = 100
+DEFAULT_KP = 1
 DEFAULT_KI = 0
 DEFAULT_KD = 0
 DEFAULT_MAX_CMD = 80
-DEFAULT_DEADZONE_CMD = 40
-DEFAULT_MIN_CMD = 10
+DEFAULT_DEADZONE_CMD = 20
+DEFAULT_MIN_CMD = 20
 
 
 class PIPositionRegulator(object):
@@ -29,20 +29,20 @@ class PIPositionRegulator(object):
 
     def __init__(self, kp=DEFAULT_KP, ki=DEFAULT_KI, kd=DEFAULT_KD, max_cmd=DEFAULT_MAX_CMD,
                  deadzone_cmd=DEFAULT_DEADZONE_CMD, min_cmd=DEFAULT_MIN_CMD):
-        self._set_point : Position = Position()
+        self._setpoint: Position = Position()
         self.accumulator = 0, 0, 0
         self.constants = PIDConstants(kp, ki, kd, max_cmd, deadzone_cmd, min_cmd)
 
     @property
-    def set_point(self):
+    def setpoint(self):
         return self._set_point
 
-    @set_point.setter
-    def set_point(self, new_set_point):
+    @setpoint.setter
+    def setpoint(self, new_setpoint):
         """" Assigne une consigne au regulateur. Effet de bord: reinitialise les accumulateurs. """
-        if self._set_point != new_set_point:
+        if self._setpoint != new_setpoint:
             self.accumulator = 0, 0, 0
-            self._set_point = new_set_point
+            self._setpoint = new_setpoint
 
     def next_speed_command(self, actual_position: Position, delta_t: float=DEFAULT_DELTA_T) -> List[int]:
         """"
@@ -56,13 +56,13 @@ class PIPositionRegulator(object):
         actual_x = actual_position.pos_x
         actual_y = actual_position.pos_y
         actual_theta = actual_position.theta
-        dest_x = self.set_point.pos_x
-        dest_y = self.set_point.pos_y
-        dest_theta = self.set_point.theta
+        dest_x = self.setpoint.pos_x
+        dest_y = self.setpoint.pos_y
+        dest_theta = self.setpoint.theta
         err_x, err_y, err_theta = dest_x - actual_x, dest_y - actual_y, dest_theta - actual_theta
 
-        cmd_x = err_x / MAX_X * self.constants.kp
-        cmd_y = err_y / MAX_Y * self.constants.kp
+        cmd_x = err_x * self.constants.kp
+        cmd_y = err_y * self.constants.kp
         cmd_x = self._relinearize(cmd_x)
         cmd_y = self._relinearize(cmd_y)
         cmd_x, cmd_y = _correct_for_referential_frame(cmd_x, cmd_y, actual_theta)
@@ -70,7 +70,7 @@ class PIPositionRegulator(object):
         for cmd in [cmd_x, cmd_y, err_theta]:
             saturated_cmd.append(self._saturate_cmd(cmd))
 
-        if math.sqrt(err_x**2 + err_y**2) < DEADZONE:
+        if self._is_arrived(actual_position, DEADZONE):
             saturated_cmd = 0, 0, 0
 
         command = []
@@ -96,6 +96,11 @@ class PIPositionRegulator(object):
             return -self.constants.max_cmd
         else:
             return cmd
+
+    def _is_arrived(self, robot_position: Position, deadzone = DEADZONE):
+        err_x = robot_position.pos_x - self.setpoint.pos_x
+        err_y = robot_position.pos_y - self.setpoint.pos_y
+        return math.sqrt(err_x**2 + err_y**2) < deadzone
 
 
 def _correct_for_referential_frame(x: float, y: float, t: float) -> Tuple[float]:
@@ -131,7 +136,7 @@ class ICommand(metaclass=ABCMeta):
 
 
 class MoveCommand(ICommand):
-    def __init__(self, x, y, theta):
+    def __init__(self, robot_position):
         """"
         Args:
             :x: Position x sur le plan monde
@@ -139,14 +144,10 @@ class MoveCommand(ICommand):
             :theta: Orientation du robot en radians
         """
         super().__init__()
-        self.x = x
-        self.y = y
-        self.theta = theta
+        self.robot_position = robot_position
 
     def pack_command(self) -> bytes:
-        regulator.set_point = self.x, self.y, self.theta
-        position = 0, 0, 0  # TODO: obtenir la retroaction de la camera
-        regulated_command = regulator.next_speed_command(position)
+        regulated_command = regulator.next_speed_command(self.robot_position)
         return protocol.generate_move_command(*regulated_command)
 
 

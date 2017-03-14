@@ -9,6 +9,7 @@ from domain.gameboard.position import Position
 from mcu.robotcontroller import robot_controller
 from mcu.commands import regulator, MoveCommand
 from mcu import protocol
+from app.domain.command.visionregulation import vision_regulator
 
 go_to_position = Blueprint('go-to-position', __name__)
 
@@ -38,7 +39,7 @@ def go_to_position_():
                                                 robot_position, destination)
     destinations = get_segments.get_filter_path(path)
     for point in destinations:
-        regulator.set_point = destination_position
+        vision_regulator.go_to_position(point)
 
     return make_response(
         jsonify({
