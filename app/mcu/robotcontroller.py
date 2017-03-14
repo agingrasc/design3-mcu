@@ -2,11 +2,12 @@
 import serial
 import time
 
+from domain.gameboard.position import Position
 from mcu import protocol
 
 if __name__ == "__main__":
     from mcu.protocol import Leds
-    from mcu.commands import ICommand, LedCommand
+    from mcu.commands import ICommand, LedCommand, MoveCommand, regulator
 else:
     from mcu.protocol import Leds
     from .commands import ICommand, LedCommand
@@ -56,6 +57,10 @@ class RobotController(object):
         while ret_code != 0:
             self.ser_mcu.write(cmd.pack_command())
 
+    def send_move_command(self, robot_position: Position):
+        cmd = MoveCommand(robot_position)
+        self.send_command(cmd)
+
     def lower_pencil(self):
         pass
 
@@ -77,6 +82,11 @@ class RobotController(object):
 
 """ Instance persistante du Controler."""
 robot_controller = RobotController()
+
+
+def set_move_destination(move_destination: Position):
+    regulator.setpoint = move_destination
+
 
 if __name__ == "__main__":
     robot_controller._startup_test()

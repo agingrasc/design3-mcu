@@ -20,7 +20,7 @@ def go_to_position_():
     theta = req_info['theta']
 
     pos = Position(pos_x, pos_y, theta)
-    regulator.set_point = pos
+    regulator.setpoint = pos
 
     return make_response(jsonify({'x': int(pos.pos_x), 'y': int(pos_y)}), 200)
 
