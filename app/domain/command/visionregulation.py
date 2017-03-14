@@ -40,9 +40,14 @@ class VisionRegulation:
                 self.connection.send(json.dumps(data))
 
                 robot_position_json = self.connection.recv()
-                robot_position_info = json.loads(robot_position_json)
-                pos_x = float(robot_position_info['x'])
-                pos_y = float(robot_position_info['y'])
+                try:
+                    robot_position_info = json.loads(robot_position_json)
+                    pos_x = float(robot_position_info['x'])
+                    pos_y = float(robot_position_info['y'])
+                except:
+                    pos_x = 0
+                    pos_y = 0
+                    print("position non detecte!")
                 print("Trying to move, actual position: {} -- {}".format(pos_x, pos_y))
                 robot_position = Position(int(pos_x), int(pos_y))
 

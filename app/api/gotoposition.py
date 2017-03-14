@@ -36,11 +36,14 @@ def go_to_position_():
     destination_x = destination["x"]
     destination_y = destination["y"]
     destination_position = Position(destination_x, destination_y, theta)
-    path = pathfinding_application_service.find(obstacles, width, length,
-                                                robot_position, destination_position)
-    destinations = get_segments.get_filter_path(path)
-    for point in destinations:
-        vision_regulator.go_to_position(point)
+    #path = pathfinding_application_service.find(obstacles, width, length,
+    #                                            robot_position, destination_position)
+    #destinations = get_segments.get_filter_path(path)
+    #for point in destinations:
+    #    #vision_regulator.go_to_position(point)
+    #    pass
+
+    vision_regulator.go_to_position(destination_position)
 
     return make_response(
         jsonify({
