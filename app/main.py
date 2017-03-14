@@ -10,6 +10,7 @@ app = Flask(__name__)
 MANUAL = "manual"
 AUTOMATIC = "automatic"
 
+
 def run_automatic():
     print("run robot AI")
 
@@ -40,11 +41,11 @@ def not_found(error):
 
 if __name__ == '__main__':
     status = sys.argv[1]
+    base_station_url = sys.argv[2]
     if status == AUTOMATIC:
         print("AUTOMATIC MODE not implemented")
     elif status == MANUAL:
         print("MANUAL MODE")
-        robot_controller.startup_test()
         app.register_blueprint(go_to_position)
         app.register_blueprint(ledok.led_ok)
     else:

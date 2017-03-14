@@ -15,7 +15,7 @@ class PositionTest(unittest.TestCase):
         angle = math.atan(1.0)
         distance = math.sqrt(
             float(self.a_valid_x**2) + float(self.a_valid_x**2))
-        self.assertEqual(distance, pos.get_distance())
+        self.assertEqual(distance, pos.get_norm())
         self.assertEqual(angle, pos.get_angle())
 
     def test_differentxy_init(self):
@@ -24,7 +24,7 @@ class PositionTest(unittest.TestCase):
         angle = math.atan(self.a_valid_y / self.a_valid_x)
         distance = math.sqrt(
             float(self.a_valid_x**2) + float(self.a_valid_y**2))
-        self.assertEqual(distance, pos.get_distance())
+        self.assertEqual(distance, pos.get_norm())
         self.assertEqual(angle, pos.get_angle())
 
     def test_samexy_setcartesian(self):
@@ -35,7 +35,7 @@ class PositionTest(unittest.TestCase):
         angle = math.atan(self.a_valid_y / self.a_valid_x)
         distance = math.sqrt(
             float(self.a_valid_x**2) + float(self.a_valid_y**2))
-        self.assertEqual(distance, pos.get_distance())
+        self.assertEqual(distance, pos.get_norm())
         self.assertEqual(angle, pos.get_angle())
 
     def test_differentxy_setcartesian(self):
@@ -46,5 +46,5 @@ class PositionTest(unittest.TestCase):
         angle = math.atan(1.0)
         distance = math.sqrt(
             float(self.a_valid_x**2) + float(self.a_valid_x**2))
-        self.assertEqual(distance, pos.get_distance())
+        self.assertEqual(distance, pos.get_norm())
         self.assertEqual(angle, pos.get_angle())
