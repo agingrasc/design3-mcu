@@ -1,12 +1,12 @@
 import sys
 from unittest import TestCase
-from app.domain.gameboard.gameboard import Coordinate
-from app.domain.gameboard.gameboard import ObstacleValueObject
-from app.domain.gameboard.gameboard import Tag
-from app.domain.gameboard.gameboard import GameBoard
+from domain.gameboard.gameboard import Coordinate
+from domain.gameboard.gameboard import ObstacleValueObject
+from domain.gameboard.gameboard import Tag
+from domain.gameboard.gameboard import GameBoard
 from . import pathfinding
 from .grid import Grid
-from app.domain.pathfinding import get_segments
+from domain.pathfinding import get_segments
 
 
 class PathFindingITest(TestCase):
