@@ -33,8 +33,8 @@ def go_to_position_():
     length = req_info["length"]
     robot_position = Position(robot_x, robot_y)
     destination = req_info["destination"]
-    destination_x = destination["x"]
-    destination_y = destination["y"]
+    destination_x = int(float(destination["x"]))
+    destination_y = int(float(destination["y"]))
     destination_position = Position(destination_x, destination_y, theta)
     #path = pathfinding_application_service.find(obstacles, width, length,
     #                                            robot_position, destination_position)
