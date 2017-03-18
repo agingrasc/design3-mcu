@@ -17,4 +17,4 @@ class Position:
         return math.atan(float(self.pos_y) / float(self.pos_x))
 
     def str(self):
-        print("x: " + str(self.pos_x) + " y : " + str(self.pos_y))
+        print("x: {} -- y: {} -- theta: {}".format(self.pos_x, self.pos_y, self.theta))
