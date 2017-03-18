@@ -11,7 +11,7 @@ ser = serial.Serial("/dev/ttySTM32")
 
 
 def main():
-    # test allumer led verte (bleu)
+    # test allumer led verte
     ser.write(protocol.generate_led_command(protocol.Leds.UP_GREEN))
     print_code(HEADER_W, ser)
     print_code(PAYLOAD_W, ser)
@@ -19,7 +19,7 @@ def main():
     # wait
     time.sleep(0.5)
 
-    # test éteindre led verte (bleu)
+    # test éteindre led verte
     ser.write(protocol.generate_led_command(protocol.Leds.DOWN_GREEN))
     print_code(HEADER_W, ser)
     print_code(PAYLOAD_W, ser)
@@ -27,8 +27,29 @@ def main():
     # wait
     time.sleep(0.5)
 
-    # test led 1 seconde sur mcu
+    # test led verte 1 seconde sur mcu
     ser.write(protocol.generate_led_command(protocol.Leds.BLINK_GREEN))
+    print_code(HEADER_W, ser)
+    print_code(PAYLOAD_W, ser)
+
+    # test allumer led rouge 
+    ser.write(protocol.generate_led_command(protocol.Leds.UP_RED))
+    print_code(HEADER_W, ser)
+    print_code(PAYLOAD_W, ser)
+
+    # wait
+    time.sleep(0.5)
+
+    # test éteindre led rouge 
+    ser.write(protocol.generate_led_command(protocol.Leds.DOWN_RED))
+    print_code(HEADER_W, ser)
+    print_code(PAYLOAD_W, ser)
+
+    # wait
+    time.sleep(0.5)
+
+    # test led rouge 1 seconde sur mcu
+    ser.write(protocol.generate_led_command(protocol.Leds.BLINK_RED))
     print_code(HEADER_W, ser)
     print_code(PAYLOAD_W, ser)
 

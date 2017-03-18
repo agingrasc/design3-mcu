@@ -28,7 +28,7 @@ void updateDisplay() {
     char buf1[16];
     buf1[15] = '\0';
 
-   // sprintf(buf1, "Hello, I am");
+    sprintf(buf1, "Hello, I am");
     for (int i = 0; i < 16; i++) {
         if (buf1[i] == '\0') break;
         lcd_putc(buf1[i]);
@@ -69,8 +69,6 @@ void checkForVCP() {
 }
 
 int main() {
-    current_motor = 0;
-
     initLed();
     /* Initialize USB virtual COM port */
     TM_USB_VCP_Init();
@@ -80,6 +78,19 @@ int main() {
     initDelay();
     initTimer();
     lcd_init();
+    init_robot_leds();
+
+    set_robot_green_led();
+    delay(1000);
+    reset_robot_green_led();
+    delay(1000);
+    set_robot_green_led();
+
+    set_robot_red_led();
+    delay(1000);
+    reset_robot_red_led();
+    delay(1000);
+    set_robot_red_led();
 
 #ifdef ID_MODE
     id_test_status = 0;

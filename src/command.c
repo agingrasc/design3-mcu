@@ -5,6 +5,7 @@
 #include <string.h>
 #include <util.h>
 #include "command.h"
+#include "leds.h"
 
 #define MOVE_CMD 0x00
 #define CAMERA_CMD 0x01
@@ -17,8 +18,17 @@
 #define TEST_PID 0xa3
 #define READ_PID_LAST_CMD   0xa4
 
-#define GREEN_LED GPIO_Pin_15
-#define RED_LED GPIO_Pin_14
+#define CMD_LED_SET_RED         0
+#define CMD_LED_SET_GREEN       1
+#define CMD_LED_RESET_RED       2
+#define CMD_LED_RESET_GREEN     3
+#define CMD_LED_TOGGLE_RED      4
+#define CMD_LED_TOGGLE_GREEN    5
+#define CMD_LED_SET_BLUE        6
+#define CMD_LED_RESET_BLUE      7
+#define CMD_LED_TOGGLE_BLUE     8
+
+#define BLUE_LED GPIO_Pin_15
 
 #define PID_SCALING 100000
 
@@ -30,32 +40,46 @@ uint16_t read_uint16(char* arg) {
 
 void cmd_led(command *cmd) {
     switch (cmd->payload[0]) {
-        case 0:
-            GPIO_SetBits(GPIOD, RED_LED);
+        case CMD_LED_SET_RED:
+            set_robot_red_led();
             TM_USB_VCP_Putc(CMD_EXECUTE_OK);
             break;
-        case 1:
-            GPIO_SetBits(GPIOD, GREEN_LED);
+        case CMD_LED_SET_GREEN:
+            set_robot_green_led();
             TM_USB_VCP_Putc(CMD_EXECUTE_OK);
             break;
-        case 2:
-            GPIO_ResetBits(GPIOD, RED_LED);
+        case CMD_LED_RESET_RED:
+            reset_robot_red_led();
             TM_USB_VCP_Putc(CMD_EXECUTE_OK);
             break;
-        case 3:
-            GPIO_ResetBits(GPIOD, GREEN_LED);
+        case CMD_LED_RESET_GREEN:
+            reset_robot_green_led();
             TM_USB_VCP_Putc(CMD_EXECUTE_OK);
             break;
-        case 4:
-            GPIO_SetBits(GPIOD, RED_LED);
+        case CMD_LED_TOGGLE_RED:
+            set_robot_red_led();
             delay(1000);
-            GPIO_ResetBits(GPIOD, RED_LED);
+            reset_robot_red_led();
             TM_USB_VCP_Putc(CMD_EXECUTE_OK);
             break;
-        case 5:
-            GPIO_SetBits(GPIOD, GREEN_LED);
+        case CMD_LED_TOGGLE_GREEN:
+            set_robot_green_led();
             delay(1000);
-            GPIO_ResetBits(GPIOD, GREEN_LED);
+            reset_robot_green_led();
+            TM_USB_VCP_Putc(CMD_EXECUTE_OK);
+            break;
+        case CMD_LED_SET_BLUE:
+            GPIO_SetBits(GPIOD, BLUE_LED);
+            TM_USB_VCP_Putc(CMD_EXECUTE_OK);
+            break;
+        case CMD_LED_RESET_BLUE:
+            GPIO_ResetBits(GPIOD, BLUE_LED);
+            TM_USB_VCP_Putc(CMD_EXECUTE_OK);
+            break;
+        case CMD_LED_TOGGLE_BLUE:
+            GPIO_SetBits(GPIOD, BLUE_LED);
+            delay(1000);
+            GPIO_ResetBits(GPIOD, BLUE_LED);
             TM_USB_VCP_Putc(CMD_EXECUTE_OK);
             break;
         default:
