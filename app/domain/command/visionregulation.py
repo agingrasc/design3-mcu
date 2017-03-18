@@ -44,11 +44,10 @@ class VisionRegulation:
                     pos_y = float(robot_position_info['y'])
                     theta = float(robot_position_info['theta'])
                 except (json.JSONDecodeError,ValueError) as e:
-                    print("Retroaction vide!")
                     pos_x = 0
                     pos_y = 0
+                    theta = 0
                 robot_position = Position(int(pos_x), int(pos_y), theta)
-                print("Retroaction: {}".format(robot_position))
 
                 robot_controller.send_move_command(robot_position)
 
