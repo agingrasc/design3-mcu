@@ -70,7 +70,7 @@ class PIPositionRegulator(object):
         for cmd in [cmd_x, cmd_y, err_theta]:
             saturated_cmd.append(self._saturate_cmd(cmd))
 
-        if self._is_arrived(actual_position, DEADZONE):
+        if self.is_arrived(actual_position, DEADZONE):
             saturated_cmd = 0, 0, 0
 
         command = []
@@ -97,7 +97,7 @@ class PIPositionRegulator(object):
         else:
             return cmd
 
-    def _is_arrived(self, robot_position: Position, deadzone = DEADZONE):
+    def is_arrived(self, robot_position: Position, deadzone = DEADZONE):
         err_x = robot_position.pos_x - self.setpoint.pos_x
         err_y = robot_position.pos_y - self.setpoint.pos_y
         return math.sqrt(err_x**2 + err_y**2) < deadzone

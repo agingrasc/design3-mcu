@@ -1,4 +1,4 @@
-from mcu.commands import MoveCommand
+from domain.gameboard.position import Position
 
 
 class CommandController:
@@ -8,5 +8,5 @@ class CommandController:
     def move_to_position(self, angle, position):
         x = position.pos_x
         y = position.pos_y
-        command = Move(x, y, angle)
-        self.robot_controller.send_command(command)
+        pos = Position(x, y, 0)
+        self.robot_controller.send_move_command(pos)

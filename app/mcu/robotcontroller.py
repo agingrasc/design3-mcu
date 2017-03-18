@@ -90,6 +90,15 @@ class RobotController(object):
         cmd = LedCommand(Leds.DOWN_GREEN)
         self.send_command(cmd)
 
+        # Hack pour contourner le probleme que les moteurs parfois ne roule pas en positif avant d'avoir recu une
+        # commande negative
+        negative_speed_cmd = protocol.generate_move_command(-20, -20, 0)
+        self.send_command(negative_speed_cmd)
+        time.sleep(0.1)
+        positive_speed_cmd = protocol.generate_move_command(20, 20, 0)
+        self.send_command(positive_speed_cmd)
+        time.sleep(0.1)
+
     def _get_return_code(self):
         return int.from_bytes(self.ser_mcu.read(1), byteorder='little')
 
