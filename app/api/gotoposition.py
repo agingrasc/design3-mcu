@@ -1,11 +1,19 @@
 from flask import Blueprint, request, make_response, jsonify
+from service import pathfinding_application_service
+from domain.gameboard.position import Position
+from domain.pathfinding import get_segments
+from domain.command.commandcontroller import CommandController
+from mcu import robotcontroller
 
 from domain.gameboard.position import Position
 from mcu.robotcontroller import robot_controller
 from mcu.commands import regulator, MoveCommand
 from mcu import protocol
+from domain.command.visionregulation import vision_regulator
 
 go_to_position = Blueprint('go-to-position', __name__)
+
+commandcontroller = CommandController(robotcontroller.robot_controller)
 
 
 @go_to_position.route('/go-to-position', methods=['POST'])
@@ -14,14 +22,21 @@ def go_to_position_():
     try:
         req_info = request.json
     except Exception as e:
+        print(e.with_traceback())
         return make_response(jsonify(), 400)
-    pos_x = req_info['x']
-    pos_y = req_info['y']
-    theta = req_info['theta']
+    robot = req_info["robot"]
+    robot_pos = robot['position']
+    theta = robot_pos['theta']
 
-    pos = Position(pos_x, pos_y, theta)
-    regulator.set_point = pos
+    destination = req_info["destination"]
+    destination_x = int(float(destination["x"]))
+    destination_y = int(float(destination["y"]))
+    destination_position = Position(destination_x, destination_y, theta)
 
-    return make_response(jsonify({'x': int(pos.pos_x), 'y': int(pos_y)}), 200)
+    vision_regulator.go_to_position(destination_position)
 
-
+    return make_response(
+        jsonify({
+            'x': destination_x,
+            'y': destination_y
+        }), 200)

@@ -1,6 +1,7 @@
 import sys
-from app.domain.gameboard.position import Position
-from app.domain.gameboard.gameboard import Tag
+import queue
+from domain.gameboard.position import Position
+from domain.gameboard.gameboard import Tag
 from .grid import Grid
 
 
@@ -47,22 +48,12 @@ def removed_already_visited_neighbors(neighbors, path):
 
 
 def initialise_weight(grid, begin_position):
-    neighbors = set(grid.neighbors(begin_position))
-    next_neighbors = []
-    while len(neighbors) > 0:
-        for neighbor in neighbors:
-            if neighbor.weight == -1:
-                tmp_neibhbors = [
-                    x for x in grid.neighbors(neighbor)
-                    if x.weight != -1 and x.weight != sys.maxsize
-                ]
-                new_weight = find_minimum(tmp_neibhbors).weight + 1
-                neighbor.set_weight(new_weight)
-                next_neighbors.append(neighbor)
-        neighbors = []
-        for next_neighbor in next_neighbors:
-            new_neighbors = [
-                x for x in grid.neighbors(next_neighbor) if x.weight == -1
-            ]
-            neighbors += new_neighbors
-        neighbors = set(neighbors)
+    neighbors = queue.Queue()
+    neighbors.put(begin_position)
+    while not neighbors.empty():
+        neighbor = neighbors.get()
+        new_neighbors = grid.neighbors(neighbor)
+        for new_neighbor in new_neighbors:
+            if new_neighbor.weight == -1:
+                new_neighbor.set_weight(neighbor.weight + 1)
+                neighbors.put(new_neighbor)

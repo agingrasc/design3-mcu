@@ -1,15 +1,16 @@
-from app.pathfinding.grid import Grid
-from app.pathfinding.pathfinding import PathFinding
+from domain.pathfinding.grid import Grid
+from domain.pathfinding.pathfinding import PathFinding
+from domain.gameboard.gameboard import GameBoard
 
 
 def find(obstacles, width, length, robot_position, destination):
-    grid = Grid(width, length)
+    game_board = GameBoard(width, length, [])
+    grid = Grid(game_board)
 
-    for obstacle in obstacles:
-        grid.add_obstacle(obstacle)
-
-    robot_coordinate = grid.game_board[robot_position.x][robot_position.y]
-    destination_coordinate = grid.game_board[destination.x][destination.y]
-    pathfinder = PathFinding(grid, robot_coordinate,
-                             destination_coordinate)
-    return pathfinder.find_path()
+    robot_coordinate = grid.game_board[robot_position.pos_x][
+        robot_position.pos_y]
+    destination_coordinate = grid.game_board[destination.pos_x][
+        destination.pos_y]
+    pathfinder = PathFinding(grid, robot_coordinate, destination_coordinate)
+    path = pathfinder.find_path()
+    return path

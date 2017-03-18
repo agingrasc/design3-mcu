@@ -4,11 +4,13 @@ from flask import Flask, jsonify, make_response
 from api import ledok
 from api.gotoposition import go_to_position
 from mcu.robotcontroller import RobotController, robot_controller
+from domain.command.visionregulation import vision_regulator
 
 app = Flask(__name__)
 
 MANUAL = "manual"
 AUTOMATIC = "automatic"
+
 
 def run_automatic():
     print("run robot AI")
@@ -40,6 +42,9 @@ def not_found(error):
 
 if __name__ == '__main__':
     status = sys.argv[1]
+    base_station_url = sys.argv[2]
+    vision_regulator.set_url(base_station_url)
+
     if status == AUTOMATIC:
         print("AUTOMATIC MODE not implemented")
     elif status == MANUAL:

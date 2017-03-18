@@ -1,11 +1,12 @@
 import sys
 from unittest import TestCase
-from app.domain.gameboard.gameboard import Coordinate
-from app.domain.gameboard.gameboard import ObstacleValueObject
-from app.domain.gameboard.gameboard import Tag
-from app.domain.gameboard.gameboard import GameBoard
+from domain.gameboard.gameboard import Coordinate
+from domain.gameboard.gameboard import ObstacleValueObject
+from domain.gameboard.gameboard import Tag
+from domain.gameboard.gameboard import GameBoard
 from . import pathfinding
 from .grid import Grid
+from domain.pathfinding import get_segments
 
 
 class PathFindingITest(TestCase):
@@ -107,6 +108,9 @@ class PathFindingITest(TestCase):
         game_board.print_game_board()
 
     def validate_path(self, path):
+        new_path = get_segments.get_filter_path(path)
+        for pp in new_path:
+            print(pp)
         previous_weight = sys.maxsize
         for position in path:
             self.assertTrue(previous_weight > position.weight)
