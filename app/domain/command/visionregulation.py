@@ -42,8 +42,8 @@ class VisionRegulation:
                     robot_position_info = json.loads(robot_position_json)
                     pos_x = float(robot_position_info['x'])
                     pos_y = float(robot_position_info['y'])
-                except json.JSONDecodeError as e:
-                    print(e.with_traceback())
+                except (json.JSONDecodeError,ValueError) as e:
+                    print("Retroaction vide!")
                     pos_x = 0
                     pos_y = 0
                 robot_position = Position(int(pos_x), int(pos_y))

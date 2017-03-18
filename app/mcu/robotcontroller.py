@@ -93,11 +93,13 @@ class RobotController(object):
         # Hack pour contourner le probleme que les moteurs parfois ne roule pas en positif avant d'avoir recu une
         # commande negative
         negative_speed_cmd = protocol.generate_move_command(-20, -20, 0)
-        self.send_command(negative_speed_cmd)
+        self.ser_mcu.write(negative_speed_cmd)
         time.sleep(0.1)
         positive_speed_cmd = protocol.generate_move_command(20, 20, 0)
-        self.send_command(positive_speed_cmd)
+        self.ser_mcu.write(positive_speed_cmd)
         time.sleep(0.1)
+        null_speed_cmd = protocol.generate_move_command(0, 0, 0)
+        self.ser_mcu.write(null_speed_cmd)
 
     def _get_return_code(self):
         return int.from_bytes(self.ser_mcu.read(1), byteorder='little')

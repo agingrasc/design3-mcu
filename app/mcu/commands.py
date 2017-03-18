@@ -3,6 +3,7 @@ from abc import abstractmethod, ABCMeta
 from collections import namedtuple
 
 import math
+import time
 from typing import List, Tuple
 
 from domain.gameboard.position import Position
@@ -78,6 +79,7 @@ class PIPositionRegulator(object):
         command = []
         for cmd in saturated_cmd:
             command.append(int(cmd))
+        print("({}) Sortie du regulateur: {}, {}, {}".format(time.time(), command[0], command[1], command[2]))
         return command
 
     def _relinearize(self, cmd):
