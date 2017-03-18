@@ -70,8 +70,10 @@ class PIPositionRegulator(object):
         for cmd in [cmd_x, cmd_y, err_theta]:
             saturated_cmd.append(self._saturate_cmd(cmd))
 
-        if self.is_arrived(actual_position, DEADZONE):
-            saturated_cmd = 0, 0, 0
+        if abs(err_x) < DEADZONE:
+            saturated_cmd[0] = 0
+        if abs(err_y) < DEADZONE:
+            saturated_cmd[1] = 0
 
         command = []
         for cmd in saturated_cmd:
