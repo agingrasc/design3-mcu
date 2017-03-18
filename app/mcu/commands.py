@@ -67,13 +67,14 @@ class PIPositionRegulator(object):
         cmd_x = self._relinearize(cmd_x)
         cmd_y = self._relinearize(cmd_y)
         cmd_x, cmd_y = _correct_for_referential_frame(cmd_x, cmd_y, actual_theta)
+        corrected_err_x, corrected_err_y = _correct_for_referential_frame(err_x, err_y, actual_theta)
         saturated_cmd = []
         for cmd in [cmd_x, cmd_y, err_theta]:
             saturated_cmd.append(self._saturate_cmd(cmd))
 
-        if abs(err_x) < DEADZONE:
+        if abs(corrected_err_x) < DEADZONE:
             saturated_cmd[0] = 0
-        if abs(err_y) < DEADZONE:
+        if abs(corrected_err_y) < DEADZONE:
             saturated_cmd[1] = 0
 
         command = []
