@@ -29,7 +29,7 @@ void initTimer(void) {
     TIM_Cmd(TIM7, ENABLE);
 
     // timer pour la micro seconde
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM9, ENABLE);
+    /*RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM9, ENABLE);
     TIM_TimeBaseInitTypeDef tim9_init_struct;
     tim9_init_struct.TIM_CounterMode = TIM_CounterMode_Up;
     tim9_init_struct.TIM_ClockDivision = TIM_CKD_DIV1;
@@ -37,7 +37,7 @@ void initTimer(void) {
     tim9_init_struct.TIM_Period = 167;
     TIM_TimeBaseInit(TIM9, &tim9_init_struct);
     TIM_ITConfig(TIM9, TIM_IT_Update, ENABLE);
-    TIM_Cmd(TIM9, ENABLE);
+    TIM_Cmd(TIM9, ENABLE);*/
 
     // +++ NVIC +++
     NVIC_InitTypeDef NVIC1_InitStructure;

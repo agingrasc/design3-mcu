@@ -22,6 +22,8 @@ typedef struct PIDData {
 
 PIDData PID_data[MOTOR_COUNT];
 
+int PID_mode;
+
 void pid_init(void);
 void pid_setpoint(int, float);
 void pid_update(void);
