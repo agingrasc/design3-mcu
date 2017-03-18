@@ -8,7 +8,7 @@ class Position:
         self.theta = theta
 
     def __str__(self):
-        return "(" + str(self.pos_x) + ", " + str(self.pos_y) + ")"
+        return "x: {} -- y: {} -- theta: {}".format(self.pos_x, self.pos_y, self.theta)
 
     def get_norm(self):
         return math.sqrt(float(self.pos_x**2) + float(self.pos_y**2))
@@ -16,5 +16,3 @@ class Position:
     def get_angle(self):
         return math.atan(float(self.pos_y) / float(self.pos_x))
 
-    def str(self):
-        print("x: {} -- y: {} -- theta: {}".format(self.pos_x, self.pos_y, self.theta))

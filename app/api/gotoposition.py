@@ -31,7 +31,8 @@ def go_to_position_():
     destination = req_info["destination"]
     destination_x = int(float(destination["x"]))
     destination_y = int(float(destination["y"]))
-    destination_position = Position(destination_x, destination_y, theta)
+    destination_t = float(destination['theta'])
+    destination_position = Position(destination_x, destination_y, destination_t)
 
     vision_regulator.go_to_position(destination_position)
 

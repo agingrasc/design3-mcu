@@ -69,7 +69,7 @@ class PIPositionRegulator(object):
         cmd_x, cmd_y = _correct_for_referential_frame(cmd_x, cmd_y, actual_theta)
         corrected_err_x, corrected_err_y = _correct_for_referential_frame(err_x, err_y, actual_theta)
         saturated_cmd = []
-        for cmd in [cmd_x, cmd_y, err_theta]:
+        for cmd in [cmd_x, cmd_y, 0]:
             saturated_cmd.append(self._saturate_cmd(cmd))
 
         if abs(corrected_err_x) < DEADZONE:
@@ -121,8 +121,8 @@ def _correct_for_referential_frame(x: float, y: float, t: float) -> Tuple[float]
     cos = math.cos(t)
     sin = math.sin(t)
 
-    corrected_x = (x * cos - y * sin)
-    corrected_y = (y * cos + x * sin)
+    corrected_x = (x * cos + y * sin)
+    corrected_y = (y * cos - x * sin)
     return corrected_x, corrected_y
 
 
