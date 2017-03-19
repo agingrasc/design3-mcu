@@ -18,7 +18,7 @@ class PayloadLength(Enum):
     SET_PID_CONSTANTS = 10
     TEST_PID = 6
     READ_PID_LAST_CMD = 2
-
+    READ_LAST_ADC = 2
 
 class CommandType(Enum):
     MOVE = 0x00
@@ -31,7 +31,7 @@ class CommandType(Enum):
     TOGGLE_PID = 0xa2
     TEST_PID = 0xa3
     READ_PID_LAST_CMD = 0xa4
-
+    READ_LAST_ADC = 0xa5
 
 class Leds(Enum):
     UP_RED = 0
@@ -41,6 +41,10 @@ class Leds(Enum):
     BLINK_RED = 4
     BLINK_GREEN = 5
 
+class Adc(Enum):
+    ADC_MANCHESTER_CODE_POWER = 1
+    ADC_MANCHESTER_CODE = 2
+    ADC_PENCIL = 3
 
 class PencilStatus(Enum):
     RAISED = 0
@@ -112,6 +116,18 @@ def generate_manual_speed_command(motor: Motors, pwm_percentage: int, direction:
 
     header = _generate_header(CommandType.MANUAL_SPEED, PayloadLength.MANUAL_SPEED)
     payload = _generate_payload([motor.value, pwm_percentage])
+    return header + payload
+
+def generate_read_last_adc(adc: Adc):
+    """
+    Genere une commande qui effectue une lecture d'une valeur d'un des ADC.
+    Args:
+        :motor [0, 3]: Identifiant de l'ADC
+    Return:
+        :cmd bytes: La commande serialise
+    """
+    header = _generate_header(CommandType.READ_LAST_ADC, PayloadLength.READ_LAST_ADC)
+    payload = _generate_payload([adc.value])
     return header + payload
 
 

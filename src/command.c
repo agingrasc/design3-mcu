@@ -6,6 +6,7 @@
 #include <util.h>
 #include "command.h"
 #include "leds.h"
+#include "adc.h"
 
 #define MOVE_CMD 0x00
 #define CAMERA_CMD 0x01
@@ -17,6 +18,7 @@
 #define SET_PID_MODE 0xa2
 #define TEST_PID 0xa3
 #define READ_PID_LAST_CMD   0xa4
+#define READ_ADC_VALUE      0xa5
 
 #define CMD_LED_SET_RED         0
 #define CMD_LED_SET_GREEN       1
@@ -36,6 +38,29 @@ uint16_t read_uint16(char* arg) {
     uint16_t data = 0;
     memcpy(&data, arg, 2);
     return data;
+}
+
+void cmd_read_adc_value(command *cmd) {
+    uint16_t vals[CONVERSIONS_NUMBER_PER_CHANNEL];
+    uint8_t nval; // Number of values that will be outputed
+    char high, low;
+
+    switch (cmd->payload[0]) {
+        case ADC_PENCIL:
+            adc_get_channel_conversion_values(ADC_PENCIL, vals);
+            nval = 1;
+            high = (vals[0] >> 8) & 0xff;
+            low = vals[0] & 0xff;
+
+            TM_USB_VCP_Putc(nval);
+            TM_USB_VCP_Putc(high);
+            TM_USB_VCP_Putc(low);
+            TM_USB_VCP_Putc(CMD_EXECUTE_OK);
+            break;
+        default:
+            TM_USB_VCP_Putc(CMD_EXECUTE_FAILURE);
+            break;
+    }
 }
 
 void cmd_led(command *cmd) {
@@ -225,6 +250,8 @@ int command_execute(command *cmd) {
             cmd_test_pid(cmd);
         case (uint8_t) READ_PID_LAST_CMD:
             cmd_read_pid_last_cmd(cmd);
+        case (uint8_t) READ_ADC_VALUE:
+            cmd_read_adc_value(cmd);
         default:
             break;
     }

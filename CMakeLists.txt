@@ -43,11 +43,14 @@ set(SOURCE_FILES
         src/usbd_usr.c
         src/command.c
         src/leds.c
+        src/adc.c
         ${STM_SRC_ROOT}/stm32f4xx_gpio.c
         ${STM_SRC_ROOT}/stm32f4xx_tim.c
         ${STM_SRC_ROOT}/stm32f4xx_rcc.c
         ${STM_SRC_ROOT}/stm32f4xx_usart.c
         ${STM_SRC_ROOT}/stm32f4xx_exti.c
+        ${STM_SRC_ROOT}/stm32f4xx_adc.c
+        ${STM_SRC_ROOT}/stm32f4xx_dma.c
         ${STM_SRC_ROOT}/misc.c
         ${STM_ROOT}/Libraries/STM32_USB_OTG_Driver/src/usb_core.c
         ${STM_ROOT}/Libraries/STM32_USB_OTG_Driver/src/usb_dcd.c

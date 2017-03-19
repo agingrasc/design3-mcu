@@ -1,6 +1,8 @@
 // main.c
 
 #include "main.h"
+#include "adc.h"
+
 void initLed() {
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 
@@ -24,10 +26,7 @@ void updateDisplay() {
       motors[i].motor_speed_rpm = tmp;
       }*/
 
-    // FIXME: sprintf works fine. It's when we use %d, %s, etc that makes the cpu crash.
     char buf1[16];
-    buf1[15] = '\0';
-
     sprintf(buf1, "Hello, I am");
     for (int i = 0; i < 16; i++) {
         if (buf1[i] == '\0') break;
@@ -79,18 +78,16 @@ int main() {
     initTimer();
     lcd_init();
     init_robot_leds();
+    adc_init();
 
-    set_robot_green_led();
-    delay(1000);
-    reset_robot_green_led();
-    delay(1000);
-    set_robot_green_led();
-
+    // TODO: remove me once the communication test (and thus the led tests) will be automatically
+    // performed during AI boot
     set_robot_red_led();
     delay(1000);
     reset_robot_red_led();
+    set_robot_green_led();
     delay(1000);
-    set_robot_red_led();
+    reset_robot_green_led();
 
 #ifdef ID_MODE
     id_test_status = 0;

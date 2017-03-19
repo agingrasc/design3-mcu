@@ -21,4 +21,5 @@ void lcd_clear_row(uint8_t row);
 void lcd_putc(char ch);
 
 
+
 #endif /* LCD_H_ */
