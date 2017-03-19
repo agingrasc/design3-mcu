@@ -4,6 +4,7 @@ import time
 
 import math
 
+import adc
 import protocol
 from encodeur import read_encoder
 from util import *
@@ -164,14 +165,20 @@ def keyboard_speed(screen):
         screen.addstr(2, 0, "Moteur FRONT_X: {} tick/s".format(front_x))
         screen.addstr(3, 0, "Moteur REAR_X: {} tick/s".format(rear_x))
         screen.addstr(4, 0, "Moteur FRONT_Y: {} tick/s".format(front_y))
-        screen.addstr(5, 0, "Moteur REAR_Y: {} tick/s".format(rear_y))
+        screen.addstr(5, 0, "Moteur valREAR_Y: {} tick/s".format(rear_y))
 
         screen.addstr(6, 0, "Moteur FRONT_X last cmd: {} ".format(last_cmd_front_x))
         screen.addstr(7, 0, "Moteur REAR_X last cmd: {} ".format(last_cmd_rear_x))
         screen.addstr(8, 0, "Moteur FRONT_Y last cmd: {} ".format(last_cmd_front_y))
         screen.addstr(9, 0, "Moteur REAR_Y last cmd: {} ".format(last_cmd_rear_y))
 
-        display_busy_wait(screen, 10)
+        adc_val = adc.read_last_adc(protocol.Adc.ADC_PENCIL)
+        adc_volt = adc.convert_adc_value_to_voltage(adc_val)
+        rfsr = adc.convert_voltage_to_force_sensor_resistance(adc_volt)
+
+        screen.addstr(10, 0, "ADC pencil value: ADC={}, Vadc={:0.2f}, Rfsr={:0.2f}".format(adc_val, adc_volt, rfsr))
+
+        display_busy_wait(screen, 11)
         screen.move(3, 0)
 
     screen.nodelay(False)
