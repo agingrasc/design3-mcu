@@ -27,6 +27,7 @@ class PayloadLength(Enum):
     READ_PID_LAST_CMD = 2
     READ_LAST_ADC = 2
 
+
 class CommandType(Enum):
     MOVE = 0x00
     CAMERA = 0x01
@@ -40,6 +41,7 @@ class CommandType(Enum):
     READ_PID_LAST_CMD = 0xa4
     READ_LAST_ADC = 0xa5
 
+
 class Leds(Enum):
     UP_RED = 0
     UP_GREEN = 1
@@ -48,10 +50,12 @@ class Leds(Enum):
     BLINK_RED = 4
     BLINK_GREEN = 5
 
+
 class Adc(Enum):
     ADC_MANCHESTER_CODE_POWER = 1
     ADC_MANCHESTER_CODE = 2
     ADC_PENCIL = 3
+
 
 class PencilStatus(Enum):
     RAISED = 0
