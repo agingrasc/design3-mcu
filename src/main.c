@@ -80,14 +80,8 @@ int main() {
     init_robot_leds();
     adc_init();
 
-    // TODO: remove me once the communication test (and thus the led tests) will be automatically
-    // performed during AI boot
-    set_robot_red_led();
-    delay(1000);
-    reset_robot_red_led();
-    set_robot_green_led();
-    delay(1000);
     reset_robot_green_led();
+    reset_robot_red_led();
 
 #ifdef ID_MODE
     id_test_status = 0;

@@ -94,7 +94,7 @@ void pid_update(void) {
                                               motors[i].motor_speed);
 
             if (speed_cmd < 0) {
-                speed_cmd = PID_data[i].deadzone;
+                speed_cmd = 0;
             }
             motor_set_pwm_percentage(i, speed_cmd);
 
