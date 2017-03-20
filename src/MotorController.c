@@ -125,30 +125,32 @@ void motor_set_pwm_percentage(uint8_t motor_id, float percentage) {
 }
 
 int motor_set_direction(uint8_t motor_id, float consigne) {
-    short direction = -1;
+    uint8_t dir = MC_DIR_BGND;
+    //short direction = -1;
 
     if (consigne > 0) {
-        direction = 0;
+        //direction = 0;
+        dir = MC_DIR_CW;
         motors[motor_id].motor_direction = MOTOR_FORWARD;
     }
     else if (consigne < 0) {
-        direction = 1;
+        //direction = 1;
+        dir = MC_DIR_CCW;
         motors[motor_id].motor_direction = MOTOR_BACKWARD;
     }
 
-    uint8_t dir = MC_DIR_BGND;
-    if (direction == 0 && (motor_id == 2 || motor_id == 3)) {
-        dir = MC_DIR_CW;
-    }
-    else if (direction == 0 && (motor_id == 0 || motor_id == 1)) {
-        dir = MC_DIR_CCW;
-    }
-    else if (direction == 1 && (motor_id == 2 || motor_id == 3)) {
-        dir = MC_DIR_CCW;
-    }
-    else if (direction == 1 && (motor_id == 0 || motor_id == 1)) {
-        dir = MC_DIR_CW;
-    }
+    //if (direction == 0 && (motor_id == 2 || motor_id == 3)) {
+    //    dir = MC_DIR_CW;
+    //}
+    //else if (direction == 0 && (motor_id == 0 || motor_id == 1)) {
+    //    dir = MC_DIR_CCW;
+    //}
+    //else if (direction == 1 && (motor_id == 2 || motor_id == 3)) {
+    //    dir = MC_DIR_CCW;
+    //}
+    //else if (direction == 1 && (motor_id == 0 || motor_id == 1)) {
+    //    dir = MC_DIR_CW;
+    //}
 
     motor_set_direction_pin(motor_id, dir);
 
