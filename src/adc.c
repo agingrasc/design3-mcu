@@ -26,11 +26,11 @@ uint8_t status = 0;
         // Do something cool with the fetched data
         // You do it, but you do it cool
 
-        //uint16_t vals[CONVERSIONS_NUMBER_PER_CHANNEL];
+        uint16_t vals[CONVERSIONS_NUMBER_PER_CHANNEL];
 
-        //adc_get_channel_conversion_values(1, vals);
+        adc_get_channel_conversion_values(2, vals);
 
-        pencil_voltage = adc_values[0];
+        int i = 0;
 
         //DMA_ClearITPendingBit(DMASX, DMA_IT_TCIF4);
     }
@@ -38,9 +38,9 @@ uint8_t status = 0;
 
 void adc_get_channel_conversion_values(uint8_t channel, uint16_t *values) {
     int n = 0;
-
+    uint16_t *cvalues = adc_values;
     for (int i = channel; i < TOTAL_CONVERSIONS; i += TOTAL_CHANNELS) {
-        values[n] = adc_values[i] >> 4;
+        values[n] = cvalues[i] >> 4;
         n++;
     }
 }

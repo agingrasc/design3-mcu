@@ -42,19 +42,65 @@ uint16_t read_uint16(char* arg) {
 
 void cmd_read_adc_value(command *cmd) {
     uint16_t vals[CONVERSIONS_NUMBER_PER_CHANNEL];
-    uint8_t nval; // Number of values that will be outputed
+    uint16_t nval; // Number of values that will be sent
     char high, low;
 
     switch (cmd->payload[0]) {
-        case ADC_PENCIL:
-            adc_get_channel_conversion_values(ADC_PENCIL, vals);
-            nval = 1;
-            high = (vals[0] >> 8) & 0xff;
-            low = vals[0] & 0xff;
+        case ADC_MANCHESTER_CODE_POWER:
+            adc_get_channel_conversion_values(ADC_MANCHESTER_CODE_POWER, vals);
 
-            TM_USB_VCP_Putc(nval);
+            // Send number of values
+            nval = 1;
+            high = (nval >> 8) & 0xff;
+            low = nval & 0xff;
             TM_USB_VCP_Putc(high);
             TM_USB_VCP_Putc(low);
+
+            // Send last value
+            high = (vals[0] >> 8) & 0xff; // TODO: return the last index instead, which would be the latest sampled value?
+            low = vals[0] & 0xff;
+            TM_USB_VCP_Putc(high);
+            TM_USB_VCP_Putc(low);
+
+            TM_USB_VCP_Putc(CMD_EXECUTE_OK);
+            break;
+        case ADC_MANCHESTER_CODE:
+            adc_get_channel_conversion_values(ADC_MANCHESTER_CODE, vals);
+
+            // Send number of values
+            nval = CONVERSIONS_NUMBER_PER_CHANNEL;
+            high = (nval >> 8) & 0xff; // TODO: return the last index instead, which would be the latest sampled value?
+            low = nval & 0xff;
+            TM_USB_VCP_Putc(high);
+            TM_USB_VCP_Putc(low);
+
+            // Send values
+            for (int i = 0; i < nval; i++) {
+                high = (vals[i] >> 8) & 0xff;
+                low = vals[i] & 0xff;
+
+                TM_USB_VCP_Putc(high);
+                TM_USB_VCP_Putc(low);
+            }
+
+            TM_USB_VCP_Putc(CMD_EXECUTE_OK);
+            break;
+        case ADC_PENCIL:
+            adc_get_channel_conversion_values(ADC_PENCIL, vals);
+
+            // Send number of values
+            nval = 1;
+            high = (nval >> 8) & 0xff;
+            low = nval & 0xff;
+            TM_USB_VCP_Putc(high);
+            TM_USB_VCP_Putc(low);
+
+            // Send last value
+            high = (vals[0] >> 8) & 0xff; // TODO: return the last index instead, which would be the latest sampled value?
+            low = vals[0] & 0xff;
+            TM_USB_VCP_Putc(high);
+            TM_USB_VCP_Putc(low);
+
             TM_USB_VCP_Putc(CMD_EXECUTE_OK);
             break;
         default:
