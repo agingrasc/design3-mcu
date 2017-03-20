@@ -187,7 +187,7 @@ def keyboard_speed(screen):
     return None
 
 
-def cap_speed(speed_x, speed_y, speed_theta):
+def cap_speed(speed_x, speed_y):
     if speed_x > 100:
         speed_x = 100
     elif speed_x < -100:
@@ -196,15 +196,11 @@ def cap_speed(speed_x, speed_y, speed_theta):
         speed_y = 100
     elif speed_y < -100:
         speed_y = -100
-    if speed_theta > 0.5:
-        speed_theta = 0.5
-    elif speed_theta < -0.5:
-        speed_theta = -0.5
 
-    return speed_x, speed_y, speed_theta
+    return speed_x, speed_y
 
 
-def cap_pid_speed(speed_x, speed_y):
+def cap_pid_speed(speed_x, speed_y, speed_theta):
     if speed_x > 300:
         speed_x = 300
     elif speed_x < -300:
@@ -213,7 +209,11 @@ def cap_pid_speed(speed_x, speed_y):
         speed_y = 300
     elif speed_y < -300:
         speed_y = -300
-    return speed_x, speed_y
+    if speed_theta > 0.5:
+        speed_theta = 0.5
+    elif speed_theta < -0.5:
+        speed_theta = -0.5
+    return speed_x, speed_y, speed_theta
 
 
 def set_motor_to_keyboard_speed(speed_x, speed_y):
@@ -226,8 +226,8 @@ def set_motor_to_keyboard_speed(speed_x, speed_y):
         ser.write(protocol.generate_manual_speed_command(motor_id, speed_y))
 
 
-def set_pid_to_keyboard_speed(speed_x, speed_y):
-    ser.write(protocol.generate_move_command(speed_x, speed_y, 0))
+def set_pid_to_keyboard_speed(speed_x, speed_y, speed_theta):
+    ser.write(protocol.generate_move_command(speed_x, speed_y, speed_theta))
 
 
 def read_pid_last_cmd(motor_id: protocol.Motors, ser=ser) -> int:

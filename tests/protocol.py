@@ -9,8 +9,8 @@ import numpy as np
 
 PID_SCALING = 100000
 JACOBIAN_MATRIX = np.array([[0, -1, 120],
-                            [1, 0, 120],
-                            [0, -1, 120],
+                            [-1, 0, 120],
+                            [0, 1, 120],
                             [1, 0, 120]])
 
 
