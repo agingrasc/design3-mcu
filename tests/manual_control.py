@@ -183,6 +183,7 @@ def keyboard_speed(screen):
         screen.move(3, 0)
 
     screen.nodelay(False)
+    set_pid_to_keyboard_speed(0, 0, 0)
     ser.write(protocol.generate_set_pid_mode(protocol.PIDStatus.OFF))
     return None
 
