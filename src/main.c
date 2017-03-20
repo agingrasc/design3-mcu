@@ -80,17 +80,8 @@ int main() {
     lcd_init();
     init_robot_leds();
 
-    set_robot_green_led();
-    delay(1000);
     reset_robot_green_led();
-    delay(1000);
-    set_robot_green_led();
-
-    set_robot_red_led();
-    delay(1000);
     reset_robot_red_led();
-    delay(1000);
-    set_robot_red_led();
 
 #ifdef ID_MODE
     id_test_status = 0;
