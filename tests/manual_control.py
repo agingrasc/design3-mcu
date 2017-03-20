@@ -109,6 +109,7 @@ def keyboard_speed(screen):
 
     speed_x = 0
     speed_y = 0
+    speed_theta = 0
 
     target_changed = False
     sub_run = True
@@ -122,7 +123,7 @@ def keyboard_speed(screen):
             user_key = -1
 
         if target_changed:
-            set_pid_to_keyboard_speed(speed_x, speed_y)
+            set_pid_to_keyboard_speed(speed_x, speed_y, speed_theta)
         target_changed = False
 
         if user_key in ['q', 'Q']:
@@ -142,13 +143,21 @@ def keyboard_speed(screen):
         elif user_key in ['c']:
             speed_x = 0
             speed_y = 0
+            speed_theta = 0
+            target_changed = True
+        elif user_key in ['e']:
+            speed_theta -= 0.05
+            target_changed = True
+        elif user_key in ['r']:
+            speed_theta += 0.05
             target_changed = True
 
-        speed_x, speed_y = cap_pid_speed(speed_x, speed_y)
+        speed_x, speed_y, speed_theta = cap_pid_speed(speed_x, speed_y, speed_theta)
 
         screen.clear()
         screen.addstr(0, 0, "Speed in x: {}mm/s ({:0.0f} tick/s)".format(speed_x, convert_to_tick(speed_x)))
         screen.addstr(1, 0, "Speed in y: {}mm/s ({:0.0f} tick/s)".format(speed_y, convert_to_tick(speed_y)))
+        screen.addstr(2, 0, "Angular speed: {}".format(speed_theta))
 
         front_x = read_encoder(protocol.Motors.FRONT_X, ser)
         rear_x = read_encoder(protocol.Motors.REAR_X, ser)
@@ -160,17 +169,17 @@ def keyboard_speed(screen):
         last_cmd_front_y = read_pid_last_cmd(protocol.Motors.FRONT_Y, ser)
         last_cmd_rear_y = read_pid_last_cmd(protocol.Motors.REAR_Y, ser)
 
-        screen.addstr(2, 0, "Moteur FRONT_X: {} tick/s".format(front_x))
-        screen.addstr(3, 0, "Moteur REAR_X: {} tick/s".format(rear_x))
-        screen.addstr(4, 0, "Moteur FRONT_Y: {} tick/s".format(front_y))
-        screen.addstr(5, 0, "Moteur REAR_Y: {} tick/s".format(rear_y))
+        screen.addstr(3, 0, "Moteur FRONT_X: {} tick/s".format(front_x))
+        screen.addstr(4, 0, "Moteur REAR_X: {} tick/s".format(rear_x))
+        screen.addstr(5, 0, "Moteur FRONT_Y: {} tick/s".format(front_y))
+        screen.addstr(6, 0, "Moteur REAR_Y: {} tick/s".format(rear_y))
 
-        screen.addstr(6, 0, "Moteur FRONT_X last cmd: {} ".format(last_cmd_front_x))
-        screen.addstr(7, 0, "Moteur REAR_X last cmd: {} ".format(last_cmd_rear_x))
-        screen.addstr(8, 0, "Moteur FRONT_Y last cmd: {} ".format(last_cmd_front_y))
-        screen.addstr(9, 0, "Moteur REAR_Y last cmd: {} ".format(last_cmd_rear_y))
+        screen.addstr(7, 0, "Moteur FRONT_X last cmd: {} ".format(last_cmd_front_x))
+        screen.addstr(8, 0, "Moteur REAR_X last cmd: {} ".format(last_cmd_rear_x))
+        screen.addstr(9, 0, "Moteur FRONT_Y last cmd: {} ".format(last_cmd_front_y))
+        screen.addstr(10, 0, "Moteur REAR_Y last cmd: {} ".format(last_cmd_rear_y))
 
-        display_busy_wait(screen, 10)
+        display_busy_wait(screen, 11)
         screen.move(3, 0)
 
     screen.nodelay(False)
@@ -178,7 +187,7 @@ def keyboard_speed(screen):
     return None
 
 
-def cap_speed(speed_x, speed_y):
+def cap_speed(speed_x, speed_y, speed_theta):
     if speed_x > 100:
         speed_x = 100
     elif speed_x < -100:
@@ -187,7 +196,12 @@ def cap_speed(speed_x, speed_y):
         speed_y = 100
     elif speed_y < -100:
         speed_y = -100
-    return speed_x, speed_y
+    if speed_theta > 0.5:
+        speed_theta = 0.5
+    elif speed_theta < -0.5:
+        speed_theta = -0.5
+
+    return speed_x, speed_y, speed_theta
 
 
 def cap_pid_speed(speed_x, speed_y):
