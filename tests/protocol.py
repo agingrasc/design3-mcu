@@ -3,12 +3,16 @@ communication."""
 from enum import Enum
 
 import struct
+from typing import List
+
+import numpy as np
 
 PID_SCALING = 100000
+JACOBIAN_MATRIX = np.array([[0, 1, 120], [1, 0, 120], [0, -1, 120], [-1, 0, 120]])
 
 
 class PayloadLength(Enum):
-    MOVE = 6
+    MOVE = 8
     LED = 2
     PENCIL = 2
     CAMERA = 4
@@ -63,13 +67,16 @@ class MotorsDirection(Enum):
     FORWARD = 0
     BACKWARD = 1
 
+
 class MotorsRotation(Enum):
     CLOCKWISE = 0
     COUNTERCLOCKWISE = 1
 
+
 def generate_move_command(x, y, theta) -> bytes:
+    speeds = compute_wheels_speed(x, y, theta)
     header = _generate_header(CommandType.MOVE, PayloadLength.MOVE)
-    payload = _generate_payload([x, y, theta])
+    payload = _generate_payload(speeds)
     return header + payload
 
 
@@ -152,10 +159,12 @@ def generate_test_pid(motor: Motors, delta_t: int, current_speed: int):
     payload = _generate_payload([motor.value, delta_t, current_speed])
     return header + payload
 
+
 def generate_read_pid_last_cmd(motor: Motors):
     header = _generate_header(CommandType.READ_PID_LAST_CMD, PayloadLength.READ_PID_LAST_CMD)
     payload = _generate_payload([motor.value])
     return header + payload
+
 
 def _generate_payload(payload: list) -> bytes:
     """"
@@ -191,3 +200,15 @@ def _generate_header(cmd_type: CommandType, payload_len: PayloadLength) -> bytes
 
     return bytes([cmd_type.value, payload_len.value, checksum])
 
+
+def compute_wheels_speed(x: float, y: float, theta: float) -> List[int]:
+    """
+    Implemente le calcul du papier: 'Holonomic Omni-Directional Vehicle with New Omni-Wheel Mechanism'
+    Permet de calculer la vitesse individuelle de chaque roue selon les vitesses x, y et theta en entree.
+    L'algorithme corrige aussi le signe de la vitesse selon le sens de rotation de la roue.
+    :param x: Vitesse en x (mm/s)
+    :param y: Vitesse en y (mm/s)
+    :param theta: Vitesse angulaire
+    :return: La liste des vitesses des moteurs en mm/s (meme ordre que l'enum Motors)
+    """
+    return [int(x[0]) for x in JACOBIAN_MATRIX.dot(np.array([x, y, theta]).reshape((3, 1)))]

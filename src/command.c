@@ -90,23 +90,14 @@ void cmd_led(command *cmd) {
 
 void cmd_move(command* cmd) {
     short* payload = cmd->payload;
-    short x = payload[0]; //mm/s
-    short y = payload[1]; //mm/s
-    short t = payload[2]; //TBD
 
-    // transformer la vitesse mm/s en tick/s
     float tick_per_militer = TICK_PER_ROT / (2 * WHEEL_RADIUS * PI);
-    float x_tick = tick_per_militer * x;
-    float y_tick = tick_per_militer * y;
 
-    // on distribue la rotation en creant des differentiels en x et y
-    short partial_t = t/4;
-
-    // Les moteurs FRONT recoivent le diff negatif par convention arbitraire
-    pid_setpoint(0, x_tick + partial_t); // REAR_X
-    pid_setpoint(2, x_tick - partial_t); // FRONT_X
-    pid_setpoint(3, y_tick + partial_t); // REAR_Y
-    pid_setpoint(1, y_tick - partial_t); // FRONT_Y
+    for (int i = 0; i < MOTOR_COUNT; i++) {
+        short speed = payload[i];
+        float ticks = tick_per_militer * speed;
+        pid_setpoint(i, ticks);
+    }
 
     TM_USB_VCP_Putc(CMD_EXECUTE_OK);
 }

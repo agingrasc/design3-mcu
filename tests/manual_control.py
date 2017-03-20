@@ -1,5 +1,4 @@
 import curses
-import sys
 import time
 
 import math
@@ -216,12 +215,14 @@ def set_motor_to_keyboard_speed(speed_x, speed_y):
 def set_pid_to_keyboard_speed(speed_x, speed_y):
     ser.write(protocol.generate_move_command(speed_x, speed_y, 0))
 
+
 def read_pid_last_cmd(motor_id: protocol.Motors, ser=ser) -> int:
     ser.read(ser.inWaiting())
     ser.write(protocol.generate_read_pid_last_cmd(motor_id))
     ser.read(1)
     last_cmd = ser.read(2)
     return int.from_bytes(last_cmd, byteorder='big')
+
 
 def motor(screen):
     global directions
