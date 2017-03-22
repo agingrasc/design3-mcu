@@ -16,7 +16,8 @@
 #define DMASX_IRQ_NO        DMA2_Stream4_IRQn
 #define DMA_STREAM_NO        4
 
-volatile uint16_t adc_values[TOTAL_CONVERSIONS];
+volatile uint16_t adc_values1[TOTAL_CONVERSIONS];
+volatile uint16_t adc_values2[TOTAL_CONVERSIONS];
 
 uint8_t status = 0;
 
@@ -36,9 +37,18 @@ uint8_t status = 0;
     }
 }*/
 
+uint16_t *adc_get_current_adc_buffer() {
+    uint16_t *retval = adc_values2;
+
+    if (DMA_GetCurrentMemoryTarget(DMASX) == 1)
+        retval = adc_values1;
+
+    return retval;
+}
+
 void adc_get_channel_conversion_values(uint8_t channel, uint16_t *values) {
     int n = 0;
-    uint16_t *cvalues = adc_values;
+    uint16_t *cvalues = adc_get_current_adc_buffer();
     for (int i = channel; i < TOTAL_CONVERSIONS; i += TOTAL_CHANNELS) {
         values[n] = cvalues[i] >> 4;
         n++;
@@ -99,7 +109,8 @@ void adc_init() {
     DMASX->PAR = (uint32_t) &ADC1->DR;
 
     // Set the memory addresses
-    DMASX->M0AR = adc_values;
+    DMASX->M0AR = adc_values1;
+    DMASX->M1AR = adc_values2;
 
     // Set the total number of data items to be transferred
     DMASX->NDTR = TOTAL_CONVERSIONS;
@@ -117,6 +128,7 @@ void adc_init() {
     DMASX->CR |= DMA_SxCR_PSIZE_0; // half-word (16 bits) peripheral data size
     //DMASX->CR |= DMA_SxCR_DIR_1; // peripheral-to-memory direction
     //DMASX->CR |= DMA_SxCR_TCIE; // transfer complete interrupt enable
+    DMASX->CR |= DMA_SxCR_DBM; // enable double buffer mode
 
     // Enable stream!
     DMASX->CR |= DMA_SxCR_EN;

@@ -26,7 +26,7 @@ class PayloadLength(Enum):
     TEST_PID = 6
     READ_PID_LAST_CMD = 2
     READ_LAST_ADC = 2
-
+    DECODE_MANCHESTER = 2
 
 class CommandType(Enum):
     MOVE = 0x00
@@ -40,7 +40,7 @@ class CommandType(Enum):
     TEST_PID = 0xa3
     READ_PID_LAST_CMD = 0xa4
     READ_LAST_ADC = 0xa5
-
+    DECODE_MANCHESTER = 0xb1
 
 class Leds(Enum):
     UP_RED = 0
@@ -83,6 +83,15 @@ class MotorsRotation(Enum):
     CLOCKWISE = 0
     COUNTERCLOCKWISE = 1
 
+class ManchesterOrientation(Enum):
+    NORTH = 0
+    EAST = 1
+    SOUTH = 2
+    WEST = 3
+
+class ManchesterScale(Enum):
+    X2 = 0
+    X4 = 1
 
 def generate_move_command(x, y, theta) -> bytes:
     speeds = compute_wheels_speed(x, y, theta)
@@ -144,6 +153,15 @@ def generate_read_last_adc(adc: Adc):
     payload = _generate_payload([adc.value])
     return header + payload
 
+def generate_decode_manchester():
+    """
+    Genere une commande qui une demande de décodage Manchester au MCU
+    Return:
+        :cmd bytes: La commande serialise
+    """
+    header = _generate_header(CommandType.DECODE_MANCHESTER, PayloadLength.DECODE_MANCHESTER)
+    payload = _generate_payload([0])
+    return header + payload
 
 def generate_read_encoder(motor: Motors):
     """

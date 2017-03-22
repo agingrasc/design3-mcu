@@ -7,6 +7,7 @@
 #include "command.h"
 #include "leds.h"
 #include "adc.h"
+#include "manchester.h"
 
 #define MOVE_CMD 0x00
 #define CAMERA_CMD 0x01
@@ -19,6 +20,7 @@
 #define TEST_PID 0xa3
 #define READ_PID_LAST_CMD   0xa4
 #define READ_ADC_VALUE      0xa5
+#define DECODE_MANCHESTER_CMD      0xb1
 
 #define CMD_LED_SET_RED         0
 #define CMD_LED_SET_GREEN       1
@@ -38,6 +40,40 @@ uint16_t read_uint16(char* arg) {
     uint16_t data = 0;
     memcpy(&data, arg, 2);
     return data;
+}
+
+void cmd_decode_manchester(command *cmd) {
+    uint16_t signal[CONVERSIONS_NUMBER_PER_CHANNEL];
+    uint8_t code[MANCHESTER_N_DATA_BITS];
+    char high, low;
+
+    adc_get_channel_conversion_values(ADC_MANCHESTER_CODE, signal);
+
+    ManchesterInfo info;
+    int16_t res = (int16_t)decode(signal, CONVERSIONS_NUMBER_PER_CHANNEL, &info, code);
+
+    // Send decoding success result
+    high = (res >> 8) & 0xff;
+    low = res & 0xff;
+
+    TM_USB_VCP_Putc(high);
+    TM_USB_VCP_Putc(low);
+
+    // Send figure #
+    TM_USB_VCP_Putc(info.figNum);
+
+    // Send orientation
+    TM_USB_VCP_Putc((uint8_t)info.figOrientation);
+
+    // Send scale
+    TM_USB_VCP_Putc((uint8_t)info.figScale);
+
+    //high = (info.packedInfo >> 8) & 0xff;
+    //low = info.packedInfo & 0xff;
+
+    // TODO: update LCD with values if succeeded
+
+    TM_USB_VCP_Putc(CMD_EXECUTE_OK);
 }
 
 void cmd_read_adc_value(command *cmd) {
@@ -285,10 +321,16 @@ int command_execute(command *cmd) {
             break;
         case (uint8_t) TEST_PID:
             cmd_test_pid(cmd);
+            break;
         case (uint8_t) READ_PID_LAST_CMD:
             cmd_read_pid_last_cmd(cmd);
+            break;
         case (uint8_t) READ_ADC_VALUE:
             cmd_read_adc_value(cmd);
+            break;
+        case (uint8_t) DECODE_MANCHESTER_CMD:
+            cmd_decode_manchester(cmd);
+            break;
         default:
             break;
     }

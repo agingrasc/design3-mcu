@@ -1,6 +1,8 @@
 import serial
 import protocol
 
+from typing import List
+
 from protocol import Adc
 
 LOGICAL_THRESHOLD = 500
@@ -96,9 +98,10 @@ def manchester_decode(input_signal: list):
 
         t = i
         j = len(validToken) - 1
+        print('len(validToken) is {}'.format(len(validToken)))
         while (buffer[t] == validToken[j] or validToken[j] == -1) and (t >= 0 and j >= 0):
             if validToken[j] == -1:
-                dataBits.insert(0, buffer[t])
+                dataBits.append(buffer[t])
 
             t -= 1
             j -= 1
@@ -145,19 +148,32 @@ def read_last_adc(adc_id: protocol.Adc, ser=ser) -> tuple:
         values.append(int.from_bytes(val, byteorder='big'))
     return (nbytes, values) #int.from_bytes(val, byteorder='big')
 
+def manchester_decode_cmd(ser=ser) -> tuple:
+    ser.read(ser.inWaiting())
+    ser.write(protocol.generate_decode_manchester())
+    ser.read(1)
+    res = int.from_bytes(ser.read(2), byteorder='big') # Decode result (success or error)
+    figNo = int.from_bytes(ser.read(1), byteorder='big')
+    orien = int.from_bytes(ser.read(1), byteorder='big')
+    scale = int.from_bytes(ser.read(1), byteorder='big')
+    #val = int.from_bytes(ser.read(2), byteorder='big') # Code packed into uint8
+
+    return (res, [figNo, protocol.ManchesterOrientation(orien), protocol.ManchesterScale(scale)])
+
 def main():
     run = True
     while run:
+        print('Commands: "a" = read adc, "d" = decode manchester)')
         cmd = input('Command to exec ("q" to quit): ')
         if cmd == 'q':
             run = False
-        else:
+        elif cmd == 'd':
+            (res, minfos) = manchester_decode_cmd()
+            print('command result is {}'.format(res))
+            print("figure # = {}, orientation = {}, scale = {}".format(minfos[0], minfos[1], minfos[2]))
+        elif cmd == 'a':
             ch = int(input('Channel: '))
-            ncmd = int(cmd)
             (n, values) = read_last_adc(Adc.ADC_MANCHESTER_CODE)
-            #print('raw buffer: ')
-            #print(values)
-            #print('\n')
             decoded = manchester_decode(values)
             if decoded != None:
                 print('decoded:')
