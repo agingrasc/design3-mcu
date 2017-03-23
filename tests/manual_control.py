@@ -123,35 +123,26 @@ def keyboard_speed(screen):
         except curses.error:
             user_key = -1
 
-        if target_changed:
-            set_pid_to_keyboard_speed(speed_x, speed_y, speed_theta)
-        target_changed = False
+        set_pid_to_keyboard_speed(speed_x, speed_y, speed_theta)
 
         if user_key in ['q', 'Q']:
             sub_run = False
         elif user_key == 'w':
             speed_x += 10
-            target_changed = True
         elif user_key == 's':
             speed_x -= 10
-            target_changed = True
         elif user_key == 'd':
             speed_y += 10
-            target_changed = True
         elif user_key == 'a':
             speed_y -= 10
-            target_changed = True
         elif user_key in ['c']:
             speed_x = 0
             speed_y = 0
             speed_theta = 0
-            target_changed = True
         elif user_key in ['e']:
             speed_theta -= 0.05
-            target_changed = True
         elif user_key in ['r']:
             speed_theta += 0.05
-            target_changed = True
 
         speed_x, speed_y, speed_theta = cap_pid_speed(speed_x, speed_y, speed_theta)
 
@@ -180,11 +171,11 @@ def keyboard_speed(screen):
         screen.addstr(9, 0, "Moteur FRONT_Y last cmd: {} ".format(last_cmd_front_y))
         screen.addstr(10, 0, "Moteur REAR_Y last cmd: {} ".format(last_cmd_rear_y))
 
-        adc_val = adc.read_last_adc(protocol.Adc.ADC_PENCIL)
-        adc_volt = adc.convert_adc_value_to_voltage(adc_val)
-        rfsr = adc.convert_voltage_to_force_sensor_resistance(adc_volt)
+        #adc_val = adc.read_last_adc(protocol.Adc.ADC_PENCIL)
+        #adc_volt = adc.convert_adc_value_to_voltage(adc_val)
+        #rfsr = adc.convert_voltage_to_force_sensor_resistance(adc_volt)
 
-        screen.addstr(10, 0, "ADC pencil value: ADC={}, Vadc={:0.2f}, Rfsr={:0.2f}".format(adc_val, adc_volt, rfsr))
+        #screen.addstr(10, 0, "ADC pencil value: ADC={}, Vadc={:0.2f}, Rfsr={:0.2f}".format(adc_val, adc_volt, rfsr))
 
         display_busy_wait(screen, 11)
         screen.move(3, 0)
