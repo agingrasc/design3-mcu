@@ -108,7 +108,7 @@ void motor_controller_init(void) {
         motors[i].input_consigne = 0x0;
         motors[i].consigne_percent = 0x0;
         motors[i].old_consigne_percent = 0x0;
-        motors[i].motor_direction = MOTOR_FORWARD;
+        motors[i].motor_direction = MOTOR_BREAK;
     }
 
     _motor_setup_pwm_timer();
