@@ -28,6 +28,7 @@ class PayloadLength(Enum):
     READ_LAST_ADC = 2
     DECODE_MANCHESTER = 4
     GET_MANCHESTER_CODE_POWER = 2
+    GET_MOTOR_ROTATION_DIRECTION = 2
 
 class CommandType(Enum):
     MOVE = 0x00
@@ -43,6 +44,8 @@ class CommandType(Enum):
     READ_LAST_ADC = 0xa5
     DECODE_MANCHESTER = 0xb1
     GET_MANCHESTER_CODE_POWER = 0xb2
+    GET_MOTOR_ROTATION_DIRECTION = 0xb3
+
 
 class Leds(Enum):
     UP_RED = 0
@@ -215,6 +218,11 @@ def generate_test_pid(motor: Motors, delta_t: int, current_speed: int):
 
 def generate_read_pid_last_cmd(motor: Motors):
     header = _generate_header(CommandType.READ_PID_LAST_CMD, PayloadLength.READ_PID_LAST_CMD)
+    payload = _generate_payload([motor.value])
+    return header + payload
+
+def generate_get_motor_rotation_direction(motor: Motors):
+    header = _generate_header(CommandType.GET_MOTOR_ROTATION_DIRECTION, PayloadLength.GET_MOTOR_ROTATION_DIRECTION)
     payload = _generate_payload([motor.value])
     return header + payload
 
