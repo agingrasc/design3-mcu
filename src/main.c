@@ -105,11 +105,11 @@ int main() {
             cmd_payload_ok = 0;
         }
 
-        uint32_t delta_t = timestamp - last_move_timestamp;
-        if (delta_t > MOVE_DELTA_T_THRESHOLD) {
-            for (int i = 0; i < MOTOR_COUNT; i++) {
-                pid_setpoint(i, 0);
-            }
-        }
+        //uint32_t delta_t = timestamp - last_move_timestamp;
+        //if (delta_t > MOVE_DELTA_T_THRESHOLD) {
+        //    for (int i = 0; i < MOTOR_COUNT; i++) {
+        //        pid_setpoint(i, 0);
+        //    }
+        //}
     }
 }
