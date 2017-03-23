@@ -23,6 +23,7 @@
 #define READ_ADC_VALUE      0xa5
 #define DECODE_MANCHESTER_CMD      0xb1
 #define GET_MANCHESTER_POWER_CMD    0xb2
+#define GET_MOTOR_ROTATION_DIRECTION 0xb3
 
 #define CMD_LED_SET_RED         0
 #define CMD_LED_SET_GREEN       1
@@ -309,6 +310,12 @@ int cmd_read_pid_last_cmd(command *cmd) {
     TM_USB_VCP_Putc(CMD_EXECUTE_OK);
 }
 
+int cmd_get_motor_rotation_direction(command *cmd) {
+    short motor_id = cmd->payload[0];
+    TM_USB_VCP_Putc(motors[motor_id].motor_direction);
+    TM_USB_VCP_Putc(CMD_EXECUTE_OK);
+}
+
 int command_execute(command *cmd) {
     switch (cmd->header.type) {
         case (uint8_t) MOVE_CMD:
@@ -349,6 +356,9 @@ int command_execute(command *cmd) {
             break;
         case (uint8_t) GET_MANCHESTER_POWER_CMD:
             cmd_get_manchester_power(cmd);
+            break;
+        case (uint8_t) GET_MOTOR_ROTATION_DIRECTION:
+            cmd_get_motor_rotation_direction(cmd);
             break;
         default:
             break;
