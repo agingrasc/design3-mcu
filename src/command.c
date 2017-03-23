@@ -211,6 +211,7 @@ void cmd_led(command *cmd) {
 }
 
 void cmd_move(command* cmd) {
+    last_move_timestamp = timestamp;
     short* payload = cmd->payload;
 
     float tick_per_militer = TICK_PER_ROT / (2 * WHEEL_RADIUS * PI);

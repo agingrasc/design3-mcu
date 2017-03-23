@@ -12,6 +12,8 @@
 
 #define MAX_PAYLOAD_SIZE 256
 
+uint32_t last_move_timestamp = 0;
+
 typedef struct headerData {
     uint8_t type;
     uint8_t size;
