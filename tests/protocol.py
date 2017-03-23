@@ -26,7 +26,8 @@ class PayloadLength(Enum):
     TEST_PID = 6
     READ_PID_LAST_CMD = 2
     READ_LAST_ADC = 2
-    DECODE_MANCHESTER = 2
+    DECODE_MANCHESTER = 4
+    GET_MANCHESTER_CODE_POWER = 2
 
 class CommandType(Enum):
     MOVE = 0x00
@@ -41,6 +42,7 @@ class CommandType(Enum):
     READ_PID_LAST_CMD = 0xa4
     READ_LAST_ADC = 0xa5
     DECODE_MANCHESTER = 0xb1
+    GET_MANCHESTER_CODE_POWER = 0xb2
 
 class Leds(Enum):
     UP_RED = 0
@@ -151,6 +153,16 @@ def generate_read_last_adc(adc: Adc):
     """
     header = _generate_header(CommandType.READ_LAST_ADC, PayloadLength.READ_LAST_ADC)
     payload = _generate_payload([adc.value])
+    return header + payload
+
+def generate_get_manchester_power_cmd():
+    """
+    Genere une commande qui une demande le dernier voltage du code manchester mesuré par le MCU
+    Return:
+        :cmd bytes: La commande serialise
+    """
+    header = _generate_header(CommandType.GET_MANCHESTER_CODE_POWER, PayloadLength.GET_MANCHESTER_CODE_POWER)
+    payload = _generate_payload([0])
     return header + payload
 
 def generate_decode_manchester():

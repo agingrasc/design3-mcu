@@ -27,6 +27,8 @@
 
 void adc_init();
 void adc_get_channel_conversion_values(uint8_t channel, uint16_t *values);
+uint16_t adc_perform_injected_conversion();
+uint16_t adc_convert_value(uint16_t value);
 
 void DMA2_Stream4_IRQHandler();
 

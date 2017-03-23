@@ -35,6 +35,6 @@ typedef struct ManchesterInfo {
     uint8_t packedInfo;
 } ManchesterInfo;
 
-int16_t decode(uint16_t *input_signal, uint16_t length, ManchesterInfo *info);
+int16_t decode(uint16_t *input_signal, uint16_t length, ManchesterInfo *info, uint8_t *code);
 
 #endif //DESIGN3_MCU_MANCHESTER_H

@@ -213,7 +213,7 @@ int16_t decode(uint16_t *input_signal, uint16_t length, ManchesterInfo *info, ui
 
     if (res != 0) {
         // Could not decode
-        return res;
+        return res*-1; // Only send positive error return value
     }
 
     /*            MSB           LSB

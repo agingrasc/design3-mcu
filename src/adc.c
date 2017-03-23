@@ -37,6 +37,10 @@ uint8_t status = 0;
     }
 }*/
 
+uint16_t adc_convert_value(uint16_t value) {
+    return value >> 4;
+}
+
 uint16_t *adc_get_current_adc_buffer() {
     uint16_t *retval = adc_values2;
 
@@ -50,9 +54,27 @@ void adc_get_channel_conversion_values(uint8_t channel, uint16_t *values) {
     int n = 0;
     uint16_t *cvalues = adc_get_current_adc_buffer();
     for (int i = channel; i < TOTAL_CONVERSIONS; i += TOTAL_CHANNELS) {
-        values[n] = cvalues[i] >> 4;
+        values[n] = adc_convert_value(cvalues[i]);
         n++;
     }
+}
+
+uint16_t adc_perform_injected_conversion() {
+    // Software trigger the start of injected channels conversion
+    ADC_SoftwareStartInjectedConv(ADC1);
+
+    // Wait until the conversion is started
+    while (ADC1->CR2 & ADC_CR2_JSWSTART);
+
+    // Wait until injected channel end of conversion flag is raised
+    while (ADC_GetFlagStatus(ADC1, ADC_SR_JEOC) == SET);
+
+    uint16_t val = ADC_GetInjectedConversionValue(ADC1, ADC_InjectedChannel_1);
+
+    // Clear the end of conversion flag
+    ADC_ClearFlag(ADC1, ADC_SR_JEOC);
+
+    return adc_convert_value(val);
 }
 
 // ADC1: DMA2, channel 0, stream 4
@@ -79,6 +101,7 @@ void adc_init() {
     ADC_init_structure.ADC_Resolution = ADC_Resolution_12b;//Input voltage is converted into a 12bit number giving a maximum value of 4096
     ADC_init_structure.ADC_ContinuousConvMode = ENABLE; //the conversion is continuous, the input data is converted more than once
 
+    // Use trigger only if we wish to get adc conversions at precise intervals through timer trigger interrupts
     //ADC_init_structure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T8_TRGO;// conversion is synchronous with TIM1 and CC1 (actually I'm not sure about this one :/)
     //ADC_init_structure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_Rising;//no trigger for conversion
 
@@ -93,10 +116,16 @@ void adc_init() {
     ADC_RegularChannelConfig(ADC1, ADC_Channel_12, 3, ADC_SampleTime_480Cycles);
     ADC_RegularChannelConfig(ADC1, ADC_Channel_13, 4, ADC_SampleTime_480Cycles);
 
+    // Sets the injected channels. Once a software conversion is triggered, the current regular channel conversions
+    // are stopped and the injected channel conversions are started. When injection conversions are completed, the
+    // regular channel conversions are resumed.
+    ADC_InjectedChannelConfig(ADC1, ADC_Channel_12, 1, ADC_SampleTime_3Cycles);
+
     //Enable ADC conversion
     ADC_Cmd(ADC1, ENABLE);
 
     ADC_DMACmd(ADC1, ENABLE);
+
 
     // Enable dma clock
 

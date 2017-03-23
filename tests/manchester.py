@@ -148,29 +148,39 @@ def read_last_adc(adc_id: protocol.Adc, ser=ser) -> tuple:
         values.append(int.from_bytes(val, byteorder='big'))
     return (nbytes, values) #int.from_bytes(val, byteorder='big')
 
+def get_manchester_code_power(ser=ser) -> tuple:
+    ser.read(ser.inWaiting())
+    ser.write(protocol.generate_get_manchester_power_cmd())
+    ser.read(1)
+
+    pow = int.from_bytes(ser.read(2), byteorder='big')
+
+    return pow
+
 def manchester_decode_cmd(ser=ser) -> tuple:
     ser.read(ser.inWaiting())
     ser.write(protocol.generate_decode_manchester())
     ser.read(1)
-    res = int.from_bytes(ser.read(2), byteorder='big') # Decode result (success or error)
+    res = int.from_bytes(ser.read(1), byteorder='big') # Decode result (success or error)
     figNo = int.from_bytes(ser.read(1), byteorder='big')
     orien = int.from_bytes(ser.read(1), byteorder='big')
     scale = int.from_bytes(ser.read(1), byteorder='big')
     #val = int.from_bytes(ser.read(2), byteorder='big') # Code packed into uint8
 
-    return (res, [figNo, protocol.ManchesterOrientation(orien), protocol.ManchesterScale(scale)])
+    return (res, [figNo, orien, scale])
 
 def main():
     run = True
     while run:
-        print('Commands: "a" = read adc, "d" = decode manchester)')
+        print('Commands: "a" = read adc, "d" = decode manchester, "p" = get manchester code power)')
         cmd = input('Command to exec ("q" to quit): ')
         if cmd == 'q':
             run = False
         elif cmd == 'd':
             (res, minfos) = manchester_decode_cmd()
             print('command result is {}'.format(res))
-            print("figure # = {}, orientation = {}, scale = {}".format(minfos[0], minfos[1], minfos[2]))
+            if res == 0:
+                print("figure # = {}, orientation = {}, scale = {}".format(minfos[0], protocol.ManchesterOrientation(minfos[1]), protocol.ManchesterScale(minfos[2])))
         elif cmd == 'a':
             ch = int(input('Channel: '))
             (n, values) = read_last_adc(Adc.ADC_MANCHESTER_CODE)
@@ -178,6 +188,9 @@ def main():
             if decoded != None:
                 print('decoded:')
                 print(decoded)
+        elif cmd == 'p':
+            pow = get_manchester_code_power()
+            print('Last manchester signal voltage sampled: {}'.format(pow))
 
 if __name__ == "__main__":
     main()
