@@ -17,7 +17,7 @@
 #define ADC_PENCIL                  3 // Channel 13
 
 // Number of ADC conversions that will be recorded by DMA
-#define CONVERSIONS_NUMBER_PER_CHANNEL  512
+#define CONVERSIONS_NUMBER_PER_CHANNEL  2048
 
 // Number of channel ADC must sample
 #define TOTAL_CHANNELS                   4
@@ -27,6 +27,8 @@
 
 void adc_init();
 void adc_get_channel_conversion_values(uint8_t channel, uint16_t *values);
+uint16_t adc_perform_injected_conversion();
+uint16_t adc_convert_value(uint16_t value);
 
 void DMA2_Stream4_IRQHandler();
 

@@ -30,7 +30,7 @@ typedef struct motor {
     volatile uint32_t old_timestamp;
     volatile uint32_t encoder_cnt;
     volatile uint32_t old_encoder_cnt;
-    int motor_direction;
+    short motor_direction;
 } Motor;
 
 Motor motors[MOTOR_COUNT];

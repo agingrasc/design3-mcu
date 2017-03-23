@@ -7,6 +7,8 @@
 #include "command.h"
 #include "leds.h"
 #include "adc.h"
+#include "manchester.h"
+#include "LCD.h"
 
 #define MOVE_CMD 0x00
 #define CAMERA_CMD 0x01
@@ -19,6 +21,9 @@
 #define TEST_PID 0xa3
 #define READ_PID_LAST_CMD   0xa4
 #define READ_ADC_VALUE      0xa5
+#define DECODE_MANCHESTER_CMD      0xb1
+#define GET_MANCHESTER_POWER_CMD    0xb2
+#define GET_MOTOR_ROTATION_DIRECTION 0xb3
 
 #define CMD_LED_SET_RED         0
 #define CMD_LED_SET_GREEN       1
@@ -38,6 +43,53 @@ uint16_t read_uint16(char* arg) {
     uint16_t data = 0;
     memcpy(&data, arg, 2);
     return data;
+}
+
+void cmd_get_manchester_power(command *cmd) {
+    uint16_t signal[CONVERSIONS_NUMBER_PER_CHANNEL];
+    char high, low;
+
+    //adc_get_channel_conversion_values(ADC_MANCHESTER_CODE_POWER, signal);
+    uint16_t last_value = adc_perform_injected_conversion();
+    //uint16_t last_value = signal[0]; // TODO: really last sampled value?
+
+    high = (last_value >> 8) & 0xff;
+    low = last_value & 0xff;
+
+    TM_USB_VCP_Putc(high);
+    TM_USB_VCP_Putc(low);
+
+    TM_USB_VCP_Putc(CMD_EXECUTE_OK);
+}
+
+void cmd_decode_manchester(command *cmd) {
+    uint16_t signal[CONVERSIONS_NUMBER_PER_CHANNEL];
+    uint8_t code[MANCHESTER_N_DATA_BITS];
+    char high, low;
+
+    adc_get_channel_conversion_values(ADC_MANCHESTER_CODE, signal);
+
+    ManchesterInfo info;
+    uint8_t res = (uint8_t)decode(signal, CONVERSIONS_NUMBER_PER_CHANNEL, &info, code);
+
+    // Send decoding success result
+    TM_USB_VCP_Putc(res);
+
+    // Send figure #
+    TM_USB_VCP_Putc(info.figNum);
+
+    // Send orientation
+    TM_USB_VCP_Putc((uint8_t)info.figOrientation);
+
+    // Send scale
+    TM_USB_VCP_Putc((uint8_t)info.figScale);
+
+    // Update LCD with values if succeeded
+    if (res == 0) {
+        lcd_update_display(&info);
+    }
+
+    TM_USB_VCP_Putc(CMD_EXECUTE_OK);
 }
 
 void cmd_read_adc_value(command *cmd) {
@@ -160,6 +212,7 @@ void cmd_led(command *cmd) {
 }
 
 void cmd_move(command* cmd) {
+    last_move_timestamp = timestamp;
     short* payload = cmd->payload;
 
     float tick_per_militer = TICK_PER_ROT / (2 * WHEEL_RADIUS * PI);
@@ -257,6 +310,12 @@ int cmd_read_pid_last_cmd(command *cmd) {
     TM_USB_VCP_Putc(CMD_EXECUTE_OK);
 }
 
+int cmd_get_motor_rotation_direction(command *cmd) {
+    short motor_id = cmd->payload[0];
+    TM_USB_VCP_Putc(motors[motor_id].motor_direction);
+    TM_USB_VCP_Putc(CMD_EXECUTE_OK);
+}
+
 int command_execute(command *cmd) {
     switch (cmd->header.type) {
         case (uint8_t) MOVE_CMD:
@@ -285,10 +344,22 @@ int command_execute(command *cmd) {
             break;
         case (uint8_t) TEST_PID:
             cmd_test_pid(cmd);
+            break;
         case (uint8_t) READ_PID_LAST_CMD:
             cmd_read_pid_last_cmd(cmd);
+            break;
         case (uint8_t) READ_ADC_VALUE:
             cmd_read_adc_value(cmd);
+            break;
+        case (uint8_t) DECODE_MANCHESTER_CMD:
+            cmd_decode_manchester(cmd);
+            break;
+        case (uint8_t) GET_MANCHESTER_POWER_CMD:
+            cmd_get_manchester_power(cmd);
+            break;
+        case (uint8_t) GET_MOTOR_ROTATION_DIRECTION:
+            cmd_get_motor_rotation_direction(cmd);
+            break;
         default:
             break;
     }

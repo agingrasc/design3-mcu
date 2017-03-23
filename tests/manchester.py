@@ -1,16 +1,14 @@
-#!/usr/bin/python3.4
-
 import serial
 import protocol
 
-from protocol import Adc
+from typing import List
 
-ser = serial.Serial("/dev/ttySTM32")
+from protocol import Adc
 
 LOGICAL_THRESHOLD = 500
 SAMPLE_NUMBER_PER_TRANSITION = 11 # This is the sampling count of the ADC for one logic level
 
-signal = [3076, 3075, 0, 7, 0, 1, 5, 4, 6, 0, 6, 0, 8, 3086, 3076, 3075, 3076, 3076, 3076, 3077, 3076, 3076, 3077, 4095, 1, 4, 8, 0, 0, 4, 2, 0, 4, 0, 3083, 3077, 3075, 3075, 3075, 3075, 3077, 3076, 3076, 3076, 3076, 4, 0, 0, 1, 7, 1, 3, 0, 0, 5, 4095, 3085, 3075, 3074, 3075, 3076, 3076, 3076, 3075, 3076, 3076, 9, 5, 4, 0, 4, 0, 4, 3, 0, 1, 5, 3089, 3074, 3076, 3076, 3074, 3076, 3077, 3076, 3076, 3076, 3076, 0, 5, 8, 2, 0, 0, 0, 0, 0, 5, 3083, 3077, 3075, 3075, 3076, 3077, 3076, 3076, 3075, 3076, 3075, 0, 2, 7, 10, 3, 6, 0, 2, 0, 5, 3662, 3085, 3075, 3076, 3075, 3077, 3076, 3076, 3076, 3075, 3076, 6, 4, 0, 6, 0, 1, 0, 4, 8, 0, 0, 4, 0, 0, 0, 1, 6, 2, 4, 0, 0, 4, 3085, 3077, 3076, 3076, 3075, 3076, 3076, 3076, 3077, 3076, 0, 0, 0, 5, 1, 0, 0, 6, 0, 2, 0, 3101, 3076, 3075, 3076, 3075, 3075, 3075, 3075, 3077, 3075, 3077, 4, 0, 0, 2, 1, 0, 3, 1, 5, 2, 4095, 3079, 3074, 3075, 3075, 3076, 3076, 3076, 3077, 3077, 3075, 4, 0, 0, 0, 4, 1, 0, 0, 3, 0, 4, 3086, 3077, 3075, 3076, 3076, 3075, 3076, 3076, 3076, 3075, 6, 0, 0, 0, 0, 14, 2, 0, 2, 2, 0, 3104, 3075, 3076, 3076, 3076, 3076, 3076, 3076, 3077, 3075, 3077, 8, 0, 0, 6, 2, 0, 2, 0, 2, 6, 4095, 3083, 3076, 3077, 3074, 3077, 3077, 3076, 3076, 3076, 3076, 0, 0, 0, 6, 2, 0, 0, 6, 5, 2, 2, 3085, 3076, 3075, 3076, 3075, 3076, 3081, 3075, 3076, 3076, 6, 4, 1, 0, 2, 3076, 3076, 3075, 3076, 3077, 3076, 2, 0, 0, 4, 0, 4, 7, 0, 0, 1, 1, 2, 5, 5, 0, 0, 4, 0, 8, 0, 1, 3074, 3075, 3076, 3076, 3076, 3074, 3076, 3076, 3076, 3078, 3076, 0, 4, 0, 0, 0, 0, 0, 1, 2, 0, 4095, 3084, 3077, 3076, 3076, 3076, 3077, 3077, 3077, 3076, 3076, 0, 0, 6, 2, 4, 8, 1, 0, 4, 4, 6, 3087, 3076, 3074, 3076, 3076, 3076, 3076, 3076, 3076, 3076, 0, 0, 0, 5, 0, 0, 4, 0, 0, 8, 8, 3085, 3076, 3074, 3076, 3076, 3075, 3076, 3077, 3076, 3076, 3076, 0, 7, 1, 2, 8, 2, 0, 2, 0, 0, 4095, 3085, 3076, 3075, 3075, 3074, 3076, 3075, 3076, 3076, 3076, 5, 5, 4, 3, 1, 0, 2, 1, 0, 6, 10, 3088, 3077, 3074, 3075, 3076, 3076, 3076, 3076, 3076, 3077, 8, 8, 5, 1, 0, 0, 0, 5, 0, 3, 13, 3086, 3075, 3074, 3075, 3076, 3076, 3076, 3076, 3076, 3077, 3077, 1, 0, 0, 0, 0, 1, 0, 9, 0, 0, 4095, 3087, 3076, 3076, 3073, 3075, 3075, 3076, 3076, 3076, 3077, 3076, 3076, 3076, 3075, 3076, 3076, 3075, 3076, 3076, 3076, 3076, 3, 0, 0, 0, 0, 5, 3, 5, 1, 8, 4095, 3086, 3076, 3074, 3075, 3075, 3074]
+ser = serial.Serial("/dev/ttySTM32")
 
 def manchester_decode(input_signal: list):
     # Step 1: convert the input to logical 0 and 1
@@ -23,8 +21,6 @@ def manchester_decode(input_signal: list):
     # Step 2: find the first valid logic level index in buffer
     count = 0
     current_level = input_signal[0]
-    buffer = []
-    idx = 0
     last_idx = 0
     for i in range(0, len(input_signal)):
         if input_signal[i] == current_level:
@@ -34,21 +30,20 @@ def manchester_decode(input_signal: list):
                 while input_signal[i] == current_level:
                     i += 1
 
-                idx = i
-                print("thats it idx is {}".format(idx))
+                #print("thats it idx is {}".format(idx))
                 break
             else:
-                print("i is {}".format(i))
+                #print("i is {}".format(i))
                 last_idx = i
                 count = 1
                 current_level = input_signal[i]
-                print("curr level is now {}".format(current_level))
+                #print("curr level is now {}".format(current_level))
 
-    # Step 3: Process the logic levels and isolate each bit
-    current_bit = input_signal[last_idx]
-    current_level = current_bit
+    # Step 3: Process the logic levels and isolate each bitT t
+    current_level = input_signal[last_idx]
     count = 0
-    print("idx is {}".format(idx))
+    #print("idx is {}".format(idx))
+    buffer = []
     i = last_idx
     while i < len(input_signal):
         if input_signal[i] == current_level:
@@ -70,19 +65,77 @@ def manchester_decode(input_signal: list):
 
         i += 1
 
+    #print('buffer is')
+    #print(buffer)
+    #print('\n')
+
     # Step 4: Search for valid token (start bit (LOW) + 8 stop bits (HIGH))
-    startBit = ['']
-    validToken = ['0', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', '1', '1', '1', ]
+    stopBits = [1, 0] * 8
+    startBit = stopBits + [0, 1]
+    data = [-1] * 14 # -1 means don't care (there are 7 data bits)
+    validToken = startBit + data + stopBits
+
+    #print('valid token is ')
+    #print(validToken)
+    #print('\n')
+
+    dataBits = []
     # Manchester:
     # Low = LOW + HIGH
     # High = HIGH + LOW
-    i = len(input_signal)
-    while i >= 0:
+    i = len(buffer) - 1
+    valid = False
+    #it = 0
+    while i >= 0 or not valid:
+        dataBits = []
+        #print('## it no {}'.format(it))
+        #print('i = {}'.format(i))
+        validn = 0
+        if i < len(buffer)-len(validToken):
+            #print('i < len(validToken): {} < {}'.format(i, len(buffer)-len(validToken)))
+            valid = False
+            break
+
+        t = i
+        j = len(validToken) - 1
+        print('len(validToken) is {}'.format(len(validToken)))
+        while (buffer[t] == validToken[j] or validToken[j] == -1) and (t >= 0 and j >= 0):
+            if validToken[j] == -1:
+                dataBits.append(buffer[t])
+
+            t -= 1
+            j -= 1
+            validn += 1
+
+        #print('validn == len(validToken) ? {} == {}'.format(validn, len(validToken)))
+        if validn == len(validToken):
+            #print("Found something valid")
+            valid = True
+            break
 
         i -= 1
+        #it += 1
 
-    return buffer
 
+    if not valid: return None
+
+    #print('data bits: ')
+    #print(dataBits)
+    #print('\n')
+
+    # Step 5: return real data bits
+
+    i = 0
+    retval = []
+    while i < len(dataBits):
+        if dataBits[i] == 0 and dataBits[i+1] == 1:
+            retval.append(0)
+        elif dataBits[i] == 1 and dataBits[i+1] == 0:
+            retval.append(1)
+
+        i += 2
+
+    return retval
 
 def read_last_adc(adc_id: protocol.Adc, ser=ser) -> tuple:
     ser.read(ser.inWaiting())
@@ -95,20 +148,49 @@ def read_last_adc(adc_id: protocol.Adc, ser=ser) -> tuple:
         values.append(int.from_bytes(val, byteorder='big'))
     return (nbytes, values) #int.from_bytes(val, byteorder='big')
 
+def get_manchester_code_power(ser=ser) -> tuple:
+    ser.read(ser.inWaiting())
+    ser.write(protocol.generate_get_manchester_power_cmd())
+    ser.read(1)
+
+    pow = int.from_bytes(ser.read(2), byteorder='big')
+
+    return pow
+
+def manchester_decode_cmd(ser=ser) -> tuple:
+    ser.read(ser.inWaiting())
+    ser.write(protocol.generate_decode_manchester())
+    ser.read(1)
+    res = int.from_bytes(ser.read(1), byteorder='big') # Decode result (success or error)
+    figNo = int.from_bytes(ser.read(1), byteorder='big')
+    orien = int.from_bytes(ser.read(1), byteorder='big')
+    scale = int.from_bytes(ser.read(1), byteorder='big')
+    #val = int.from_bytes(ser.read(2), byteorder='big') # Code packed into uint8
+
+    return (res, [figNo, orien, scale])
+
 def main():
     run = True
     while run:
+        print('Commands: "a" = read adc, "d" = decode manchester, "p" = get manchester code power)')
         cmd = input('Command to exec ("q" to quit): ')
         if cmd == 'q':
             run = False
-        else:
+        elif cmd == 'd':
+            (res, minfos) = manchester_decode_cmd()
+            print('command result is {}'.format(res))
+            if res == 0:
+                print("figure # = {}, orientation = {}, scale = {}".format(minfos[0], protocol.ManchesterOrientation(minfos[1]), protocol.ManchesterScale(minfos[2])))
+        elif cmd == 'a':
             ch = int(input('Channel: '))
-            ncmd = int(cmd)
             (n, values) = read_last_adc(Adc.ADC_MANCHESTER_CODE)
-            print(n)
-            print(values)
+            decoded = manchester_decode(values)
+            if decoded != None:
+                print('decoded:')
+                print(decoded)
+        elif cmd == 'p':
+            pow = get_manchester_code_power()
+            print('Last manchester signal voltage sampled: {}'.format(pow))
 
 if __name__ == "__main__":
-    #main()
-    buf = manchester_decode(signal)
-    print(buf)
+    main()

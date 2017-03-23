@@ -131,3 +131,65 @@ void lcd_clear_row(uint8_t row) {
 
     lcd_set_cursor(row, 0);
 }
+
+void lcd_update_display(ManchesterInfo *infos) {
+    lcd_clear_row(0);
+    lcd_set_cursor(0, 0);
+
+    // Convert units to human readable units
+    /*for (int i = 0; i < MOTOR_COUNT; i++) {
+      uint32_t tmp = (motors[i].last_tick_delta * 60000 * WHEEL_RADIUS)/(motors[i].last_timestamp_delta * 6400);
+      motors[i].motor_speed_rpm = tmp;
+      }*/
+
+
+    char row1[16] = {"Figure #X"};
+    row1[8] = infos->figNum%10+'0'; // Fig number
+    row1[9] = '\0';
+
+    char ori[5];
+    switch (infos->figOrientation) {
+        case NORTH:
+            sprintf(ori, "NORD ");
+            break;
+        case EAST:
+            sprintf(ori, "EST  ");
+            break;
+        case SOUTH:
+            sprintf(ori, "SUD  ");
+            break;
+        case WEST:
+            sprintf(ori, "OUEST");
+            break;
+    }
+    ori[5] = '\0';
+
+    char scale[2];
+    switch (infos->figScale) {
+        case X2:
+            sprintf(scale, "X2");
+            break;
+        case X4:
+            sprintf(scale, "X4");
+            break;
+    }
+    scale[2] = '\0';
+
+    for (int i = 0; i < 16; i++) {
+        if (row1[i] == '\0') break;
+        lcd_putc(row1[i]);
+    }
+
+    lcd_clear_row(1);
+    lcd_set_cursor(1, 0);
+
+    for (int i = 0; i < 5; i++) {
+        lcd_putc(ori[i]);
+    }
+    lcd_putc(',');
+    lcd_putc(' ');
+
+    for (int i = 0; i < 2; i++) {
+        lcd_putc(scale[i]);
+    }
+}

@@ -3,6 +3,8 @@
 #include "main.h"
 #include "adc.h"
 
+#define MOVE_DELTA_T_THRESHOLD 500
+
 void initLed() {
     RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
 
@@ -15,37 +17,6 @@ void initLed() {
     GPIO_Init(GPIOD, &GPIO_InitStructure);
     GPIO_ResetBits(GPIOD, GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15);
 }
-
-void updateDisplay() {
-    lcd_clear_row(0);
-    lcd_set_cursor(0, 0);
-
-    // Convert units to human readable units
-    /*for (int i = 0; i < MOTOR_COUNT; i++) {
-      uint32_t tmp = (motors[i].last_tick_delta * 60000 * WHEEL_RADIUS)/(motors[i].last_timestamp_delta * 6400);
-      motors[i].motor_speed_rpm = tmp;
-      }*/
-
-    char buf1[16];
-    sprintf(buf1, "Hello, I am");
-    for (int i = 0; i < 16; i++) {
-        if (buf1[i] == '\0') break;
-        lcd_putc(buf1[i]);
-    }
-
-    lcd_clear_row(1);
-    lcd_set_cursor(1, 0);
-
-    char buf2[16];
-    buf2[15] = '\0';
-    sprintf(buf2, "HERTEL the robot!");
-
-    for (int i = 0; i < 16; i++) {
-        if (buf2[i] == '\0') break;
-        lcd_putc(buf2[i]);
-    }
-}
-
 
 void checkForVCP() {
     /* USB configured OK, drivers OK */
@@ -87,20 +58,11 @@ int main() {
     id_test_status = 0;
 #endif
 
-    unsigned int last_second = 0;
-
     int cmd_header_ok = 0;
     int cmd_payload_ok = 0;
     while (1) {
         // Check for VCP connection
         checkForVCP();
-
-        unsigned int mstemp = (unsigned int)(timestamp / 1680);
-        if (mstemp > last_second) { // One second elapsed
-            updateDisplay(); // Update LCD
-            last_second = mstemp;
-
-        }
 
         command cmd;
         if (!cmd_header_ok && !TM_USB_VCP_BufferEmpty()) {
@@ -143,13 +105,11 @@ int main() {
             cmd_payload_ok = 0;
         }
 
-        // Update time line, if necessary
-        /*unsigned int mstemp = (unsigned int)(timestamp / 1000);
-        if (mstemp != last_second) { // One second elapsed
-            // FIXME: sprintf in updateDisplay() crashes the MCU
-            updateDisplay(); // Update time on LCD
-            last_second = mstemp;
-
-        }*/
+        uint32_t delta_t = timestamp - last_move_timestamp;
+        if (delta_t > MOVE_DELTA_T_THRESHOLD) {
+            for (int i = 0; i < MOTOR_COUNT; i++) {
+                pid_setpoint(i, 0);
+            }
+        }
     }
 }
