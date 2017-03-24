@@ -11,6 +11,7 @@
 #include "stm32f4xx_adc.h"
 #include "stm32f4xx_dma.h"
 #include "adc.h"
+#include "manchester.h"
 
 #define DMASX                DMA2_Stream4
 #define DMASX_IRQ_NO        DMA2_Stream4_IRQn
@@ -27,9 +28,15 @@ uint8_t status = 0;
         // Do something cool with the fetched data
         // You do it, but you do it cool
 
-        uint16_t vals[CONVERSIONS_NUMBER_PER_CHANNEL];
+        uint16_t signal[CONVERSIONS_NUMBER_PER_CHANNEL];
+        uint8_t code[MANCHESTER_N_DATA_BITS];
+        char high, low;
 
-        adc_get_channel_conversion_values(2, vals);
+        adc_get_channel_conversion_values(ADC_MANCHESTER_CODE, signal);
+
+        ManchesterInfo info;
+        uint8_t res = (uint8_t)decode(signal, CONVERSIONS_NUMBER_PER_CHANNEL, &info, code);
+
 
         int i = 0;
 
@@ -67,7 +74,7 @@ uint16_t adc_perform_injected_conversion() {
     while (ADC1->CR2 & ADC_CR2_JSWSTART);
 
     // Wait until injected channel end of conversion flag is raised
-    while (ADC_GetFlagStatus(ADC1, ADC_SR_JEOC) == SET);
+    while (ADC_GetFlagStatus(ADC1, ADC_SR_JEOC) != SET);
 
     uint16_t val = ADC_GetInjectedConversionValue(ADC1, ADC_InjectedChannel_1);
 
@@ -108,9 +115,8 @@ void adc_init() {
     ADC_init_structure.ADC_NbrOfConversion = TOTAL_CHANNELS;// !!!!!!!!!
     ADC_init_structure.ADC_ScanConvMode = ENABLE;//The scan is configured in one channel // TEMP: was disable
 
-    ADC_Init(ADC1, &ADC_init_structure);//Initialize ADC with the previous configuration
+    ADC_Init(ADC1, &ADC_init_structure);
 
-    //Select the channel to be read from
     ADC_RegularChannelConfig(ADC1, ADC_Channel_10, 1, ADC_SampleTime_480Cycles);
     ADC_RegularChannelConfig(ADC1, ADC_Channel_11, 2, ADC_SampleTime_480Cycles);
     ADC_RegularChannelConfig(ADC1, ADC_Channel_12, 3, ADC_SampleTime_480Cycles);
@@ -119,7 +125,8 @@ void adc_init() {
     // Sets the injected channels. Once a software conversion is triggered, the current regular channel conversions
     // are stopped and the injected channel conversions are started. When injection conversions are completed, the
     // regular channel conversions are resumed.
-    ADC_InjectedChannelConfig(ADC1, ADC_Channel_12, 1, ADC_SampleTime_3Cycles);
+    ADC_InjectedSequencerLengthConfig(ADC1, 1);
+    ADC_InjectedChannelConfig(ADC1, ADC_Channel_11, 1, ADC_SampleTime_480Cycles);
 
     //Enable ADC conversion
     ADC_Cmd(ADC1, ENABLE);

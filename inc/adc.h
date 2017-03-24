@@ -17,7 +17,7 @@
 #define ADC_PENCIL                  3 // Channel 13
 
 // Number of ADC conversions that will be recorded by DMA
-#define CONVERSIONS_NUMBER_PER_CHANNEL  2048
+#define CONVERSIONS_NUMBER_PER_CHANNEL  4096
 
 // Number of channel ADC must sample
 #define TOTAL_CHANNELS                   4

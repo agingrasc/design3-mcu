@@ -138,6 +138,10 @@ int motor_set_direction(uint8_t motor_id, float consigne) {
         dir = MC_DIR_CCW;
         motors[motor_id].motor_direction = MOTOR_BACKWARD;
     }
+    else {
+        dir = MC_DIR_BGND;
+        motors[motor_id].motor_direction = MOTOR_BREAK;
+    }
 
     //if (direction == 0 && (motor_id == 2 || motor_id == 3)) {
     //    dir = MC_DIR_CW;

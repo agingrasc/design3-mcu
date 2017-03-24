@@ -85,10 +85,10 @@ int16_t man_process_sampled_values(uint16_t *aValues, uint16_t length, uint16_t 
                 count = 0; // resets counter
                 current_level = aValues[i];
             }
-            else {
+            /*else {
                 // Hmmm, that should not happen. Something is wrong with this frame, discards it.
                 return MAN_ERR_SPURIOUS_LEVEL;
-            }
+            }*/
         }
     }
 
@@ -104,12 +104,7 @@ int16_t man_process_sampled_values(uint16_t *aValues, uint16_t length, uint16_t 
 // The Manchester encoding states: LOW logic level = 0 + 1, HIGH logic level = 1 + 0
 
 #define MANCHESTER_PATTERN_LENGTH   48
-/*int16_t manchester_pattern[MANCHESTER_PATTERN_LENGTH] = {
-        1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, // stop bits of previous frame
-        0, 1, // start bit
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, // our data bits (don't care bits)
-        1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0 // stop bits of curent bits
-};*/
+
 int16_t manchester_pattern[MANCHESTER_PATTERN_LENGTH] = {
         0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, // stop bits of previous frame
         1, 0, // start bit
@@ -192,15 +187,15 @@ int16_t man_decode(uint16_t *input_signal, uint16_t length, uint8_t *data) {
     uint16_t buffer[CONVERSIONS_NUMBER_PER_CHANNEL];
     int16_t nvals = man_process_sampled_values(input_signal, length, buffer);
     if (nvals < 0) {
-        return nvals; // Report the error
+        return -1*nvals; // Report the error
     }
     if (nvals == 0) {
         return MAN_ERR_NO_VALID_LOGIC_LEVEL; // No valid logic levels were detected
     }
 
     // Step 3: detect the valid Manchester pattern amongst buffer bits
-    int16_t rval = 0;
-    if (man_detect_valid_pattern(buffer, nvals, data) != 0) {
+    int16_t rval = man_detect_valid_pattern(buffer, nvals, data);
+    if (rval != 0) {
         return rval; // Report the error
     }
 
@@ -216,16 +211,16 @@ int16_t decode(uint16_t *input_signal, uint16_t length, ManchesterInfo *info, ui
         return res*-1; // Only send positive error return value
     }
 
-    /*            MSB           LSB
-     * BIT ORDER: 7 6 5 4 3 2 1 0
-     * BUF INDEX: X 6 5 4 3 2 1 X
-     * DIP SW NO: 1 2 3 4 5 6 7 8
-     *              ----- --- -
-     *                |    |  |-> scale
-     *     fig no  <- |    |-> orientation
-     */
+    // Step 4: Convert the values contained in buffer into a single uint8 to send through communication port
+    /*          MSB           LSB
+	 * BIT ORDER: X 6 5 4 3 2 1 0
+	 * BUF INDEX: X 6 5 4 3 2 1 0
+	 * DIP SW NO: 1 2 3 4 5 6 7 8
+	 *               ----- --- -
+	 *                |    |  |-> scale
+	 *     fig no  <- |    |-> orientation
+	 */
 
-    // Convert the values contained in buffer into a single uint8 to send through communication port
     uint8_t num_code = 0;
     for (int i = 0; i < MANCHESTER_N_DATA_BITS; i++) {
         num_code |= (code[i] << i);
