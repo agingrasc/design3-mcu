@@ -67,7 +67,7 @@ void cmd_decode_manchester(command *cmd) {
     uint8_t code[MANCHESTER_N_DATA_BITS];
     char high, low;
 
-    adc_get_channel_conversion_values(ADC_MANCHESTER_CODE, signal);
+    adc_get_channel_conversion_values(ADC_MANCHESTER_CODE, signal); //adc_get_channel_conversion_values(ADC_MANCHESTER_CODE, signal);
 
     ManchesterInfo info;
     uint8_t res = (uint8_t)decode(signal, CONVERSIONS_NUMBER_PER_CHANNEL, &info, code);

@@ -117,8 +117,10 @@ void adc_init() {
 
     ADC_Init(ADC1, &ADC_init_structure);
 
+    // IMPORTANT: an ADC channel cannot be at the same time a regular channel while being an injected channel.
+    // It works but produces unpredictable results.
     ADC_RegularChannelConfig(ADC1, ADC_Channel_10, 1, ADC_SampleTime_480Cycles);
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_11, 2, ADC_SampleTime_480Cycles);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_14, 2, ADC_SampleTime_480Cycles); // Dummy ADC
     ADC_RegularChannelConfig(ADC1, ADC_Channel_12, 3, ADC_SampleTime_480Cycles);
     ADC_RegularChannelConfig(ADC1, ADC_Channel_13, 4, ADC_SampleTime_480Cycles);
 
@@ -126,7 +128,7 @@ void adc_init() {
     // are stopped and the injected channel conversions are started. When injection conversions are completed, the
     // regular channel conversions are resumed.
     ADC_InjectedSequencerLengthConfig(ADC1, 1);
-    ADC_InjectedChannelConfig(ADC1, ADC_Channel_11, 1, ADC_SampleTime_480Cycles);
+    ADC_InjectedChannelConfig(ADC1, ADC_Channel_11, 1, ADC_SampleTime_3Cycles);
 
     //Enable ADC conversion
     ADC_Cmd(ADC1, ENABLE);
