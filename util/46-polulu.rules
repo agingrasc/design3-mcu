@@ -1,3 +1,5 @@
+# Works with fedora
+SUBSYSTEMS=="usb", ENV{.LOCAL_ifNum}="$attr{bInterfaceNumber}"
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="1ffb", ATTRS{idProduct}=="0089", \
-    ENV{ID_USB_INTERFACE_NUM}=="00", KERNEL=="ttyACM*", MODE:="0666", \
+    ENV{.LOCAL_ifNum}=="00", KERNEL=="ttyACM*", MODE:="0666", \
     SYMLINK+="ttyPololu"
