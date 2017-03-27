@@ -2,6 +2,23 @@
 
 #include "MotorEncoder.h"
 
+void reset_traveled_distance() {
+    for (int i = 0; i < MOTOR_COUNT; i++) {
+        motors[i].traveled_distance = 0;
+    }
+}
+
+void update_traveled_distance(uint8_t motor, int32_t last_speed, uint32_t time_delta) {
+    // Convert speed to mm/sec
+    int32_t metric_speed = last_speed * ((2*M_PI*WHEEL_RADIUS)/(TICK_PER_ROT));
+
+    // Compute traveled distance since last encoder read
+    int32_t traveled_distance =  metric_speed * time_delta;
+
+    // Update the overall traveled distance
+    motors[motor].traveled_distance += traveled_distance;
+}
+
 void MotorEncodersInit() {
     GPIO_InitTypeDef GPIO_InitStructure;
 
@@ -122,6 +139,7 @@ void MotorEncodersInit() {
         // Set current count to half the autoreload value.
         motors[i].encoder_cnt = TIMER_INIT_VAL;
         motors[i].old_encoder_cnt = TIMER_INIT_VAL;
+        motors[i].traveled_distance = 0;
         TIM_SetCounter(motors[i].ENCx, TIMER_INIT_VAL);
     }
 
@@ -158,9 +176,14 @@ void MotorEncodersRead() {
     // RPM
     //motors[i].motor_speed = ((last_tick_delta)*MILLI_PER_MN)/((tmp_timestamp-motors[i].old_timestamp)*TICK_PER_ROT);
     // Tick/sec
-    motors[i].motor_speed = (last_tick_delta * 1000) / (tmp_timestamp - motors[i].old_timestamp);
+
+    uint32_t time_delta = (tmp_timestamp - motors[i].old_timestamp);
+
+    motors[i].motor_speed = (last_tick_delta * 1000) / time_delta;
 
     motors[i].old_timestamp = tmp_timestamp;
+
+    //update_traveled_distance(i, motors[i].motor_speed, time_delta);
 
 #ifdef ID_MODE
     collectIdResponse(motors[i].motor_speed);

@@ -3,10 +3,10 @@
 
 #define MOTOR_COUNT    4
 
-#define MOTOR_A        0x0
-#define MOTOR_B        0x1
-#define MOTOR_C        0x2
-#define MOTOR_D        0x3
+#define MOTOR_REAR_X            0x0
+#define MOTOR_FRONT_Y           0x1
+#define MOTOR_FRONT_X           0x2
+#define MOTOR_REAR_Y            0x3
 
 #define MOTOR_FORWARD 0
 #define MOTOR_BACKWARD 1
@@ -31,6 +31,8 @@ typedef struct motor {
     volatile uint32_t encoder_cnt;
     volatile uint32_t old_encoder_cnt;
     short motor_direction;
+    int32_t traveled_distance;
+
 } Motor;
 
 Motor motors[MOTOR_COUNT];

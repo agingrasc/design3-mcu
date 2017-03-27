@@ -11,7 +11,7 @@
 void initIdTest() {
     id_sample_no = 0;
     id_test_status = ID_TEST_WAITING;
-    current_motor = MOTOR_A; // by default, use motor a
+    current_motor = MOTOR_FRONT_X; // by default, use motor a
     fillIdConsigne();
 }
 

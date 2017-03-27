@@ -77,15 +77,15 @@ int main() {
                 valid_checksum = checksum_header(&cmd.header);
             } else if (cmd_header_ok > 0) {
                 usb_empty_buffer();
-                TM_USB_VCP_Putc(CMD_INVALID_HEADER);
+                //TM_USB_VCP_Putc(CMD_INVALID_HEADER);
             }
 
             if (!valid_checksum) {
-                TM_USB_VCP_Putc(CMD_RECEPTION_OK);
+                //TM_USB_VCP_Putc(CMD_RECEPTION_OK);
             } else {
                 cmd_header_ok = 0;
                 usb_empty_buffer();
-                TM_USB_VCP_Putc(CMD_CHECKSUM_FAILURE);
+                //TM_USB_VCP_Putc(CMD_CHECKSUM_FAILURE);
             }
         }
 
