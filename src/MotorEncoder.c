@@ -8,17 +8,6 @@ void reset_traveled_distance() {
     }
 }
 
-void update_traveled_distance(uint8_t motor, int32_t last_speed, uint32_t time_delta) {
-    // Convert speed to mm/sec
-    int32_t metric_speed = last_speed * ((2*M_PI*WHEEL_RADIUS)/(TICK_PER_ROT));
-
-    // Compute traveled distance since last encoder read
-    int32_t traveled_distance =  metric_speed * time_delta;
-
-    // Update the overall traveled distance
-    motors[motor].traveled_distance += traveled_distance;
-}
-
 void MotorEncodersInit() {
     GPIO_InitTypeDef GPIO_InitStructure;
 
@@ -134,6 +123,7 @@ void MotorEncodersInit() {
 
     // Reset variables
     for (int i = 0; i < MOTOR_COUNT; i++) {
+        motors[i].motor_direction = MOTOR_BREAK;
         motors[i].motor_speed = 0;
         motors[i].old_timestamp = 0;
         // Set current count to half the autoreload value.
@@ -183,7 +173,21 @@ void MotorEncodersRead() {
 
     motors[i].old_timestamp = tmp_timestamp;
 
-    //update_traveled_distance(i, motors[i].motor_speed, time_delta);
+    // Set appropriate sign of speed depending on the motor direction
+    int32_t sign = 1;
+
+    if (motors[i].motor_direction == MOTOR_BACKWARD)
+       sign = -1;
+
+    // Convert speed to mm/sec
+    // NOTE: 2*M_PÎ*WHEEL_RADIUS approx 220
+    int32_t metric_speed = (int32_t)((sign*motors[i].motor_speed*220)/TICK_PER_ROT);
+
+    // Compute traveled distance since last encoder read
+    int32_t traveled_distance = (int32_t)(metric_speed * time_delta);
+
+    // Update the overall traveled distance
+    motors[i].traveled_distance += traveled_distance;
 
 #ifdef ID_MODE
     collectIdResponse(motors[i].motor_speed);

@@ -15,6 +15,7 @@
 #define PENCIL_CMD 0x02
 #define LED_CMD 0x03
 #define SET_PID_CONSTANT 0x04
+#define RESET_STATE_CMD 0x05
 #define MANUAL_SPEED_CMD 0xa0
 #define READ_ENCODER 0xa1
 #define SET_PID_MODE 0xa2
@@ -45,6 +46,20 @@ uint16_t read_uint16(char* arg) {
     uint16_t data = 0;
     memcpy(&data, arg, 2);
     return data;
+}
+
+void cmd_reset_state(command *cmd) {
+    // Resets all parts to initial state for the beginning of a new round
+
+    // Turn all LEDs off
+    reset_robot_green_led();
+    reset_robot_red_led();
+
+    // Clear LCD screen
+    lcd_clear();
+
+    // Reset travaled distances by motors
+    reset_traveled_distance();
 }
 
 void cmd_reset_traveled_distance(command *cmd) {
@@ -91,7 +106,6 @@ void cmd_get_manchester_power(command *cmd) {
 void cmd_decode_manchester(command *cmd) {
     uint16_t signal[CONVERSIONS_NUMBER_PER_CHANNEL];
     uint8_t code[MANCHESTER_N_DATA_BITS];
-    char high, low;
 
     adc_get_channel_conversion_values(ADC_MANCHESTER_CODE, signal); //adc_get_channel_conversion_values(ADC_MANCHESTER_CODE, signal);
 
@@ -135,7 +149,7 @@ void cmd_read_adc_value(command *cmd) {
             TM_USB_VCP_Putc(low);
 
             // Send last value
-            high = (vals[0] >> 8) & 0xff; // TODO: return the last index instead, which would be the latest sampled value?
+            high = (vals[0] >> 8) & 0xff;
             low = vals[0] & 0xff;
             TM_USB_VCP_Putc(high);
             TM_USB_VCP_Putc(low);
@@ -147,7 +161,7 @@ void cmd_read_adc_value(command *cmd) {
 
             // Send number of values
             nval = CONVERSIONS_NUMBER_PER_CHANNEL;
-            high = (nval >> 8) & 0xff; // TODO: return the last index instead, which would be the latest sampled value?
+            high = (nval >> 8) & 0xff;
             low = nval & 0xff;
             TM_USB_VCP_Putc(high);
             TM_USB_VCP_Putc(low);
@@ -174,7 +188,7 @@ void cmd_read_adc_value(command *cmd) {
             TM_USB_VCP_Putc(low);
 
             // Send last value
-            high = (vals[0] >> 8) & 0xff; // TODO: return the last index instead, which would be the latest sampled value?
+            high = (vals[0] >> 8) & 0xff;
             low = vals[0] & 0xff;
             TM_USB_VCP_Putc(high);
             TM_USB_VCP_Putc(low);
@@ -256,9 +270,9 @@ int cmd_manual_speed(command *cmd) {
     short* payload = cmd->payload;
     short motor_id = payload[0];
     short pwm = payload[1];
-    short direction = payload[2];
+    //short direction = payload[2];
 
-    uint8_t dir = MC_DIR_BGND;
+    /*uint8_t dir = MC_DIR_BGND;
     if (direction == 0 && (motor_id == 2 || motor_id == 3)) {
         dir = MC_DIR_CW;
     }
@@ -270,7 +284,7 @@ int cmd_manual_speed(command *cmd) {
     }
     else if (direction == 1 && (motor_id == 0 || motor_id == 1)) {
         dir = MC_DIR_CW;
-    }
+    }*/
 
     motor_set_direction(motor_id, pwm);
     motors[motor_id].consigne_percent = abs(pwm);
@@ -391,6 +405,10 @@ int command_execute(command *cmd) {
             break;
         case (uint8_t) GET_TRAVELED_DISTANCE:
             cmd_get_traveled_distance(cmd);
+            break;
+        case (uint8_t) RESET_STATE_CMD:
+            cmd_reset_state(cmd);
+            break;
         default:
             break;
     }

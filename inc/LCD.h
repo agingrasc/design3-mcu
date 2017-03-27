@@ -24,4 +24,6 @@ void lcd_putc(char ch);
 
 void lcd_update_display(ManchesterInfo *infos);
 
+void lcd_clear();
+
 #endif /* LCD_H_ */

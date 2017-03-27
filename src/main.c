@@ -42,12 +42,12 @@ int main() {
     initLed();
     /* Initialize USB virtual COM port */
     TM_USB_VCP_Init();
-    pid_init();
     motor_controller_init();
     MotorEncodersInit();
     initDelay();
     initTimer();
     lcd_init();
+    pid_init();
     init_robot_leds();
     adc_init();
 
