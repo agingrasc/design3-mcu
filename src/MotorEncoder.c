@@ -10,7 +10,7 @@ void update_traveled_distance(int motor_id, int32_t motor_speed, float time_delt
         sign = -1;
 
     // Convert tick/s to mm/s, then compute traveled distance in time_delta
-    float metric_speed = (sign*motor_speed*219.9f)/TICK_PER_ROT;
+    float metric_speed = (sign*motor_speed*219.91148575f)/TICK_PER_ROT;
 
     // Compute traveled distance in time_delta
     float traveled_distance = metric_speed * (time_delta);
