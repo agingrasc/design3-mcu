@@ -2,6 +2,23 @@
 
 #include "MotorEncoder.h"
 
+void update_traveled_distance(int motor_id, int32_t motor_speed, float time_delta) {
+    // Set appropriate sign of speed depending on the motor direction
+    int32_t sign = 1;
+
+    if (motors[motor_id].motor_direction == MOTOR_BACKWARD)
+        sign = -1;
+
+    // Convert tick/s to mm/s, then compute traveled distance in time_delta
+    float metric_speed = (sign*motor_speed*219.9f)/TICK_PER_ROT;
+
+    // Compute traveled distance in time_delta
+    float traveled_distance = metric_speed * (time_delta);
+
+    // Update overall traveled distance
+    motors[motor_id].traveled_distance += traveled_distance;
+}
+
 void reset_traveled_distance() {
     for (int i = 0; i < MOTOR_COUNT; i++) {
         motors[i].traveled_distance = 0;
@@ -173,21 +190,8 @@ void MotorEncodersRead() {
 
     motors[i].old_timestamp = tmp_timestamp;
 
-    // Set appropriate sign of speed depending on the motor direction
-    int32_t sign = 1;
-
-    if (motors[i].motor_direction == MOTOR_BACKWARD)
-       sign = -1;
-
-    // Convert speed to mm/sec
-    // NOTE: 2*M_PÎ*WHEEL_RADIUS approx 220
-    int32_t metric_speed = (int32_t)((sign*motors[i].motor_speed*220)/TICK_PER_ROT);
-
-    // Compute traveled distance since last encoder read
-    int32_t traveled_distance = (int32_t)(metric_speed * time_delta);
-
-    // Update the overall traveled distance
-    motors[i].traveled_distance += traveled_distance;
+    // Update overall traveled distance by motor
+    update_traveled_distance(i, motors[i].motor_speed, time_delta*0.001f);
 
 #ifdef ID_MODE
     collectIdResponse(motors[i].motor_speed);

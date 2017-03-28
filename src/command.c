@@ -70,18 +70,28 @@ void cmd_reset_traveled_distance(command *cmd) {
 void cmd_get_traveled_distance(command *cmd) {
     char high, low;
 
-    int16_t traveled_distance_x = (int16_t)motors[MOTOR_FRONT_X].traveled_distance; // TODO: really a x-axis motor?
-    int16_t traveled_distance_y = (int16_t)motors[MOTOR_FRONT_Y].traveled_distance; // TODO: really a y-axis motor?
+    int16_t traveled_distance_frontx = (int16_t)(motors[MOTOR_FRONT_X].traveled_distance);
+    int16_t traveled_distance_rearx = (int16_t)(motors[MOTOR_REAR_X].traveled_distance);
+    int16_t traveled_distance_fronty = (int16_t)(motors[MOTOR_FRONT_Y].traveled_distance);
+    int16_t traveled_distance_reary = (int16_t)(motors[MOTOR_REAR_Y].traveled_distance);
 
     // Send traveled distance in x
-    high = (traveled_distance_x >> 8) & 0xff;
-    low = traveled_distance_x & 0xff;
+    high = (traveled_distance_frontx >> 8) & 0xff;
+    low = traveled_distance_frontx & 0xff;
+    TM_USB_VCP_Putc(high);
+    TM_USB_VCP_Putc(low);
+    high = (traveled_distance_rearx >> 8) & 0xff;
+    low = traveled_distance_rearx & 0xff;
     TM_USB_VCP_Putc(high);
     TM_USB_VCP_Putc(low);
 
     // Send traveled distance in y
-    high = (traveled_distance_y >> 8) & 0xff;
-    low = traveled_distance_y & 0xff;
+    high = (traveled_distance_fronty >> 8) & 0xff;
+    low = traveled_distance_fronty & 0xff;
+    TM_USB_VCP_Putc(high);
+    TM_USB_VCP_Putc(low);
+    high = (traveled_distance_reary >> 8) & 0xff;
+    low = traveled_distance_reary & 0xff;
     TM_USB_VCP_Putc(high);
     TM_USB_VCP_Putc(low);
 

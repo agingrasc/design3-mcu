@@ -31,7 +31,7 @@ typedef struct motor {
     volatile uint32_t encoder_cnt;
     volatile uint32_t old_encoder_cnt;
     short motor_direction;
-    int32_t traveled_distance;
+    float traveled_distance;
 
 } Motor;
 
