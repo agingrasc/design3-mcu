@@ -1,7 +1,16 @@
 #ifndef MOTOR_H_
 #define MOTOR_H_
 
-#define MOTOR_COUNT    4
+#define MOTOR_COUNT     4
+
+#define MOTOR_CW_REAR_X        0x0
+#define MOTOR_CCW_REAR_X       0x1
+#define MOTOR_CW_FRONT_Y       0x2
+#define MOTOR_CCW_FRONT_Y      0x3
+#define MOTOR_CW_FRONT_X       0x4
+#define MOTOR_CCW_FRONT_X      0x5
+#define MOTOR_CW_REAR_Y        0x6
+#define MOTOR_CCW_REAR_Y       0x7
 
 #define MOTOR_REAR_X            0x0
 #define MOTOR_FRONT_Y           0x1
@@ -27,7 +36,7 @@ typedef struct motor {
     // Encoder
     TIM_TypeDef *ENCx;
     volatile int32_t motor_speed;
-    volatile uint32_t old_timestamp;
+    volatile uint32_t last_timestamp;
     volatile uint32_t encoder_cnt;
     volatile uint32_t old_encoder_cnt;
     short motor_direction;

@@ -142,7 +142,7 @@ void MotorEncodersInit() {
     for (int i = 0; i < MOTOR_COUNT; i++) {
         motors[i].motor_direction = MOTOR_BREAK;
         motors[i].motor_speed = 0;
-        motors[i].old_timestamp = 0;
+        motors[i].last_timestamp = 0;
         // Set current count to half the autoreload value.
         motors[i].encoder_cnt = TIMER_INIT_VAL;
         motors[i].old_encoder_cnt = TIMER_INIT_VAL;
@@ -181,14 +181,14 @@ void MotorEncodersRead() {
     }
 
     // RPM
-    //motors[i].motor_speed = ((last_tick_delta)*MILLI_PER_MN)/((tmp_timestamp-motors[i].old_timestamp)*TICK_PER_ROT);
+    //motors[i].motor_speed = ((last_tick_delta)*MILLI_PER_MN)/((tmp_timestamp-motors[i].last_timestamp)*TICK_PER_ROT);
     // Tick/sec
 
-    uint32_t time_delta = (tmp_timestamp - motors[i].old_timestamp);
+    uint32_t time_delta = (tmp_timestamp - motors[i].last_timestamp);
 
     motors[i].motor_speed = (last_tick_delta * 1000) / time_delta;
 
-    motors[i].old_timestamp = tmp_timestamp;
+    motors[i].last_timestamp = tmp_timestamp;
 
     // Update overall traveled distance by motor
     update_traveled_distance(i, motors[i].motor_speed, time_delta*0.001f);

@@ -45,12 +45,16 @@ int _pid_is_direction_corresponding_setpoint(int motor_id, float setpoint) {
 void pid_init(void) {
     // Init structure
     for (int current_motor = 0; current_motor < MOTOR_COUNT; current_motor++) {
-        PID_data[current_motor].kp = P_GAIN;
-        PID_data[current_motor].ki = I_GAIN;
-        PID_data[current_motor].deadzone = DEFAULT_DEADZONE;
+        PID_data[current_motor].kp[0] = P_GAIN;
+        PID_data[current_motor].ki[0] = I_GAIN;
+        PID_data[current_motor].deadzone[0] = DEFAULT_DEADZONE;
+        PID_data[current_motor].kp[1] = P_GAIN;
+        PID_data[current_motor].ki[1] = I_GAIN;
+        PID_data[current_motor].deadzone[1] = DEFAULT_DEADZONE;
         PID_data[current_motor].previous_input = 0;
         PID_data[current_motor].accumulator = 0;
         PID_data[current_motor].last_timestamp = 0;
+        PID_data[current_motor].real_direction = 0;
     }
     PID_mode = 1;
 }
@@ -61,6 +65,39 @@ void pid_setpoint(int motor_idx, float setpoint) {
     int new_consigne = setpoint;
     int old_consigne = motor->input_consigne;
     motor->input_consigne = setpoint;
+
+    /*if (motor_idx == MOTOR_REAR_X) { // 0
+        if (setpoint <= 0) {
+            pid->real_direction = 0;
+        }
+        else {
+            pid->real_direction = 1;
+        }
+    }
+    else if (motor_idx == MOTOR_FRONT_Y) { // 1
+        if (setpoint <= 0) {
+            pid->real_direction = 0;
+        }
+        else {
+            pid->real_direction = 1;
+        }
+    }
+    else if (motor_idx == MOTOR_FRONT_X) { // 2
+        if (setpoint >= 0) {
+            pid->real_direction = 0;
+        }
+        else {
+            pid->real_direction = 1;
+        }
+    }
+    else if (motor_idx == MOTOR_REAR_Y) { // 3
+        if (setpoint >= 0) {
+            pid->real_direction = 0;
+        }
+        else {
+            pid->real_direction = 1;
+        }
+    }*/
 
     // on reset l'accumulateur si la consigne a change
     if (new_consigne == 0) {
@@ -89,6 +126,10 @@ void pid_update(void) {
                     motors[i].motor_direction = MOTOR_BREAK;
                 }
             }
+
+            PID_data[i].real_direction = motors[i].motor_direction;
+            if (PID_data[i].real_direction == MOTOR_BREAK)
+                PID_data[i].real_direction = MOTOR_FORWARD;
 
             float speed_cmd = pid_compute_cmd(&PID_data[i], last_timestamp, work_timestamp, abs(setpoint),
                                               motors[i].motor_speed);
@@ -123,7 +164,7 @@ float clamp_command(float naiveCommand) {
  * Limite la valeur de l'accumulateur
  */
 float clamp_accumulator(PIDData *pidData, float accVal) {
-    float maxAccumulator = MAX_COMMAND / pidData->ki;
+    float maxAccumulator = MAX_COMMAND / pidData->ki[pidData->real_direction];
     if (accVal > maxAccumulator) {
         pidData->accumulator = maxAccumulator;
         return maxAccumulator;
@@ -164,12 +205,12 @@ pid_compute_cmd(PIDData *pid_data, float last_timestamp, float timestamp, float 
     float timescale = DELTA_T_TIMESCALE;
     float delta_t = (timestamp - last_timestamp) / timescale;
     float error = target_speed - current_speed;
-    float pCmd = pid_data->kp * error;
-    float iCmd = pid_data->accumulator + pid_data->ki * error * delta_t;
+    float pCmd = pid_data->kp[pid_data->real_direction] * error;
+    float iCmd = pid_data->accumulator + pid_data->ki[pid_data->real_direction] * error * delta_t;
     iCmd = clamp_accumulator(pid_data, iCmd);
 
     float naiveCmd = pCmd + iCmd;
-    float cmd = relinearize_command(naiveCmd, pid_data->deadzone);
+    float cmd = relinearize_command(naiveCmd, pid_data->deadzone[pid_data->real_direction]);
     cmd = clamp_command(cmd);
 
     //sauvegarde donnee pour prochain calcul
@@ -179,4 +220,3 @@ pid_compute_cmd(PIDData *pid_data, float last_timestamp, float timestamp, float 
 
     return cmd;
 }
-

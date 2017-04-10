@@ -14,7 +14,8 @@
 #define CAMERA_CMD 0x01
 #define PENCIL_CMD 0x02
 #define LED_CMD 0x03
-#define SET_PID_CONSTANT 0x04
+#define SET_PID_CONSTANT_FORWARD 0x04
+#define SET_PID_CONSTANT_BACKWARD 0x06
 #define RESET_STATE_CMD 0x05
 #define MANUAL_SPEED_CMD 0xa0
 #define READ_ENCODER 0xa1
@@ -282,20 +283,6 @@ int cmd_manual_speed(command *cmd) {
     short pwm = payload[1];
     //short direction = payload[2];
 
-    /*uint8_t dir = MC_DIR_BGND;
-    if (direction == 0 && (motor_id == 2 || motor_id == 3)) {
-        dir = MC_DIR_CW;
-    }
-    else if (direction == 0 && (motor_id == 0 || motor_id == 1)) {
-        dir = MC_DIR_CCW;
-    }
-    else if (direction == 1 && (motor_id == 2 || motor_id == 3)) {
-        dir = MC_DIR_CCW;
-    }
-    else if (direction == 1 && (motor_id == 0 || motor_id == 1)) {
-        dir = MC_DIR_CW;
-    }*/
-
     motor_set_direction(motor_id, pwm);
     motors[motor_id].consigne_percent = abs(pwm);
 
@@ -319,18 +306,37 @@ int cmd_set_pid_mode(command *cmd) {
     return 0;
 }
 
-int cmd_set_pid_constant(command *cmd) {
+int cmd_set_pid_constant_forward(command *cmd) {
     short motor = cmd->payload[0];
-    short kp = cmd->payload[1];
-    short ki = cmd->payload[2];
-    short kd = cmd->payload[3];
-    short dz = cmd->payload[4];
+
+    short kp_cw = cmd->payload[1];
+    short ki_cw = cmd->payload[2];
+    short kd_cw = cmd->payload[3];
+    short dz_cw = cmd->payload[4];
 
     PIDData* pid = &PID_data[motor];
-    pid->kp = ((float) kp)/PID_SCALING;
-    pid->ki = ((float) ki)/PID_SCALING;
-    pid->kd = ((float) kd)/PID_SCALING;
-    pid->deadzone = dz;
+    pid->kp[MOTOR_FORWARD] = ((float) kp_cw)/PID_SCALING;
+    pid->ki[MOTOR_FORWARD] = ((float) ki_cw)/PID_SCALING;
+    pid->kd[MOTOR_FORWARD] = ((float) kd_cw)/PID_SCALING;
+    pid->deadzone[MOTOR_FORWARD] = dz_cw;
+
+    //TM_USB_VCP_Putc(CMD_EXECUTE_OK);
+    return 0;
+}
+
+int cmd_set_pid_constant_backward(command *cmd) {
+    short motor = cmd->payload[0];
+
+    short kp_cw = cmd->payload[1];
+    short ki_cw = cmd->payload[2];
+    short kd_cw = cmd->payload[3];
+    short dz_cw = cmd->payload[4];
+
+    PIDData* pid = &PID_data[motor];
+    pid->kp[MOTOR_BACKWARD] = ((float) kp_cw)/PID_SCALING;
+    pid->ki[MOTOR_BACKWARD] = ((float) ki_cw)/PID_SCALING;
+    pid->kd[MOTOR_BACKWARD] = ((float) kd_cw)/PID_SCALING;
+    pid->deadzone[MOTOR_BACKWARD] = dz_cw;
 
     //TM_USB_VCP_Putc(CMD_EXECUTE_OK);
     return 0;
@@ -380,8 +386,11 @@ int command_execute(command *cmd) {
         case (uint8_t) LED_CMD:
             cmd_led(cmd);
             break;
-        case (uint8_t) SET_PID_CONSTANT:
-            cmd_set_pid_constant(cmd);
+        case (uint8_t) SET_PID_CONSTANT_FORWARD:
+            cmd_set_pid_constant_forward(cmd);
+            break;
+        case (uint8_t) SET_PID_CONSTANT_BACKWARD:
+            cmd_set_pid_constant_backward(cmd);
             break;
         case (uint8_t) MANUAL_SPEED_CMD:
             cmd_manual_speed(cmd);
