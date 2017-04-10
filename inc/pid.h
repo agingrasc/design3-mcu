@@ -10,14 +10,15 @@
 //doc: http://brettbeauregard.com/blog/2011/04/improving-the-beginners-pid-introduction/
 
 typedef struct PIDData {
-    float kp;
-    float ki;
-    float kd;
-    short deadzone;
+    float kp[2];
+    float ki[2];
+    float kd[2];
+    short deadzone[2];
     short previous_input;
     float last_command;
     float accumulator;
     uint32_t last_timestamp;
+    uint8_t real_direction;
 } PIDData;
 
 PIDData PID_data[MOTOR_COUNT];

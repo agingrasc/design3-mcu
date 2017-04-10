@@ -13,6 +13,7 @@ JACOBIAN_MATRIX = np.array([[0, 1, 120],
                             [0, -1, 120],
                             [1, 0, 120]])
 
+export_speeds = [0, 0, 0, 0]
 
 class PayloadLength(Enum):
     MOVE = 8
@@ -29,13 +30,17 @@ class PayloadLength(Enum):
     DECODE_MANCHESTER = 4
     GET_MANCHESTER_CODE_POWER = 2
     GET_MOTOR_ROTATION_DIRECTION = 2
+    RESET_TRAVELED_DISTANCE = 0
+    GET_TRAVELED_DISTANCE = 0
+    RESET_STATE = 0
 
 class CommandType(Enum):
     MOVE = 0x00
     CAMERA = 0x01
     PENCIL = 0x02
     LED = 0x03
-    SET_PID_CONSTANTS = 0x04
+    SET_PID_CONSTANTS_FORWARD = 0x04
+    SET_PID_CONSTANTS_BACKWARD = 0x06
     MANUAL_SPEED = 0xa0
     READ_ENCODER = 0xa1
     TOGGLE_PID = 0xa2
@@ -45,6 +50,9 @@ class CommandType(Enum):
     DECODE_MANCHESTER = 0xb1
     GET_MANCHESTER_CODE_POWER = 0xb2
     GET_MOTOR_ROTATION_DIRECTION = 0xb3
+    RESET_STATE = 0x05
+    RESET_TRAVELED_DISTANCE = 0xb4
+    GET_TRAVELED_DISTANCE = 0xb5
 
 
 class Leds(Enum):
@@ -100,6 +108,8 @@ class ManchesterScale(Enum):
 
 def generate_move_command(x, y, theta) -> bytes:
     speeds = compute_wheels_speed(x, y, theta)
+    global export_speeds
+    export_speeds = speeds
     header = _generate_header(CommandType.MOVE, PayloadLength.MOVE)
     payload = _generate_payload(speeds)
     return header + payload
@@ -178,6 +188,41 @@ def generate_decode_manchester():
     payload = _generate_payload([0])
     return header + payload
 
+
+def generate_reset_traveled_distance_command():
+    """
+    Genere une commande qui demande de reinitialiser l'intégration de la vitesse au MCU
+    Return:
+        :cmd bytes: La commande serialise
+    """
+
+    header = _generate_header(CommandType.RESET_TRAVELED_DISTANCE, PayloadLength.RESET_TRAVELED_DISTANCE)
+    payload = _generate_payload([0])
+    return header + payload
+
+def generate_get_traveled_distance_command():
+    """
+    Genere une commande qui demande au MCU la distance parcourue pour en X et en Y depuis la dernière réinitialisation
+    Return:
+        :cmd bytes: La commande serialise
+    """
+
+    header = _generate_header(CommandType.GET_TRAVELED_DISTANCE, PayloadLength.GET_TRAVELED_DISTANCE)
+    payload = _generate_payload([0])
+    return header + payload
+
+def generate_reset_state_command():
+    """
+    Genere une commande qui demande au MCU de réinitialiser l'état des périphériques afin de débuter une nouvelle ronde de jeu
+    Return:
+        :cmd bytes: La commande serialise
+    """
+
+    header = _generate_header(CommandType.RESET_STATE, PayloadLength.RESET_STATE)
+    payload = _generate_payload([0])
+    return header + payload
+
+
 def generate_read_encoder(motor: Motors):
     """
     Genere une commande qui effectue une lecture d'un encodeur.
@@ -197,16 +242,35 @@ def generate_set_pid_mode(mode: PIDStatus):
     return header + payload
 
 
-def generate_set_pid_constant(motor: Motors, ki: float, kp: float, kd: float, dz: int):
+def generate_set_pid_constant_forward(motor: Motors, ki_cw: float, kp_cw: float, kd_cw: float, dz_cw: int):
     """"
     Args:
+        :motor: motor identifier
+        :direction: direction identifier
         :ki: gain integral
         :kp: gain proportionnel
         :kd: gain differentiel
         :dz: deadzone
     """
-    header = _generate_header(CommandType.SET_PID_CONSTANTS, PayloadLength.SET_PID_CONSTANTS)
-    payload = _generate_payload([motor.value] + [int(ki*PID_SCALING), int(kp*PID_SCALING), int(kd*PID_SCALING)] + [dz])
+
+    header = _generate_header(CommandType.SET_PID_CONSTANTS_FORWARD, PayloadLength.SET_PID_CONSTANTS)
+    payload = _generate_payload([motor.value] + [int(ki_cw*PID_SCALING), int(kp_cw*PID_SCALING), int(kd_cw*PID_SCALING)] + [dz_cw])
+    return header + payload
+
+
+def generate_set_pid_constant_backward(motor: Motors, ki_cw: float, kp_cw: float, kd_cw: float, dz_cw: int):
+    """"
+    Args:
+        :motor: motor identifier
+        :direction: direction identifier
+        :ki: gain integral
+        :kp: gain proportionnel
+        :kd: gain differentiel
+        :dz: deadzone
+    """
+
+    header = _generate_header(CommandType.SET_PID_CONSTANTS_BACKWARD, PayloadLength.SET_PID_CONSTANTS)
+    payload = _generate_payload([motor.value] + [int(ki_cw*PID_SCALING), int(kp_cw*PID_SCALING), int(kd_cw*PID_SCALING)] + [dz_cw])
     return header + payload
 
 

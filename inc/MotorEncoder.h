@@ -71,13 +71,15 @@
 #define MILLI_PER_MN    60000
 #define WHEEL_RADIUS    35    // mm
 
+#define M_PI            3.14
+
 // Functions
 
 void MotorEncodersInit(void);
-
 void MotorEncodersReset(void);
-
 void MotorEncodersRead(void);
+
+void reset_traveled_distance();
 
 #define _MOTOR_ENCODER_H_
 #endif

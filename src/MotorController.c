@@ -36,14 +36,14 @@ void _motor_setup_pwm_timer(void) {
     GPIO_InitTypeDef init_gpio_struct;
 
     // Enable motor pin controls
-    motor_set_pin_1_direction(MOTOR_A, MCD_A_PIN1_PORT, MCD_A_PIN1_CLK_PORT, MCD_A_PIN1);
-    motor_set_pin_2_direction(MOTOR_A, MCD_A_PIN2_PORT, MCD_A_PIN2_CLK_PORT, MCD_A_PIN2);
-    motor_set_pin_1_direction(MOTOR_B, MCD_B_PIN1_PORT, MCD_B_PIN1_CLK_PORT, MCD_B_PIN1);
-    motor_set_pin_2_direction(MOTOR_B, MCD_B_PIN2_PORT, MCD_B_PIN2_CLK_PORT, MCD_B_PIN2);
-    motor_set_pin_1_direction(MOTOR_C, MCD_C_PIN1_PORT, MCD_C_PIN1_CLK_PORT, MCD_C_PIN1);
-    motor_set_pin_2_direction(MOTOR_C, MCD_C_PIN2_PORT, MCD_C_PIN2_CLK_PORT, MCD_C_PIN2);
-    motor_set_pin_1_direction(MOTOR_D, MCD_D_PIN1_PORT, MCD_D_PIN1_CLK_PORT, MCD_D_PIN1);
-    motor_set_pin_2_direction(MOTOR_D, MCD_D_PIN2_PORT, MCD_D_PIN2_CLK_PORT, MCD_D_PIN2);
+    motor_set_pin_1_direction(MOTOR_REAR_X, MCD_A_PIN1_PORT, MCD_A_PIN1_CLK_PORT, MCD_A_PIN1);
+    motor_set_pin_2_direction(MOTOR_REAR_X, MCD_A_PIN2_PORT, MCD_A_PIN2_CLK_PORT, MCD_A_PIN2);
+    motor_set_pin_1_direction(MOTOR_FRONT_Y, MCD_B_PIN1_PORT, MCD_B_PIN1_CLK_PORT, MCD_B_PIN1);
+    motor_set_pin_2_direction(MOTOR_FRONT_Y, MCD_B_PIN2_PORT, MCD_B_PIN2_CLK_PORT, MCD_B_PIN2);
+    motor_set_pin_1_direction(MOTOR_FRONT_X, MCD_C_PIN1_PORT, MCD_C_PIN1_CLK_PORT, MCD_C_PIN1);
+    motor_set_pin_2_direction(MOTOR_FRONT_X, MCD_C_PIN2_PORT, MCD_C_PIN2_CLK_PORT, MCD_C_PIN2);
+    motor_set_pin_1_direction(MOTOR_REAR_Y, MCD_D_PIN1_PORT, MCD_D_PIN1_CLK_PORT, MCD_D_PIN1);
+    motor_set_pin_2_direction(MOTOR_REAR_Y, MCD_D_PIN2_PORT, MCD_D_PIN2_CLK_PORT, MCD_D_PIN2);
 
     // PWM setup
     RCC_AHB1PeriphClockCmd(MCS_PIN_CLK, ENABLE);

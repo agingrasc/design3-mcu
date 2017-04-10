@@ -193,3 +193,10 @@ void lcd_update_display(ManchesterInfo *infos) {
         lcd_putc(scale[i]);
     }
 }
+
+void lcd_clear() {
+    lcd_clear_row(0);
+    lcd_clear_row(1);
+
+    lcd_set_cursor(1, 0);
+}

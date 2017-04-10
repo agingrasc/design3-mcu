@@ -2,6 +2,29 @@
 
 #include "MotorEncoder.h"
 
+void update_traveled_distance(int motor_id, int32_t motor_speed, float time_delta) {
+    // Set appropriate sign of speed depending on the motor direction
+    int32_t sign = 1;
+
+    if (motors[motor_id].motor_direction == MOTOR_BACKWARD)
+        sign = -1;
+
+    // Convert tick/s to mm/s, then compute traveled distance in time_delta
+    float metric_speed = (sign*motor_speed*219.91148575f)/TICK_PER_ROT;
+
+    // Compute traveled distance in time_delta
+    float traveled_distance = metric_speed * (time_delta);
+
+    // Update overall traveled distance
+    motors[motor_id].traveled_distance += traveled_distance;
+}
+
+void reset_traveled_distance() {
+    for (int i = 0; i < MOTOR_COUNT; i++) {
+        motors[i].traveled_distance = 0;
+    }
+}
+
 void MotorEncodersInit() {
     GPIO_InitTypeDef GPIO_InitStructure;
 
@@ -117,11 +140,13 @@ void MotorEncodersInit() {
 
     // Reset variables
     for (int i = 0; i < MOTOR_COUNT; i++) {
+        motors[i].motor_direction = MOTOR_BREAK;
         motors[i].motor_speed = 0;
-        motors[i].old_timestamp = 0;
+        motors[i].last_timestamp = 0;
         // Set current count to half the autoreload value.
         motors[i].encoder_cnt = TIMER_INIT_VAL;
         motors[i].old_encoder_cnt = TIMER_INIT_VAL;
+        motors[i].traveled_distance = 0;
         TIM_SetCounter(motors[i].ENCx, TIMER_INIT_VAL);
     }
 
@@ -156,11 +181,17 @@ void MotorEncodersRead() {
     }
 
     // RPM
-    //motors[i].motor_speed = ((last_tick_delta)*MILLI_PER_MN)/((tmp_timestamp-motors[i].old_timestamp)*TICK_PER_ROT);
+    //motors[i].motor_speed = ((last_tick_delta)*MILLI_PER_MN)/((tmp_timestamp-motors[i].last_timestamp)*TICK_PER_ROT);
     // Tick/sec
-    motors[i].motor_speed = (last_tick_delta * 1000) / (tmp_timestamp - motors[i].old_timestamp);
 
-    motors[i].old_timestamp = tmp_timestamp;
+    uint32_t time_delta = (tmp_timestamp - motors[i].last_timestamp);
+
+    motors[i].motor_speed = (last_tick_delta * 1000) / time_delta;
+
+    motors[i].last_timestamp = tmp_timestamp;
+
+    // Update overall traveled distance by motor
+    update_traveled_distance(i, motors[i].motor_speed, time_delta*0.001f);
 
 #ifdef ID_MODE
     collectIdResponse(motors[i].motor_speed);
